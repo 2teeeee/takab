@@ -59,20 +59,40 @@
         </div>
     </div>
 
-    <div class="mb-3" id="product">
+    <div class="py-3 bg-product-gray" id="product">
         <h3 class="text-center">محصولات تک آب</h3>
         <div class="row justify-content-center mx-0">
             <div class="col-md-10">
                 <div class="row row-cols-2 row-cols-md-3 row-cols-lg-4 row-cols-xl-5 g-4">
                     @foreach($products as $product)
-                        <div class="col">
-                            <div class="card h-100">
-                                <img src="{{asset("img/product/".$product->image)}}" class="card-img-top" alt="{{$product->title}}">
-                                <div class="card-body">
-                                    <h5 class="card-title text-center">{{$product->title}}</h5>
+                        <a href="{{route('product.view', ['id' => $product->id, 'slug' => $product->slug])}}" class="col text-decoration-none">
+                            <div class="card h-100 card-product">
+                                @if($product->main_price != $product->sell_price)
+                                    <div class="bg-danger p-1 rounded-2 position-absolute text-white text-small ltr" style="top:5px; left:5px;">
+                                        {{ 100 - round($product->sell_price * 100 / $product->main_price) }}%
+                                    </div>
+                                @endif
+                                <img src="{{asset("img/product/".$product->image_name)}}" class="card-img-top" alt="{{$product->title}}">
+                                <div class="card-body pb-1">
+                                    <div class="fw-bold card-title text-center">{{$product->title}}</div>
+                                </div>
+                                <div class="card-footer">
+                                    <div class="row text-center">
+                                        <div class="col px-1 text-small @if($product->main_price != $product->sell_price) border-end @endif">
+                                            @if($product->main_price != $product->sell_price)
+                                                <span class="text-danger text-decoration-line-through">
+                                                    {{ number_format($product->main_price) }}
+                                                </span>
+                                                <span class="text-danger text-xsmall">تومان</span>
+                                            @endif
+                                        </div>
+                                        <div class="col px-1 text-small">
+                                            {{ number_format($product->sell_price) }} <span class="text-xsmall">تومان</span>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
-                        </div>
+                        </a>
                     @endforeach
                 </div>
             </div>

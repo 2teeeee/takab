@@ -24,8 +24,11 @@ return new class extends Migration
             $table->string('title');
             $table->text('small_text')->nullable();
             $table->longText('large_text')->nullable();
+            $table->string('slug')->nullable();
             $table->text('keywords')->nullable();
             $table->text('description')->nullable();
+            $table->decimal('main_price')->nullable();
+            $table->decimal('sell_price')->nullable();
             $table->foreignId('category_id')->nullable()->index();
             $table->timestamps();
         });

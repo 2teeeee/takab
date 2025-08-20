@@ -4,3 +4,12 @@
 
 .bg-main-light { background-color: #cfe2ff; }
 .bg-footer { background-color: #052c65; }
+.bg-product-gray { background-color: #e9ecef; }
+.bg-product-detail { background-color: #ebf2ff; }
+
+.card-product {
+    border-bottom-width: 2px;
+}
+.card-product:hover {
+    border-bottom-color: #0dcaf0;
+}

@@ -6,6 +6,10 @@ use Illuminate\Support\Facades\Route;
 
 Route::get('/',  [MainController::class, 'index'])->name('main.index');
 
+Route::prefix('product')->group(function () {
+    Route::get('/{id}/{slug}', [\App\Http\Controllers\ProductController::class, 'view'])->name('product.view');
+});
+
 Route::get('/dashboard', function () {
     return view('dashboard');
 })->middleware(['auth', 'verified'])->name('dashboard');

@@ -20,7 +20,7 @@
     </head>
     <body>
     <div class="header">
-        <nav class="navbar navbar-expand-lg bg-body-tertiary">
+        <nav class="navbar navbar-expand-lg pb-0 bg-body-tertiary">
             <div class="container-fluid">
                 <a class="navbar-brand" href="#">
                     <img src="{{asset("img/logo.png")}}" alt="takab logo" width="100">
