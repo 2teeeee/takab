@@ -5,7 +5,9 @@
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <meta name="csrf-token" content="{{ csrf_token() }}">
 
-        <title>تک آب صنعت آریا</title>
+        <title>@yield('title', 'تک آب صنعت آریا')</title>
+        <meta name="description" content="@yield('description', 'شرکت تک آب صنعت آریا تولید کننده دستگاه های تصویه آب و تانکرهای ذخیره سازی آب')">
+        <meta name="keywords" content="@yield('keywords', 'تک آب, صنعت آریا, تصویه آب, تانکر, مخزن آب')">
 
         <link rel="stylesheet" href="{{asset("fonts/fontstyle.css")}}">
         <link rel="stylesheet" href="{{asset("bootstrap/dist/css/bootstrap.rtl.css")}}">
