@@ -24,7 +24,7 @@
     <div class="header">
         <nav class="navbar navbar-expand-lg pb-0 bg-body-tertiary">
             <div class="container-fluid">
-                <a class="navbar-brand" href="#">
+                <a class="navbar-brand" href="{{route('main.index')}}">
                     <img src="{{asset("img/logo.png")}}" alt="takab logo" width="100">
                 </a>
                 <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
@@ -33,13 +33,13 @@
                 <div class="collapse navbar-collapse" id="navbarSupportedContent">
                     <ul class="navbar-nav me-auto mb-2 ms-3 mb-lg-0">
                         <li class="nav-item px-2">
-                            <a class="nav-link active" aria-current="page" href="#home">خانه</a>
+                            <a class="nav-link active" aria-current="page" href="{{route('main.index')}}#home">خانه</a>
                         </li>
                         <li class="nav-item px-2 border-start">
-                            <a class="nav-link" href="#product">محصولات</a>
+                            <a class="nav-link" href="{{route('main.index')}}#product">محصولات</a>
                         </li>
                         <li class="nav-item px-2 border-start">
-                            <a class="nav-link" href="#about">درباره ما</a>
+                            <a class="nav-link" href="{{route('main.index')}}#about">درباره ما</a>
                         </li>
                         <li class="nav-item px-2 border-start">
                             <a class="nav-link" href="#contact">تماس با ما</a>
