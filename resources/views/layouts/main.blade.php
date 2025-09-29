@@ -5,9 +5,9 @@
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <meta name="csrf-token" content="{{ csrf_token() }}">
 
-        <title>@yield('title', 'تک آب صنعت آریا')</title>
-        <meta name="description" content="@yield('description', 'شرکت تک آب صنعت آریا تولید کننده دستگاه های تصویه آب و تانکرهای ذخیره سازی آب')">
-        <meta name="keywords" content="@yield('keywords', 'تک آب, صنعت آریا, تصویه آب, تانکر, مخزن آب')">
+        <title>@yield('title', 'تک آب صنعت ارم')</title>
+        <meta name="description" content="@yield('description', 'شرکت تک آب صنعت ارم تولید کننده دستگاه های تصویه آب و مخزنهای ذخیره سازی آب')">
+        <meta name="keywords" content="@yield('keywords', 'تک آب, صنعت ارم, تصویه آب, مخزن آب')">
 
         <link rel="stylesheet" href="{{asset("fonts/fontstyle.css")}}">
         <link rel="stylesheet" href="{{asset("bootstrap/dist/css/bootstrap.rtl.css")}}">
@@ -57,7 +57,7 @@
     <div class="footer bg-footer text-light pt-3">
         <div class="row mx-0">
             <div class="col-md-4 pt-2">
-                <p>                تک آب صنعت آریا، با سال‌ها تجربه در زمینه طراحی و تولید دستگاه‌های تصفیه آب و تانکرهای ذخیره آب، همراه مطمئن شما در تأمین آب سالم و باکیفیت است.
+                <p>                تک آب صنعت ارم، با سال‌ها تجربه در زمینه طراحی و تولید دستگاه‌های تصفیه آب و مخزن های ذخیره آب، همراه مطمئن شما در تأمین آب سالم و باکیفیت است.
                 </p>
                 <p>                ما با بهره‌گیری از دانش فنی روز و استفاده از بهترین متریال، محصولاتی بادوام و کارآمد ارائه می‌دهیم تا نیاز خانواده‌ها، صنایع و سازمان‌ها را به بهترین شکل برآورده کنیم.
                 </p>
@@ -67,9 +67,9 @@
                     ارتباط با ما
                 </div>
                 <div class="text-start">
-                    <div class="my-1"><i class="bi bi-geo-alt-fill"></i> آدرس: [اینجا آدرس شرکت شما درج می‌شود]</div>
-                    <div class="my-1"><i class="bi bi-telephone-fill"></i> تلفن تماس: [شماره تماس]</div>
-                    <div class="my-1"><i class="bi bi-envelope-fill"></i> ایمیل: [ایمیل شرکت]</div>
+                    <div class="my-1"><i class="bi bi-geo-alt-fill"></i> آدرس: شهرک صنعتی بزرگ شیراز, میدان سوم, کوشش شمالی, میدان ساعی, خیابان ساعی, خیابان پردازش,  خیابان ۸۰۷/۲, سوله پنجم سمت راست</div>
+                    <div class="my-1"><i class="bi bi-telephone-fill"></i> تلفن تماس: ۳۶-۰۷۱۳۷۷۳۴۸۳۴</div>
+                    <div class="my-1"><i class="bi bi-envelope-fill"></i> ایمیل: info@takab-sanat.ir</div>
                 </div>
             </div>
             <div class="col-md-4 py-2 text-center d-flex justify-content-center">
@@ -82,7 +82,7 @@
             </div>
         </div>
         <div class="bg-dark py-2 mt-3" dir="ltr">
-            CopyRight 2025 <i class="bi bi-c-circle"></i> TakAb Sanat Arya
+            CopyRight 2025 <i class="bi bi-c-circle"></i> TakAb Sanat Eram
         </div>
     </div>
     <div class="min-h-screen bg-gray-100">

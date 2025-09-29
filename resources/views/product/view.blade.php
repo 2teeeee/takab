@@ -1,5 +1,5 @@
 <x-main-layout>
-    @section('title', 'تک آب صنعت آریا | '.$product->title)
+    @section('title', 'تک آب صنعت ارم | '.$product->title)
     @section('description', $product->description)
     @section('keywords', $product->keywords)
 
