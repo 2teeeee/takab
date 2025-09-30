@@ -5,11 +5,11 @@
             <form method="POST" action="{{ route('login') }}">
                 @csrf
                 <div class="mb-3">
-                    <label for="mobile" class="form-label">{{ __('Mobile') }}</label>
+                    <label for="mobile" class="form-label">{{ __('mobile') }}</label>
                     <input type="text" class="form-control" id="mobile" name="mobile">
                 </div>
                 <div class="mb-3">
-                    <label for="password" class="form-label">{{ __('Password') }}</label>
+                    <label for="password" class="form-label">{{ __('password') }}</label>
                     <input type="password" class="form-control" id="password" name="password">
                 </div>
                 <div class="mb-3 form-check">
@@ -17,7 +17,7 @@
                     <label class="form-check-label" for="remember">{{ __('Remember me') }}</label>
                 </div>
                 <button type="submit" class="btn btn-primary">
-                    {{ __('Log in') }}</button>
+                    {{ __('login') }}</button>
             </form>
         </div>
 

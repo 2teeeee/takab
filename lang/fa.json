@@ -1,0 +1,10 @@
+{
+    "nsme": "نام",
+    "mobile": "موبایل",
+    "password": "کلمه عبور",
+    "confirmPassword": "تکرار کلمه عبور",
+    "Remember me": "من را به یاد بسپار",
+    "login": "ورود",
+    "register": "ثبت نام",
+    "logout": "خروج"
+}

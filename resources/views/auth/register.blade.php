@@ -4,23 +4,23 @@
             <form method="POST" action="{{ route('register') }}">
                 @csrf
                 <div class="mb-3">
-                    <label for="name" class="form-label">{{ __('Name') }}</label>
+                    <label for="name" class="form-label">{{ __('nsme') }}</label>
                     <input type="text" class="form-control" id="name" name="name">
                 </div>
                 <div class="mb-3">
-                    <label for="mobile" class="form-label">{{ __('Mobile') }}</label>
+                    <label for="mobile" class="form-label">{{ __('mobile') }}</label>
                     <input type="text" class="form-control" id="mobile" name="mobile">
                 </div>
                 <div class="mb-3">
-                    <label for="password" class="form-label">{{ __('Password') }}</label>
+                    <label for="password" class="form-label">{{ __('password') }}</label>
                     <input type="password" class="form-control" id="password" name="password">
                 </div>
                 <div class="mb-3">
-                    <label for="password_confirmation" class="form-label">{{ __('Confirm Password') }}</label>
+                    <label for="password_confirmation" class="form-label">{{ __('confirmPassword') }}</label>
                     <input type="password" class="form-control" id="password_confirmation" name="password_confirmation">
                 </div>
                 <button type="submit" class="btn btn-primary">
-                    {{ __('Register') }}</button>
+                    {{ __('register') }}</button>
             </form>
         </div>
 
