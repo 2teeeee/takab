@@ -44,6 +44,79 @@
                         <li class="nav-item px-2 border-start">
                             <a class="nav-link" href="#contact">تماس با ما</a>
                         </li>
+
+
+                    </ul>
+
+                    <form class="d-flex w-50 me-auto" role="search" >
+                        <input class="form-control rounded-end-0 shadow-none" type="text" placeholder="جستجوی محصول"  id="title">
+                        <button type="submit" class="btn btn-outline-dark rounded-start-0">
+                            <i class="bi bi-search"></i>
+                        </button>
+                    </form>
+                    <ul class="navbar-nav nav-left py-1">
+                        @if(!Auth::check())
+                        <li class="nav-item px-2 border-start">
+                            <a class="nav-link" href="{{route('register')}}">
+                                <i class="icon-user icon-size-2x mb-1"></i>
+                                ثبت نام
+                            </a>
+                        </li>
+                        <li class="nav-item px-2 border-start">
+                            <a class="nav-link" href="{{route('login')}}">
+                                <i class="icon-user icon-size-2x mb-1"></i>
+                                ورود
+                            </a>
+                        </li>
+
+                        @else
+                        <li class="nav-item px-3 border-left-light-gray dropdown">
+                            <button type="button"
+                                    class="border-0 d-grid bg-transparent shadow-none text-sm text-darkgray nav-link py-0"
+                                    data-bs-toggle="dropdown" aria-expanded="false">
+                                <i class="icon-user icon-size-2x mb-1"></i>
+                                <span class="dropdown-toggle">
+                  {{ Auth::name() }}
+                </span>
+                            </button>
+                            <ul class="dropdown-menu text-sm pb-1">
+                                <li>
+                                    <a class="text-dark px-2 pb-1 align-self-center d-flex" href="/">
+                                        <i class="bi bi-house icon-size-1x me-2"></i>
+                                        <span>پروفایل</span>
+                                    </a>
+                                </li>
+                                <li>
+                                    <a class="text-dark px-2 pb-1 align-self-center d-flex" href="/">
+                                        <i class="bi bi-bag-check icon-size-1x me-2"></i>
+                                        <span>سفارش ها</span>
+                                    </a>
+                                </li>
+                                <li><hr class="dropdown-divider my-1"></li>
+                                <li>
+                                    <form method="POST" action="{{ route('logout') }}">
+                                        @csrf
+
+                                        <x-dropdown-link :href="route('logout')"
+                                                         onclick="event.preventDefault();
+                                                this.closest('form').submit();">
+                                            {{ __('Log Out') }}
+                                        </x-dropdown-link>
+                                    </form>
+                                </li>
+                            </ul>
+                        </li>
+
+                        @endif
+                        <li class="nav-item px-3 position-relative">
+                            <span class="position-absolute top-0 end-0 me-2 badge rounded-pill bg-danger">
+                                0
+                            </span>
+                            <button type="button" class="border-0 d-grid bg-transparent shadow-none text-sm text-darkgray">
+                                <i class="icon-shopping-bag icon-size-2x mb-1"></i>
+                                {{ __('basket') }}
+                            </button>
+                        </li>
                     </ul>
                 </div>
             </div>
