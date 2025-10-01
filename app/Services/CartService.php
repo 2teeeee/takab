@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Enums\StatusCarts;
 use App\Models\Cart;
 use Illuminate\Support\Facades\Auth;
 
@@ -19,7 +20,7 @@ class CartService
             $cart = Cart::create([
                 'user_id' => Auth::id(),
                 'session_id' => session()->getId(),
-                'status' => 'active',
+                'status' => StatusCarts::Active,
             ]);
         }
 
@@ -34,15 +35,22 @@ class CartService
 
         if ($item) {
             $item->quantity += $quantity;
-            $item->total = $item->quantity * $item->price;
-            $item->save();
+
+            if ($item->quantity <= 0) {
+                $item->delete();
+            } else {
+                $item->total = $item->quantity * $item->price;
+                $item->save();
+            }
         } else {
-            $cart->items()->create([
-                'product_id' => $product->id,
-                'quantity' => $quantity,
-                'price' => $product->price,
-                'total' => $quantity * $product->price,
-            ]);
+            if ($quantity > 0) {
+                $cart->items()->create([
+                    'product_id' => $product->id,
+                    'quantity' => $quantity,
+                    'price' => $product->sell_price,
+                    'total' => $quantity * $product->sell_price,
+                ]);
+            }
         }
 
         return $cart->refresh();

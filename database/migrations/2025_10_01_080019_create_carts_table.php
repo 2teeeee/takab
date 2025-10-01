@@ -13,7 +13,7 @@ return new class extends Migration
             $table->id();
             $table->unsignedBigInteger('user_id')->nullable();
             $table->string('session_id',64)->nullable();
-            $table->enum('status', StatusCarts::cases());
+            $table->tinyInteger('status');
             $table->timestamps();
 
             $table->foreign('user_id')->references('id')->on('users');

@@ -32,8 +32,20 @@
                             <div class="py-2">
                                 {{ number_format($product->sell_price) }} <span class="text-small">تومان</span>
                             </div>
-                            <div class="btn btn-outline-success mt-3">
-                                برای ثبت سفارش تماس بگیرید.
+                            <div class="mt-3">
+                                <div id="cart-actions">
+                                    @if($quantity > 0)
+                                        <div class="d-flex justify-content-center align-items-center">
+                                            <button class="btn btn-sm btn-outline-danger me-2" onclick="updateCart({{ $product->id }}, -1)">-</button>
+                                            <span id="quantity">{{ $quantity }}</span>
+                                            <button class="btn btn-sm btn-outline-success ms-2" onclick="updateCart({{ $product->id }}, 1)">+</button>
+                                        </div>
+                                    @else
+                                        <button class="btn btn-outline-success" onclick="updateCart({{ $product->id }}, 1)">
+                                            افزودن به سبد
+                                        </button>
+                                    @endif
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -45,4 +57,39 @@
             </div>
         </div>
     </div>
+
+    <script>
+        function updateCart(productId, change) {
+            fetch(`/cart/add/${productId}`, {
+                method: "POST",
+                headers: {
+                    "X-CSRF-TOKEN": "{{ csrf_token() }}",
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify({ quantity: change })
+            })
+                .then(res => res.json())
+                .then(data => {
+                    let item = data.items.find(i => i.product_id === productId);
+                    let cartActions = document.getElementById('cart-actions');
+
+                    if (item) {
+                        cartActions.innerHTML = `
+                <div class="d-flex justify-content-center align-items-center">
+                    <button class="btn btn-sm btn-outline-danger me-2" onclick="updateCart(${productId}, -1)">-</button>
+                    <span id="quantity">${item.quantity}</span>
+                    <button class="btn btn-sm btn-outline-success ms-2" onclick="updateCart(${productId}, 1)">+</button>
+                </div>`;
+                    } else {
+                        cartActions.innerHTML = `
+                <button class="btn btn-outline-success" onclick="updateCart(${productId}, 1)">
+                    افزودن به سبد
+                </button>`;
+                    }
+                })
+                .catch(err => console.error(err));
+        }
+    </script>
+
 </x-main-layout>
+

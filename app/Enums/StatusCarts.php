@@ -3,7 +3,7 @@ namespace App\Enums;
 
 enum StatusCarts: int
 {
-    case active = 0;
-    case completed = 1;
-    case canceled = 2;
+    case Active = 0;
+    case Completed = 1;
+    case Canceled = 2;
 }
