@@ -19,6 +19,20 @@
         <script src="{{asset("bootstrap/dist/js/bootstrap.js")}}"></script>
 
         @vite(['resources/js/app.js'])
+
+        <script>
+            document.addEventListener("DOMContentLoaded", () => {
+                fetch(`/cart`)
+                    .then(res => res.json())
+                    .then(data => {
+                        document.getElementById('cart-badge').innerText = data.totalQuantity;
+                    });
+            });
+
+            function updateCartBadge(totalQuantity) {
+                document.getElementById('cart-badge').innerText = totalQuantity;
+            }
+        </script>
     </head>
     <body>
     <div class="header">
@@ -109,14 +123,16 @@
 
                         @endif
                         <li class="nav-item px-3 position-relative">
-                            <span class="position-absolute top-0 end-0 me-2 badge rounded-pill bg-danger">
-                                0
-                            </span>
-                            <button type="button" class="border-0 d-grid bg-transparent shadow-none text-sm text-darkgray">
+                            <a href="/cart" class="position-relative">
                                 <i class="icon-shopping-bag icon-size-2x mb-1"></i>
                                 {{ __('basket') }}
-                            </button>
+                                <span id="cart-badge"
+                                      class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
+                                    0
+                                </span>
+                            </a>
                         </li>
+
                     </ul>
                 </div>
             </div>

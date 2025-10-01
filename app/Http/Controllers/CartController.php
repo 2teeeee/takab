@@ -19,13 +19,22 @@ class CartController extends Controller
     public function index(): JsonResponse
     {
         $cart = $this->cartService->getCart();
-        return response()->json($cart->load('items'));
+        $cart->load('items');
+
+        return response()->json([
+            'items' => $cart->items,
+            'totalQuantity' => $cart->items->count(),
+        ]);
     }
 
     public function add(Request $request, Product $product): JsonResponse
     {
         $cart = $this->cartService->addProduct($product, $request->input('quantity', 1));
-        return response()->json($cart->load('items'));
+
+        return response()->json([
+            'items' => $cart->items,
+            'totalQuantity' => $cart->items->count(),
+        ]);
     }
 
     public function remove(Product $product): JsonResponse

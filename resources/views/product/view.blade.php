@@ -75,17 +75,19 @@
 
                     if (item) {
                         cartActions.innerHTML = `
-                <div class="d-flex justify-content-center align-items-center">
-                    <button class="btn btn-sm btn-outline-danger me-2" onclick="updateCart(${productId}, -1)">-</button>
-                    <span id="quantity">${item.quantity}</span>
-                    <button class="btn btn-sm btn-outline-success ms-2" onclick="updateCart(${productId}, 1)">+</button>
-                </div>`;
+                        <div class="d-flex justify-content-center align-items-center">
+                            <button class="btn btn-sm btn-outline-danger me-2" onclick="updateCart(${productId}, -1)">-</button>
+                            <span id="quantity">${item.quantity}</span>
+                            <button class="btn btn-sm btn-outline-success ms-2" onclick="updateCart(${productId}, 1)">+</button>
+                        </div>`;
                     } else {
                         cartActions.innerHTML = `
-                <button class="btn btn-outline-success" onclick="updateCart(${productId}, 1)">
-                    افزودن به سبد
-                </button>`;
+                        <button class="btn btn-outline-success" onclick="updateCart(${productId}, 1)">
+                            افزودن به سبد
+                        </button>`;
                     }
+                    
+                    updateCartBadge(data.totalQuantity);
                 })
                 .catch(err => console.error(err));
         }
