@@ -19,8 +19,11 @@ Route::get('/dashboard', function () {
 
 Route::prefix('cart')->group(function () {
     Route::get('/', [CartController::class, 'index'])->name('cart.index');
+    Route::get('/items', [CartController::class, 'show'])->name('cart.show');
+    Route::post('/increase/{product}', [CartController::class, 'increase'])->name('cart.increase');
+    Route::post('/decrease/{product}', [CartController::class, 'decrease'])->name('cart.decrease');
     Route::post('/add/{product}', [CartController::class, 'add'])->name('cart.add');
-    Route::delete('/remove/{product}', [CartController::class, 'remove'])->name('cart.remove');
+    Route::post('/remove/{product}', [CartController::class, 'remove'])->name('cart.remove');
     Route::delete('/clear', [CartController::class, 'clear'])->name('cart.clear');
 });
 

@@ -123,7 +123,7 @@
 
                         @endif
                         <li class="nav-item px-3 position-relative">
-                            <a href="/cart" class="position-relative">
+                            <a href="{{route('cart.show')}}" class="position-relative">
                                 <i class="icon-shopping-bag icon-size-2x mb-1"></i>
                                 {{ __('basket') }}
                                 <span id="cart-badge"
