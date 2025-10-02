@@ -90,7 +90,7 @@
                                     data-bs-toggle="dropdown" aria-expanded="false">
                                 <i class="icon-user icon-size-2x mb-1"></i>
                                 <span class="dropdown-toggle">
-                  {{ Auth::name() }}
+                  {{ Auth::user()->name }}
                 </span>
                             </button>
                             <ul class="dropdown-menu text-sm pb-1">
@@ -114,7 +114,7 @@
                                         <x-dropdown-link :href="route('logout')"
                                                          onclick="event.preventDefault();
                                                 this.closest('form').submit();">
-                                            {{ __('Log Out') }}
+                                            {{ __('logout') }}
                                         </x-dropdown-link>
                                     </form>
                                 </li>

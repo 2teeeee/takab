@@ -51,7 +51,7 @@
                     جمع کل:
                     <span id="cart-total">{{ number_format($cart->items->sum('total')) }} تومان</span>
                 </h5>
-                <a href="" class="btn btn-success mt-3">
+                <a href="{{route('cart.address')}}" class="btn btn-success mt-3">
                     ادامه به تسویه حساب
                 </a>
             </div>

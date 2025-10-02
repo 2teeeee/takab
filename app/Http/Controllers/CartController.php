@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Order;
 use App\Models\Product;
 use App\Services\CartService;
 use Illuminate\Contracts\View\View;
@@ -109,5 +110,43 @@ class CartController extends Controller
     {
         $this->cartService->clear();
         return response()->json(['message' => 'Cleared']);
+    }
+
+    public function address(): View
+    {
+        return view('cart.address');
+    }
+
+    public function pay(Request $request): RedirectResponse
+    {
+        $request->validate([
+            'address' => 'required|string|min:10',
+        ]);
+
+        $cart = $this->cartService->getCart();
+
+        $order = Order::create([
+            'user_id' => auth()->id(),
+            'address' => $request->address,
+            'status' => 'pending',
+            'total' => $cart->items->sum('total'),
+        ]);
+
+        foreach ($cart->items as $item) {
+            $order->items()->create([
+                'product_id' => $item->product_id,
+                'quantity'   => $item->quantity,
+                'price'      => $item->price,
+                'total'      => $item->total,
+            ]);
+        }
+
+        return redirect()->away('https://sandbox.bank.com/start-payment?amount=' . $order->total);
+    }
+
+    private function calculateCartTotal(): int
+    {
+        $cart = app(CartService::class)->getCart();
+        return $cart->items->sum('total');
     }
 }
