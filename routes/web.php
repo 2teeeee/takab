@@ -26,12 +26,11 @@ Route::prefix('cart')->group(function () {
     Route::post('/add/{product}', [CartController::class, 'add'])->name('cart.add');
     Route::post('/remove/{product}', [CartController::class, 'remove'])->name('cart.remove');
     Route::delete('/clear', [CartController::class, 'clear'])->name('cart.clear');
-    Route::get('/address', [CartController::class, 'address'])
-        ->middleware('auth')
-        ->name('cart.address');
-    Route::post('/pay', [CartController::class, 'pay'])
-        ->middleware('auth')
-        ->name('cart.pay');
+
+    Route::middleware('auth')->group(function () {
+        Route::get('/address', [CartController::class, 'address'])->name('cart.address');
+        Route::post('/pay', [CartController::class, 'pay'])->name('cart.pay');
+    });
 });
 
 Route::get('/register', [AuthController::class, 'create'])->name('register');

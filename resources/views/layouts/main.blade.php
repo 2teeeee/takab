@@ -70,39 +70,40 @@
                     </form>
                     <ul class="navbar-nav nav-left py-1">
                         @if(!Auth::check())
-                        <li class="nav-item px-2 border-start">
+                        <li class="nav-item px-2 border-start text-sm text-center d-block th-1">
                             <a class="nav-link" href="{{route('register')}}">
-                                <i class="icon-user icon-size-2x mb-1"></i>
-                                ثبت نام
+                                <i class="bi bi-person-add icon-size-2x"></i>
+                                <div>ثبت نام</div>
                             </a>
                         </li>
-                        <li class="nav-item px-2 border-start">
+                        <li class="nav-item px-2 border-start text-sm text-center d-block th-1">
                             <a class="nav-link" href="{{route('login')}}">
-                                <i class="icon-user icon-size-2x mb-1"></i>
-                                ورود
+                                <i class="bi bi-box-arrow-in-left icon-size-2x"></i>
+                                <div>ورود</div>
                             </a>
                         </li>
 
                         @else
-                        <li class="nav-item px-3 border-left-light-gray dropdown">
+                        <li class="nav-item px-2 border-start text-sm text-center d-block th-1 border-left-light-gray dropdown">
                             <button type="button"
-                                    class="border-0 d-grid bg-transparent shadow-none text-sm text-darkgray nav-link py-0"
+                                    class="border-0 bg-transparent shadow-none text-sm text-darkgray nav-link"
                                     data-bs-toggle="dropdown" aria-expanded="false">
-                                <i class="icon-user icon-size-2x mb-1"></i>
-                                <span class="dropdown-toggle">
-                  {{ Auth::user()->name }}
-                </span>
+                                <i class="bi bi-person icon-size-2x"></i>
+                                <div>
+                                    <span class="dropdown-toggle">
+                                    {{ Auth::user()->name }}
+                                </div>
                             </button>
-                            <ul class="dropdown-menu text-sm pb-1">
+                            <ul class="dropdown-menu text-sm text-decoration-none pb-1">
                                 <li>
-                                    <a class="text-dark px-2 pb-1 align-self-center d-flex" href="/">
-                                        <i class="bi bi-house icon-size-1x me-2"></i>
+                                    <a class="text-dark text-decoration-none px-2 pb-1 align-self-center d-flex" href="/">
+                                        <i class="bi bi-house me-2"></i>
                                         <span>پروفایل</span>
                                     </a>
                                 </li>
                                 <li>
-                                    <a class="text-dark px-2 pb-1 align-self-center d-flex" href="/">
-                                        <i class="bi bi-bag-check icon-size-1x me-2"></i>
+                                    <a class="text-dark text-decoration-none px-2 pb-1 align-self-center d-flex" href="/">
+                                        <i class="bi bi-bag-check me-2"></i>
                                         <span>سفارش ها</span>
                                     </a>
                                 </li>
@@ -111,28 +112,28 @@
                                     <form method="POST" action="{{ route('logout') }}">
                                         @csrf
 
-                                        <x-dropdown-link :href="route('logout')"
+                                        <a href="{{route('logout')}}" class="text-dark text-decoration-none px-2 pb-1 align-self-center d-flex"
                                                          onclick="event.preventDefault();
                                                 this.closest('form').submit();">
-                                            {{ __('logout') }}
-                                        </x-dropdown-link>
+                                            <i class="bi bi-box-arrow-right me-2"></i>
+                                            <span>{{ __('logout') }}</span>
+                                        </a>
                                     </form>
                                 </li>
                             </ul>
                         </li>
 
                         @endif
-                        <li class="nav-item px-3 position-relative">
-                            <a href="{{route('cart.show')}}" class="position-relative">
-                                <i class="icon-shopping-bag icon-size-2x mb-1"></i>
-                                {{ __('basket') }}
+                        <li class="nav-item px-2 border-start text-sm text-center d-block th-1">
+                            <a href="{{route('cart.show')}}" class="position-relative nav-link">
                                 <span id="cart-badge"
                                       class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
                                     0
                                 </span>
+                                <i class="bi bi-cart icon-size-2x"></i>
+                                <div>{{ __('basket') }}</div>
                             </a>
                         </li>
-
                     </ul>
                 </div>
             </div>

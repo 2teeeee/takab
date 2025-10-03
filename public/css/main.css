@@ -11,9 +11,9 @@ body {
 .bg-product-gray { background-color: #e9ecef; }
 .bg-product-detail { background-color: #ebf2ff; }
 
-.card-product {
-    border-bottom-width: 2px;
-}
-.card-product:hover {
-    border-bottom-color: #0dcaf0;
-}
+.card-product { border-bottom-width: 2px; }
+.card-product:hover { border-bottom-color: #0dcaf0; }
+
+.icon-size-2x { font-size: 2rem; }
+
+.th-1{ line-height: 1rem; }
