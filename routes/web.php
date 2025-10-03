@@ -2,13 +2,15 @@
 
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\CartController;
-use App\Http\Controllers\CheckoutController;
 use App\Http\Controllers\MainController;
+use App\Http\Controllers\PageController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\ProfileController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/',  [MainController::class, 'index'])->name('main.index');
+Route::get('/about',  [PageController::class, 'about'])->name('page.about');
+Route::get('/contact',  [PageController::class, 'contact'])->name('page.contact');
 
 Route::prefix('product')->group(function () {
     Route::get('/{id}/{slug}', [ProductController::class, 'view'])->name('product.view');

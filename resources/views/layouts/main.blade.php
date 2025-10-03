@@ -53,13 +53,11 @@
                             <a class="nav-link" href="{{route('main.index')}}#product">محصولات</a>
                         </li>
                         <li class="nav-item px-2 border-start">
-                            <a class="nav-link" href="{{route('main.index')}}#about">درباره ما</a>
+                            <a class="nav-link" href="{{route('page.about')}}">درباره ما</a>
                         </li>
                         <li class="nav-item px-2 border-start">
-                            <a class="nav-link" href="#contact">تماس با ما</a>
+                            <a class="nav-link" href="{{route('page.contact')}}">تماس با ما</a>
                         </li>
-
-
                     </ul>
 
                     <form class="d-flex w-50 me-auto" role="search" >
