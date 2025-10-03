@@ -1,59 +1,94 @@
 <x-main-layout>
     @section('title', 'سبد خرید')
+    <div class="container py-4">
+        <!-- Progress Bar -->
+        <div class="mb-4">
+            <div class="progress" style="height: 20px;">
+                <div class="progress-bar bg-success" role="progressbar" style="width: 33%">
+                    <span class="fw-bold text-small">مرحله ۱ از ۳: سبد خرید</span>
+                </div>
+            </div>
+            <div class="d-flex justify-content-between mt-2 small text-muted">
+                <span>سبد خرید</span>
+                <span>آدرس</span>
+                <span>پرداخت</span>
+            </div>
+        </div>
 
-    <div class="container my-4">
         <h3 class="mb-4">سبد خرید شما</h3>
 
         @if($cart->items->count() > 0)
-            <form method="POST" action="{{ route('cart.clear') }}">
-                @csrf
-                @method('DELETE')
-                <button class="btn btn-sm btn-danger mb-3">خالی کردن سبد</button>
-            </form>
+            <div class="row">
+                <!-- سمت راست: لیست محصولات -->
+                <div class="col-lg-8 mb-4">
+                    <form method="POST" action="{{ route('cart.clear') }}" class="mb-3">
+                        @csrf
+                        @method('DELETE')
+                        <button class="btn btn-sm btn-danger">خالی کردن سبد</button>
+                    </form>
 
-            <table class="table table-bordered">
-                <thead>
-                <tr>
-                    <th>محصول</th>
-                    <th>قیمت</th>
-                    <th>تعداد</th>
-                    <th>جمع</th>
-                    <th>حذف</th>
-                </tr>
-                </thead>
-                <tbody>
-                @foreach($cart->items as $item)
-                    <tr id="row-{{$item->product->id}}">
-                        <td>{{ $item->product->title }}</td>
-                        <td>{{ number_format($item->price) }} تومان</td>
-                        <td>
-                            <div class="d-flex align-items-center">
-                                <button class="btn btn-sm btn-outline-secondary decrease-btn" data-id="{{ $item->product->id }}">-</button>
-                                <span class="mx-2 quantity-{{ $item->product->id }}">{{ $item->quantity }}</span>
-                                <button class="btn btn-sm btn-outline-secondary increase-btn" data-id="{{ $item->product->id }}">+</button>
-                            </div>
-                        </td>
-                        <td class="item-total-{{ $item->product->id }}">
-                            {{ number_format($item->total) }} تومان
-                        </td>
-                        <td>
-                            <button class="btn btn-sm btn-danger remove-btn" data-id="{{ $item->product->id }}">
-                                <i class="bi bi-trash"></i> حذف
-                            </button>
-                        </td>
-                    </tr>
-                @endforeach
-                </tbody>
-            </table>
+                    <div class="table-responsive">
+                        <table class="table table-bordered align-middle">
+                            <thead class="table-light">
+                            <tr>
+                                <th>محصول</th>
+                                <th>قیمت</th>
+                                <th>تعداد</th>
+                                <th>جمع</th>
+                                <th>حذف</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            @foreach($cart->items as $item)
+                                <tr id="row-{{$item->product->id}}">
+                                    <td>{{ $item->product->title }}</td>
+                                    <td>{{ number_format($item->price) }} تومان</td>
+                                    <td>
+                                        <div class="d-flex align-items-center">
+                                            <button class="btn btn-sm btn-outline-secondary decrease-btn"
+                                                    data-id="{{ $item->product->id }}">-</button>
+                                            <span class="mx-2 quantity-{{ $item->product->id }}">
+                                                {{ $item->quantity }}
+                                            </span>
+                                            <button class="btn btn-sm btn-outline-secondary increase-btn"
+                                                    data-id="{{ $item->product->id }}">+</button>
+                                        </div>
+                                    </td>
+                                    <td class="item-total-{{ $item->product->id }}">
+                                        {{ number_format($item->total) }} تومان
+                                    </td>
+                                    <td>
+                                        <button class="btn btn-sm btn-danger remove-btn"
+                                                data-id="{{ $item->product->id }}">
+                                            <i class="bi bi-trash"></i>
+                                        </button>
+                                    </td>
+                                </tr>
+                            @endforeach
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
 
-            <div class="text-end">
-                <h5>
-                    جمع کل:
-                    <span id="cart-total">{{ number_format($cart->items->sum('total')) }} تومان</span>
-                </h5>
-                <a href="{{route('cart.address')}}" class="btn btn-success mt-3">
-                    ادامه به تسویه حساب
-                </a>
+                <!-- سمت چپ: اطلاعات سبد -->
+                <div class="col-lg-4">
+                    <div class="card shadow-sm">
+                        <div class="card-body">
+                            <h5 class="card-title mb-3">خلاصه سفارش</h5>
+                            <p class="mb-2">
+                                جمع کل:
+                                <strong id="cart-total">{{ number_format($cart->items->sum('total')) }} تومان</strong>
+                            </p>
+                            <p class="mb-3">
+                                تعداد کالاها:
+                                <strong id="cart-count">{{ $cart->items->sum('quantity') }}</strong>
+                            </p>
+                            <a href="{{route('cart.address')}}" class="btn btn-success w-100">
+                                ادامه به تسویه حساب
+                            </a>
+                        </div>
+                    </div>
+                </div>
             </div>
         @else
             <div class="alert alert-info">
@@ -62,6 +97,7 @@
         @endif
     </div>
 </x-main-layout>
+
 <script>
     document.addEventListener("DOMContentLoaded", function () {
         function updateUI(productId, data) {
@@ -77,7 +113,7 @@
             }
 
             document.querySelector("#cart-total").textContent = data.cart_total + " تومان";
-            document.querySelector("#cart-count").textContent = data.cart_count; // badge
+            document.querySelector("#cart-count").textContent = data.cart_count;
         }
 
         // افزایش

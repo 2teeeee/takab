@@ -37,6 +37,7 @@ class CartController extends Controller
 
         return view('cart.show', compact('cart'));
     }
+
     public function increase(Product $product): JsonResponse
     {
         $cart = $this->cartService->getCart();
@@ -114,10 +115,13 @@ class CartController extends Controller
 
     public function address(): View
     {
-        return view('cart.address');
+        $cart = $this->cartService->getCart();
+        $cart->load('items.product');
+
+        return view('cart.address', compact('cart'));
     }
 
-    public function pay(Request $request): RedirectResponse
+    public function pay(Request $request): string
     {
         $request->validate([
             'address' => 'required|string|min:10',
@@ -141,7 +145,7 @@ class CartController extends Controller
             ]);
         }
 
-        return redirect()->away('https://sandbox.bank.com/start-payment?amount=' . $order->total);
+        return 'در حال انتقال به بانک می باشید...';
     }
 
     private function calculateCartTotal(): int
