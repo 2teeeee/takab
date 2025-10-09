@@ -1,7 +1,5 @@
-<x-main-layout>
+<x-admin-layout title="لیست محصولات" header="لیست محصولات">
     <div class="container py-4">
-        <h4>لیست محصولات</h4>
-
         <a href="{{ route('products.create') }}" class="btn btn-primary mb-3">افزودن محصول جدید</a>
 
         @if (session('success'))
@@ -45,4 +43,4 @@
 
         {{ $products->links() }}
     </div>
-</x-main-layout>
+</x-admin-layout>

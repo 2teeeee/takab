@@ -1,9 +1,7 @@
-<x-main-layout>
+<x-admin-layout title="افزودن دسته" header="افزودن دسته جدید">
     <div class="container py-4">
-        <h4>افزودن دسته جدید</h4>
-
         <form action="{{ route('categories.store') }}" method="POST">
             @include('categories._form')
         </form>
     </div>
-</x-main-layout>
+</x-admin-layout>

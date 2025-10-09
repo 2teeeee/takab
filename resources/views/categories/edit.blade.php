@@ -1,10 +1,8 @@
-<x-main-layout>
+<x-admin-layout title="ویرایش دسته" header="ویرایش دسته">
     <div class="container py-4">
-        <h4>ویرایش دسته</h4>
-
         <form action="{{ route('categories.update', $category) }}" method="POST">
             @method('PUT')
             @include('categories._form')
         </form>
     </div>
-</x-main-layout>
+</x-admin-layout>

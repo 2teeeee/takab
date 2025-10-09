@@ -1,4 +1,5 @@
-<x-main-layout>
+<x-admin-layout title="{{ $product->exists ? 'ویرایش محصول' : 'افزودن محصول جدید' }}"
+                header="{{ $product->exists ? 'ویرایش محصول' : 'افزودن محصول جدید' }}">
     <div class="container py-4">
         <h4>{{ $product->exists ? 'ویرایش محصول' : 'افزودن محصول جدید' }}</h4>
 
@@ -97,4 +98,4 @@
             });
         }
     </script>
-</x-main-layout>
+</x-admin-layout>

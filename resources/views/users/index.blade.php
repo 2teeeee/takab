@@ -1,7 +1,5 @@
-<x-main-layout>
+<x-admin-layout title="لیست کاربران" header="لیست کاربران">
     <div class="container py-4">
-        <h4>لیست کاربران</h4>
-
         <a href="{{ route('users.create') }}" class="btn btn-primary mb-3">افزودن کاربر جدید</a>
 
         @if(session('success'))
@@ -43,4 +41,4 @@
 
         {{ $users->links() }}
     </div>
-</x-main-layout>
+</x-admin-layout>

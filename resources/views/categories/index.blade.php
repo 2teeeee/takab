@@ -1,7 +1,5 @@
-<x-main-layout>
+<x-admin-layout title="لیست دسته ها" header="لیست دسته‌ها">
     <div class="container py-4">
-        <h4>لیست دسته‌ها</h4>
-
         <a href="{{ route('categories.create') }}" class="btn btn-primary mb-3">افزودن دسته جدید</a>
 
         @if (session('success'))
@@ -39,4 +37,4 @@
 
         {{ $categories->links() }}
     </div>
-</x-main-layout>
+</x-admin-layout>
