@@ -47,3 +47,9 @@ Route::middleware('auth')->group(function () {
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 });
 
+Route::prefix('admin')->middleware(['auth'])->group(function () {
+    Route::middleware(['role:admin,manager'])->group(function () {
+        Route::resource('products', ProductController::class);
+    });
+});
+
