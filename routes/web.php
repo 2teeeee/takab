@@ -49,7 +49,7 @@ Route::middleware('auth')->group(function () {
 
 Route::prefix('admin')->middleware(['auth'])->group(function () {
     Route::middleware(['role:admin,manager'])->group(function () {
+        Route::resource('categories', CategoryController::class);
         Route::resource('products', ProductController::class);
     });
 });
-
