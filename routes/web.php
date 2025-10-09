@@ -2,10 +2,12 @@
 
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\CartController;
+use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\MainController;
 use App\Http\Controllers\PageController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/',  [MainController::class, 'index'])->name('main.index');
@@ -49,6 +51,7 @@ Route::middleware('auth')->group(function () {
 
 Route::prefix('admin')->middleware(['auth'])->group(function () {
     Route::middleware(['role:admin,manager'])->group(function () {
+        Route::resource('users', UserController::class);
         Route::resource('categories', CategoryController::class);
         Route::resource('products', ProductController::class);
     });
