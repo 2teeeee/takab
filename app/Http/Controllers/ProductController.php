@@ -3,14 +3,23 @@
 namespace App\Http\Controllers;
 
 use App\Models\Product;
+use App\Models\ProductImage;
 use App\Services\CartService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\View\View;
-use Intervention\Image\Facades\Image;
+use Intervention\Image\Image;
 
 class ProductController extends Controller
 {
+    public function index(): View
+    {
+        $products = Product::with('category')->latest()->paginate(10);
+
+        return view('products.index', compact('products'));
+    }
+
     public function view(Request $request, CartService $cartService): View
     {
         $product = Product::find($request->id);
@@ -121,5 +130,12 @@ class ProductController extends Controller
         }
 
         return redirect()->route('products.index')->with('success', 'محصول با موفقیت ویرایش شد');
+    }
+
+    public function destroy(Product $product): RedirectResponse
+    {
+        $product->delete();
+
+        return redirect()->route('products.index')->with('success', 'محصول حذف شد.');
     }
 }
