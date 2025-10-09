@@ -36,7 +36,8 @@ return new class extends Migration
         Schema::create('product_images', function (Blueprint $table) {
             $table->id();
             $table->foreignId('product_id')->nullable()->index();
-            $table->string('image_name');
+            $table->string('large_image_name');
+            $table->string('small_image_name');
             $table->boolean('is_main');
             $table->timestamps();
         });

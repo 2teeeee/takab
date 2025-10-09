@@ -5,9 +5,15 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 
 class Product extends Model
 {
+    protected $fillable = [
+        'title', 'small_text', 'large_text', 'slug', 'keywords',
+        'description', 'main_price', 'sell_price', 'category_id'
+    ];
+
     public function category(): BelongsTo
     {
         return $this->belongsTo(Category::class);
@@ -18,9 +24,9 @@ class Product extends Model
         return $this->hasMany(ProductImage::class);
     }
 
-    public function mainImage(): string
+    public function mainImage(): HasOne
     {
-        return $this->images()->where('is_main', 1)->first()->image_name;
+        return $this->hasOne(ProductImage::class)->where('is_main', true);
     }
 
 }
