@@ -94,17 +94,25 @@
                             </button>
                             <ul class="dropdown-menu text-sm text-decoration-none pb-1">
                                 <li>
-                                    <a class="text-dark text-decoration-none px-2 pb-1 align-self-center d-flex" href="/">
+                                    <a class="text-dark text-decoration-none px-2 pb-1 align-self-center d-flex" href="{{route('profile.index')}}">
                                         <i class="bi bi-house me-2"></i>
                                         <span>پروفایل</span>
                                     </a>
                                 </li>
                                 <li>
-                                    <a class="text-dark text-decoration-none px-2 pb-1 align-self-center d-flex" href="/">
+                                    <a class="text-dark text-decoration-none px-2 pb-1 align-self-center d-flex" href="{{route('profile.orders')}}">
                                         <i class="bi bi-bag-check me-2"></i>
                                         <span>سفارش ها</span>
                                     </a>
                                 </li>
+                                @if(Auth::user()->hasRole(['admin','manager']))
+                                <li>
+                                    <a class="text-dark text-decoration-none px-2 pb-1 align-self-center d-flex" href="{{route('admin.index')}}">
+                                        <i class="bi bi-bag-check me-2"></i>
+                                        <span>پنل مدیریت</span>
+                                    </a>
+                                </li>
+                                @endif
                                 <li><hr class="dropdown-divider my-1"></li>
                                 <li>
                                     <form method="POST" action="{{ route('logout') }}">

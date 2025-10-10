@@ -7,8 +7,9 @@
     "license": "MIT",
     "require": {
         "php": "^8.2",
-        "intervention/image": "^3.11",
+        "intervention/image": "*",
         "laravel/framework": "^12.0",
+        "laravel/sanctum": "^4.2",
         "laravel/tinker": "^2.10.1",
         "twbs/bootstrap": "5.3.7"
     },
@@ -76,7 +77,8 @@
         "allow-plugins": {
             "pestphp/pest-plugin": true,
             "php-http/discovery": true
-        }
+        },
+        "process-timeout": 0
     },
     "minimum-stability": "stable",
     "prefer-stable": true

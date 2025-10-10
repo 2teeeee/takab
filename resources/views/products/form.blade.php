@@ -4,7 +4,7 @@
         <h4>{{ $product->exists ? 'ویرایش محصول' : 'افزودن محصول جدید' }}</h4>
 
         <form method="POST"
-              action="{{ $product->exists ? route('products.update', $product) : route('products.store') }}"
+              action="{{ $product->exists ? route('admin.products.update', $product) : route('admin.products.store') }}"
               enctype="multipart/form-data">
             @csrf
             @if($product->exists)

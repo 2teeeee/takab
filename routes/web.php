@@ -54,8 +54,9 @@ Route::middleware(['auth'])->prefix('profile')->name('profile.')->group(function
     Route::get('/orders', [ProfileController::class, 'orders'])->name('orders');
 });
 
-Route::prefix('admin')->middleware(['auth'])->group(function () {
+Route::middleware(['auth'])->prefix('admin')->name('admin.')->group(function () {
     Route::middleware(['role:admin,manager'])->group(function () {
+        Route::get('/', [MainController::class, 'admin'])->name('index');
         Route::resource('users', UserController::class);
         Route::resource('categories', CategoryController::class);
         Route::resource('products', ProductController::class);

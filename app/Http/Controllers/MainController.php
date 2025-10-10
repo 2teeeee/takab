@@ -17,12 +17,12 @@ class MainController extends Controller
     public function index(Request $request): View
     {
         $products = Product::join('product_images as image', fn (JoinClause $image) =>
-            $image->on('image.product_id', '=', 'products.id')->on('image.is_main', '=', DB::raw('1'))
+        $image->on('image.product_id', '=', 'products.id')->on('image.is_main', '=', DB::raw('1'))
         )->get([
             'products.id',
             'products.title',
             'products.slug',
-            'image.image_name',
+            'image.small_image_name',
             'products.main_price',
             'products.sell_price'
         ]);
@@ -30,5 +30,9 @@ class MainController extends Controller
         return view('index', [
             'products' => $products
         ]);
+    }
+    public function admin(): View
+    {
+        return view('admin');
     }
 }

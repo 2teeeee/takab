@@ -65,11 +65,11 @@
 {{-- Sidebar --}}
 <div class="admin-sidebar">
     <h5 class="text-center text-light mb-3">مدیریت سایت</h5>
-    <a href="{{ route('users.index') }}" class="{{ request()->routeIs('users.*') ? 'active' : '' }}">👤 کاربران</a>
-    <a href="{{ route('categories.index') }}" class="{{ request()->routeIs('categories.*') ? 'active' : '' }}">📂 دسته‌ها</a>
-    <a href="{{ route('products.index') }}" class="{{ request()->routeIs('products.*') ? 'active' : '' }}">🛍 محصولات</a>
+    <a href="{{ route('admin.users.index') }}" class="{{ request()->routeIs('admin.users.*') ? 'active' : '' }}">👤 کاربران</a>
+    <a href="{{ route('admin.categories.index') }}" class="{{ request()->routeIs('admin.categories.*') ? 'active' : '' }}">📂 دسته‌ها</a>
+    <a href="{{ route('admin.products.index') }}" class="{{ request()->routeIs('admin.products.*') ? 'active' : '' }}">🛍 محصولات</a>
     <hr class="border-secondary">
-    <a href="{{ route('dashboard') }}">🏠 داشبورد</a>
+    <a href="{{ route('main.index') }}">🏠 داشبورد</a>
     <a href="{{ route('logout') }}"
        onclick="event.preventDefault(); document.getElementById('logout-form').submit();">
         🚪 خروج

@@ -14,7 +14,7 @@
             </div>
 
             <!-- Sidebar (Offcanvas در موبایل) -->
-            <div class="col-md-3 order-md-2 mb-3">
+            <div class="col-md-3 mb-3">
                 <div class="offcanvas-md offcanvas-end show" tabindex="-1" id="profileSidebar"
                      aria-labelledby="profileSidebarLabel">
                     <div class="offcanvas-header d-md-none">
@@ -23,7 +23,7 @@
                                 aria-label="Close"></button>
                     </div>
                     <div class="offcanvas-body p-0">
-                        <div class="card shadow-sm border-0">
+                        <div class="card shadow-sm border-0 w-100">
                             <div class="card-header bg-primary text-white text-center d-none d-md-block">
                                 <h6 class="mb-0">پروفایل کاربر</h6>
                             </div>
@@ -54,7 +54,7 @@
             </div>
 
             <!-- Main Content -->
-            <div class="col-md-9 order-md-1">
+            <div class="col-md-9">
                 <div class="card shadow-sm border-0">
                     <div class="card-body">
                         <h5 class="mb-3 border-bottom pb-2">{{ $title }}</h5>

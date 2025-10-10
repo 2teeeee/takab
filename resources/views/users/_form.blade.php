@@ -35,4 +35,4 @@
 </div>
 
 <button type="submit" class="btn btn-success">ذخیره</button>
-<a href="{{ route('users.index') }}" class="btn btn-secondary">بازگشت</a>
+<a href="{{ route('admin.users.index') }}" class="btn btn-secondary">بازگشت</a>
