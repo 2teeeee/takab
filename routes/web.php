@@ -43,10 +43,15 @@ Route::get('/login', [AuthController::class, 'login'])->name('login');
 Route::post('/login', [AuthController::class, 'authenticate'])->name('authenticate');
 Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 
-Route::middleware('auth')->group(function () {
-    Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
-    Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
-    Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
+Route::middleware(['auth'])->prefix('profile')->name('profile.')->group(function () {
+    Route::get('/', [ProfileController::class, 'index'])->name('index'); // صفحه اصلی پروفایل
+    Route::get('/edit', [ProfileController::class, 'edit'])->name('edit');
+    Route::post('/update', [ProfileController::class, 'update'])->name('update');
+
+    Route::get('/password', [ProfileController::class, 'editPassword'])->name('password.edit');
+    Route::post('/password', [ProfileController::class, 'updatePassword'])->name('password.update');
+
+    Route::get('/orders', [ProfileController::class, 'orders'])->name('orders');
 });
 
 Route::prefix('admin')->middleware(['auth'])->group(function () {
