@@ -12,7 +12,7 @@
             </div>
             <div class="row border-bottom">
                 <div class="col-md-3 py-2">
-                    <img src="{{asset("img/product/".$product->mainImage())}}" class="card-img-top" alt="{{$product->title}}">
+                    <img src="{{ asset('storage/' . $product->mainImage->large_image_name) }}" class="card-img-top" alt="{{$product->title}}">
                 </div>
                 <div class="col-md-9">
                     <h5 class="border-bottom pb-2">{{$product->title}}</h5>
@@ -86,7 +86,7 @@
                             افزودن به سبد
                         </button>`;
                     }
-                    
+
                     updateCartBadge(data.totalQuantity);
                 })
                 .catch(err => console.error(err));

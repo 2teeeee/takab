@@ -8,8 +8,10 @@ use App\Services\CartService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Str;
 use Illuminate\View\View;
-use Intervention\Image\Image;
+use Intervention\Image\ImageManager;
+use Intervention\Image\Drivers\Gd\Driver;
 
 class ProductController extends Controller
 {
@@ -22,7 +24,7 @@ class ProductController extends Controller
 
     public function view(Request $request, CartService $cartService): View
     {
-        $product = Product::find($request->id);
+        $product = Product::with(['images', 'mainImage'])->findOrFail($request->id);
 
         $cart = $cartService->getCart();
         $quantity = $cart->items()->where('product_id', $product->id)->value('quantity') ?? 0;
@@ -55,26 +57,32 @@ class ProductController extends Controller
 
         $product = Product::create($data);
 
-        // آپلود تصاویر
         if ($request->hasFile('images')) {
-            foreach ($request->file('images') as $index => $image) {
-                $filename = uniqid() . '.' . $image->getClientOriginalExtension();
-                $path = $image->storeAs('products/large', $filename, 'public');
+            $manager = new ImageManager(new Driver());
 
-                // ساخت تصویر کوچک با intervention
-                $smallPath = 'products/small/' . $filename;
-                $smallImage = Image::make($image)->resize(300, 300)->encode();
-                Storage::disk('public')->put($smallPath, $smallImage);
+            foreach ($request->file('images') as $index => $file) {
+                $filename = uniqid() . '.webp';
+
+                $largePath = storage_path('app/public/products/large/' . $filename);
+                $smallPath = storage_path('app/public/products/small/' . $filename);
+
+                $largeIimage = $manager->read($file);
+                $largeIimage->scale(1200,1200);
+                $largeIimage->toWebp()->save($largePath);
+
+                $smallImage = $manager->read($file);
+                $smallImage->scale(300,300);
+                $smallImage->toWebp()->save($smallPath);
 
                 $product->images()->create([
-                    'large_image_name' => $path,
-                    'small_image_name' => $smallPath,
-                    'is_main' => $index === 0, // تصویر اول به عنوان اصلی
+                    'large_image_name' => 'products/large/' . $filename,
+                    'small_image_name' => 'products/small/' . $filename,
+                    'is_main' => $index === 0,
                 ]);
             }
         }
 
-        return redirect()->route('products.index')->with('success', 'محصول با موفقیت ثبت شد');
+        return redirect()->route('admin.products.index')->with('success', 'محصول با موفقیت ثبت شد');
     }
 
     public function edit(Product $product): View
@@ -111,31 +119,39 @@ class ProductController extends Controller
             }
         }
 
-        // آپلود تصاویر جدید
-        if ($request->hasFile('images')) {
-            foreach ($request->file('images') as $index => $image) {
-                $filename = uniqid() . '.' . $image->getClientOriginalExtension();
-                $path = $image->storeAs('products/large', $filename, 'public');
 
-                $smallPath = 'products/small/' . $filename;
-                $smallImage = Image::make($image)->resize(300, 300)->encode();
-                Storage::disk('public')->put($smallPath, $smallImage);
+        if ($request->hasFile('images')) {
+            $manager = new ImageManager(new Driver());
+
+            foreach ($request->file('images') as $index => $file) {
+                $filename = uniqid() . '.webp';
+
+                $largePath = storage_path('app/public/products/large/' . $filename);
+                $smallPath = storage_path('app/public/products/small/' . $filename);
+
+                $largeIimage = $manager->read($file);
+                $largeIimage->resize(1200,1200);
+                $largeIimage->toWebp()->save($largePath);
+
+                $smallImage = $manager->read($file);
+                $smallImage->resize(300,300);
+                $smallImage->toWebp()->save($smallPath);
 
                 $product->images()->create([
-                    'large_image_name' => $path,
-                    'small_image_name' => $smallPath,
-                    'is_main' => false,
+                    'large_image_name' => 'products/large/' . $filename,
+                    'small_image_name' => 'products/small/' . $filename,
+                    'is_main' => $index === 0,
                 ]);
             }
         }
 
-        return redirect()->route('products.index')->with('success', 'محصول با موفقیت ویرایش شد');
+        return redirect()->route('admin.products.index')->with('success', 'محصول با موفقیت ویرایش شد');
     }
 
     public function destroy(Product $product): RedirectResponse
     {
         $product->delete();
 
-        return redirect()->route('products.index')->with('success', 'محصول حذف شد.');
+        return redirect()->route('admin.products.index')->with('success', 'محصول حذف شد.');
     }
 }
