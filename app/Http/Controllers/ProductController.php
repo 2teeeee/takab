@@ -64,8 +64,8 @@ class ProductController extends Controller
             foreach ($request->file('images') as $index => $file) {
                 $filename = uniqid() . '.webp';
 
-                $largePath = storage_path('app/public/products/large/' . $filename);
-                $smallPath = storage_path('app/public/products/small/' . $filename);
+                $largePath = public_path('storage/products/large/' . $filename);
+                $smallPath = public_path('storage/products/small/' . $filename);
 
                 $largeIimage = $manager->read($file);
                 $largeIimage->scale(1200,1200);
@@ -127,8 +127,8 @@ class ProductController extends Controller
             foreach ($request->file('images') as $index => $file) {
                 $filename = uniqid() . '.webp';
 
-                $largePath = storage_path('app/public/products/large/' . $filename);
-                $smallPath = storage_path('app/public/products/small/' . $filename);
+                $largePath = public_path('storage/products/large/' . $filename);
+                $smallPath = public_path('storage/products/small/' . $filename);
 
                 $largeIimage = $manager->read($file);
                 $largeIimage->resize(1200,1200);
