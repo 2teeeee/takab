@@ -29,7 +29,7 @@
 
             <div class="mb-3">
                 <label class="form-label">توضیحات کامل</label>
-                <textarea id="editor" name="large_text" class="form-control" rows="6">{{ old('large_text', $product->large_text) }}</textarea>
+                <textarea id="editor" name="large_text" class="form-control" rows="10">{{ old('large_text', $product->large_text) }}</textarea>
             </div>
 
             <div class="row">
@@ -74,28 +74,15 @@
         </form>
     </div>
 
-    {{-- ادیتور متن --}}
-    <script src="https://cdn.tiny.cloud/1/no-api-key/tinymce/6/tinymce.min.js"></script>
+    <script src="https://cdn.ckeditor.com/ckeditor5/39.0.1/classic/ckeditor.js"></script>
     <script>
-        tinymce.init({
-            selector: '#editor',
-            directionality: 'rtl',
+        ClassicEditor.create(document.querySelector('#editor'), {
             language: 'fa',
-            height: 300,
-            plugins: 'link image lists code',
-            toolbar: 'undo redo | bold italic | alignleft aligncenter alignright | bullist numlist | link image | code'
+            ckfinder: {
+                uploadUrl: "{{ route('admin.products.uploadImage') }}?&_token={{ csrf_token() }}"
+            }
+        }).catch(error => {
+            console.error(error);
         });
-
-        function previewImages(event) {
-            const preview = document.getElementById('preview');
-            preview.innerHTML = '';
-            Array.from(event.target.files).forEach(file => {
-                const img = document.createElement('img');
-                img.src = URL.createObjectURL(file);
-                img.classList.add('img-thumbnail');
-                img.style.width = '120px';
-                preview.appendChild(img);
-            });
-        }
     </script>
 </x-admin-layout>

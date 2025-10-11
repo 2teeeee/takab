@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Product;
 use App\Models\ProductImage;
 use App\Services\CartService;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
@@ -140,8 +141,17 @@ class ProductController extends Controller
                 $product->images()->create([
                     'large_image_name' => 'products/large/' . $filename,
                     'small_image_name' => 'products/small/' . $filename,
-                    'is_main' => $index === 0,
+                    'is_main' => false,
                 ]);
+            }
+        }
+
+        if ($request->main_image_id) {
+            $product->images()->update(['is_main' => false]);
+
+            $mainImage = ProductImage::find($request->main_image_id);
+            if ($mainImage) {
+                $mainImage->update(['is_main' => true]);
             }
         }
 
@@ -153,5 +163,21 @@ class ProductController extends Controller
         $product->delete();
 
         return redirect()->route('admin.products.index')->with('success', 'محصول حذف شد.');
+    }
+
+    public function uploadImage(Request $request): JsonResponse
+    {
+        $request->validate([
+            'upload' => 'required|image|max:2048',
+        ]);
+
+        $file = $request->file('upload');
+        $filename = uniqid() . '.' . $file->getClientOriginalExtension();
+
+        $path = $file->storeAs('products/editor', $filename, 'public');
+
+        return response()->json([
+            'url' => asset('storage/' . $path)
+        ]);
     }
 }

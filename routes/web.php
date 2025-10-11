@@ -60,5 +60,6 @@ Route::middleware(['auth'])->prefix('admin')->name('admin.')->group(function () 
         Route::resource('users', UserController::class);
         Route::resource('categories', CategoryController::class);
         Route::resource('products', ProductController::class);
+        Route::post('/products/upload-image', [ProductController::class, 'uploadImage'])->name('products.uploadImage');
     });
 });
