@@ -5,8 +5,8 @@
 </div>
 
 <div class="mb-3">
-    <label class="form-label">ایمیل</label>
-    <input type="email" name="email" class="form-control" value="{{ old('email', $user->email ?? '') }}" required>
+    <label class="form-label">موبایل</label>
+    <input type="text" name="mobile" class="form-control" value="{{ old('mobile', $user->mobile ?? '') }}" required>
 </div>
 
 <div class="mb-3">

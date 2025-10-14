@@ -75,5 +75,4 @@ class User extends Authenticatable
         $this->roles()->syncWithoutDetaching([$role->id]);
     }
 
-
 }

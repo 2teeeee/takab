@@ -11,7 +11,7 @@
             <tr>
                 <th>#</th>
                 <th>نام</th>
-                <th>ایمیل</th>
+                <th>موبایل</th>
                 <th>نقش‌ها</th>
                 <th>عملیات</th>
             </tr>
@@ -21,7 +21,7 @@
                 <tr>
                     <td>{{ $loop->iteration + ($users->currentPage() - 1) * $users->perPage() }}</td>
                     <td>{{ $user->name }}</td>
-                    <td>{{ $user->email }}</td>
+                    <td>{{ $user->mobile }}</td>
                     <td>{{ $user->roles->pluck('name')->join(', ') }}</td>
                     <td>
                         <a href="{{ route('admin.users.edit', $user) }}" class="btn btn-sm btn-warning">ویرایش</a>
