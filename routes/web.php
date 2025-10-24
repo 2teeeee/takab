@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\AssemblyController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\CartController;
 use App\Http\Controllers\CategoryController;
@@ -63,3 +64,9 @@ Route::middleware(['auth'])->prefix('admin')->name('admin.')->group(function () 
         Route::post('/products/upload-image', [ProductController::class, 'uploadImage'])->name('products.uploadImage');
     });
 });
+
+Route::middleware(['auth'])->group(function () {
+    Route::get('/assembly', [AssemblyController::class, 'index'])->name('assembly.index');
+    Route::post('/assembly', [AssemblyController::class, 'store'])->name('assembly.store');
+});
+

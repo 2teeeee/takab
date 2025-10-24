@@ -41,7 +41,26 @@
                             <tbody>
                             @foreach($cart->items as $item)
                                 <tr id="row-{{$item->product->id}}">
-                                    <td>{{ $item->product->title }}</td>
+                                    <td>
+                                        <strong>{{ $item->product->title }}</strong>
+
+                                        {{-- اگر محصول اسمبل‌شده است --}}
+                                        @if(!empty($item->meta['parts']))
+                                            <div class="mt-2 p-2 bg-light rounded small text-muted">
+                                                <div class="fw-bold text-success mb-1">
+                                                    <i class="bi bi-gear-wide-connected me-1"></i> قطعات دستگاه:
+                                                </div>
+                                                <ul class="list-unstyled mb-0 ps-2">
+                                                    @foreach($item->meta['parts'] as $part)
+                                                        <li class="border-bottom pb-1 mb-1">
+                                                            <span class="d-block">{{ $part['name'] }}</span>
+                                                            <span class="text-secondary">{{ number_format($part['price']) }} تومان</span>
+                                                        </li>
+                                                    @endforeach
+                                                </ul>
+                                            </div>
+                                        @endif
+                                    </td>
                                     <td>{{ number_format($item->price) }} تومان</td>
                                     <td>
                                         <div class="d-flex align-items-center">

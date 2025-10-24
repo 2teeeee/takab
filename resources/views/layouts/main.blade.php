@@ -100,6 +100,12 @@
                                     </a>
                                 </li>
                                 <li>
+                                    <a class="text-dark text-decoration-none px-2 pb-1 align-self-center d-flex" href="{{route('assembly.index')}}">
+                                        <i class="bi bi-bag-check me-2"></i>
+                                        <span>اسمبل کردن دستگاه</span>
+                                    </a>
+                                </li>
+                                <li>
                                     <a class="text-dark text-decoration-none px-2 pb-1 align-self-center d-flex" href="{{route('profile.orders')}}">
                                         <i class="bi bi-bag-check me-2"></i>
                                         <span>سفارش ها</span>
@@ -170,7 +176,9 @@
             </div>
             <div class="col-md-4 py-2 text-center d-flex justify-content-center">
                 <div class="bg-light rounded-4 me-2">
-                    <img src="{{asset("img/enamad-logo.png")}}" alt="enamad" width="100"/>
+                    <a referrerpolicy='origin' target='_blank' href='https://trustseal.enamad.ir/?id=659859&Code=4fTJ4qUyqpHgv5O5zycG2EO8r9H5ylbs'>
+                        <img referrerpolicy='origin' src='https://trustseal.enamad.ir/logo.aspx?id=659859&Code=4fTJ4qUyqpHgv5O5zycG2EO8r9H5ylbs' alt="enamad" width="100" style='cursor:pointer' code='4fTJ4qUyqpHgv5O5zycG2EO8r9H5ylbs'>
+                    </a>
                 </div>
                 <div class="bg-light rounded-4">
                     <img src="{{asset("img/samandehi-logo.png")}}" alt="samandehi" width="100"/>
