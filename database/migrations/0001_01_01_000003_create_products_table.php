@@ -16,6 +16,7 @@ return new class extends Migration
             $table->string('title');
             $table->text('keywords')->nullable();
             $table->text('description')->nullable();
+            $table->boolean('is_assembly_enabled')->default(false);
             $table->timestamps();
         });
 
@@ -30,6 +31,10 @@ return new class extends Migration
             $table->decimal('main_price')->nullable();
             $table->decimal('sell_price')->nullable();
             $table->foreignId('category_id')->nullable()->index();
+            $table->boolean('is_assembly_enabled')->default(false);
+            $table->boolean('is_main_sale')->default(true);
+            $table->boolean('is_assembled')->default(false);
+            $table->json('assembled_parts')->nullable();
             $table->timestamps();
         });
 

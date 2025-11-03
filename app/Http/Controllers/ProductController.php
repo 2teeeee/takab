@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Category;
 use App\Models\Product;
 use App\Models\ProductImage;
 use App\Services\CartService;
@@ -18,7 +19,7 @@ class ProductController extends Controller
 {
     public function index(): View
     {
-        $products = Product::with('category')->latest()->paginate(10);
+        $products = Product::with('category')->whereNotNull('category_id')->latest()->paginate(10);
 
         return view('products.index', compact('products'));
     }
@@ -35,7 +36,11 @@ class ProductController extends Controller
 
     public function create(): View
     {
-        return view('products.form', ['product' => new Product()]);
+        $categories = Category::orderBy('title')->get();
+        return view('products.form', [
+            'product' => new Product(),
+            'categories' => $categories,
+        ]);
     }
 
     public function store(Request $request): RedirectResponse
@@ -49,12 +54,16 @@ class ProductController extends Controller
             'description' => 'nullable|string',
             'main_price' => 'nullable|numeric',
             'sell_price' => 'nullable|numeric',
-            'category_id' => 'nullable|integer',
+            'category_id' => 'required|exists:categories,id',
             'images.*' => 'nullable|image|max:2048',
+            'is_assembly_enabled' => 'nullable|boolean',
+            'is_main_sale' => 'nullable|boolean',
         ]);
 
         // ساخت اسلاگ در صورت خالی بودن
         $data['slug'] = $data['slug'] ?: Str::slug($data['title']);
+        $data['is_assembly_enabled'] = $request->boolean('is_assembly_enabled');
+        $data['is_main_sale'] = $request->boolean('is_main_sale');
 
         $product = Product::create($data);
 
@@ -88,7 +97,8 @@ class ProductController extends Controller
 
     public function edit(Product $product): View
     {
-        return view('products.form', compact('product'));
+        $categories = Category::orderBy('title')->get();
+        return view('products.form', compact('product', 'categories'));
     }
 
     public function update(Request $request, Product $product): RedirectResponse
@@ -102,10 +112,15 @@ class ProductController extends Controller
             'description' => 'nullable|string',
             'main_price' => 'nullable|numeric',
             'sell_price' => 'nullable|numeric',
-            'category_id' => 'nullable|integer',
+            'category_id' => 'required|exists:categories,id',
             'images.*' => 'nullable|image|max:2048',
             'delete_images' => 'array',
+            'is_assembly_enabled' => 'nullable|boolean',
+            'is_main_sale' => 'nullable|boolean',
         ]);
+
+        $data['is_assembly_enabled'] = $request->boolean('is_assembly_enabled');
+        $data['is_main_sale'] = $request->boolean('is_main_sale');
 
         $product->update($data);
 

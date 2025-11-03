@@ -16,7 +16,7 @@ class MainController extends Controller
 {
     public function index(Request $request): View
     {
-        $products = Product::join('product_images as image', fn (JoinClause $image) =>
+        $products = Product::where('category_id',1)->join('product_images as image', fn (JoinClause $image) =>
         $image->on('image.product_id', '=', 'products.id')->on('image.is_main', '=', DB::raw('1'))
         )->get([
             'products.id',

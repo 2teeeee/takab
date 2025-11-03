@@ -4,6 +4,7 @@ use App\Http\Controllers\AssemblyController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\CartController;
 use App\Http\Controllers\CategoryController;
+use App\Http\Controllers\LetterController;
 use App\Http\Controllers\MainController;
 use App\Http\Controllers\PageController;
 use App\Http\Controllers\ProductController;
@@ -62,6 +63,15 @@ Route::middleware(['auth'])->prefix('admin')->name('admin.')->group(function () 
         Route::resource('categories', CategoryController::class);
         Route::resource('products', ProductController::class);
         Route::post('/products/upload-image', [ProductController::class, 'uploadImage'])->name('products.uploadImage');
+
+        Route::prefix('letters')->name('letters.')->group(function () {
+            Route::get('/', [LetterController::class, 'index'])->name('index');
+            Route::get('/create', [LetterController::class, 'create'])->name('create');
+            Route::post('/', [LetterController::class, 'store'])->name('store');
+            Route::get('/{letter}', [LetterController::class, 'show'])->name('show');
+            Route::post('/{letter}/refer', [LetterController::class, 'refer'])->name('refer');
+            Route::get('/attachments/{attachment}/download', [LetterController::class, 'downloadAttachment'])->name('attachments.download');
+        });
     });
 });
 

@@ -75,4 +75,13 @@ class User extends Authenticatable
         $this->roles()->syncWithoutDetaching([$role->id]);
     }
 
+    public function sentLetters()
+    {
+        return $this->hasMany(Letter::class, 'sender_id');
+    }
+
+    public function receivedLetters()
+    {
+        return $this->hasMany(Letter::class, 'receiver_id');
+    }
 }

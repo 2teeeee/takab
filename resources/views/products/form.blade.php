@@ -23,6 +23,18 @@
             </div>
 
             <div class="mb-3">
+                <label class="form-label">دسته‌بندی محصول</label>
+                <select name="category_id" class="form-select" required>
+                    @foreach($categories as $cat)
+                        <option value="{{ $cat->id }}"
+                            {{ old('category_id', $product->category_id) == $cat->id ? 'selected' : '' }}>
+                            {{ $cat->title }}
+                        </option>
+                    @endforeach
+                </select>
+            </div>
+
+            <div class="mb-3">
                 <label class="form-label">توضیح کوتاه</label>
                 <textarea name="small_text" class="form-control" rows="2">{{ old('small_text', $product->small_text) }}</textarea>
             </div>
@@ -40,6 +52,23 @@
                 <div class="col-md-6 mb-3">
                     <label class="form-label">قیمت فروش</label>
                     <input type="number" step="0.01" name="sell_price" class="form-control" value="{{ old('sell_price', $product->sell_price) }}">
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-md-6 mb-3">
+                    <div class="form-check form-switch mb-3">
+                        <input class="form-check-input" type="checkbox" name="is_assembly_enabled" id="is_assembly_enabled"
+                               value="1" {{ old('is_assembly_enabled', $product->is_assembly_enabled) ? 'checked' : '' }}>
+                        <label class="form-check-label" for="is_assembly_enabled">این محصول قابلیت اسمبل دارد</label>
+                    </div>
+                </div>
+                <div class="col-md-6 mb-3">
+                    <div class="form-check form-switch mb-3">
+                        <input class="form-check-input" type="checkbox" name="is_main_sale" id="is_main_sale" checked
+                               value="1" {{ old('is_main_sale', $product->is_main_sale) ? 'checked' : '' }}>
+                        <label class="form-check-label" for="is_main_sale">نمایش در فروش اصلی</label>
+                    </div>
                 </div>
             </div>
 

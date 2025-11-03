@@ -28,11 +28,14 @@ class CategoryController extends Controller
             'title' => 'required|string|max:255',
             'keywords' => 'nullable|string',
             'description' => 'nullable|string',
+            'is_assembly_enabled' => 'nullable|boolean',
         ]);
+
+        $data['is_assembly_enabled'] = $request->boolean('is_assembly_enabled');
 
         Category::create($data);
 
-        return redirect()->route('categories.index')->with('success', 'دسته با موفقیت ایجاد شد.');
+        return redirect()->route('admin.categories.index')->with('success', 'دسته با موفقیت ایجاد شد.');
     }
 
     public function edit(Category $category): View
@@ -40,23 +43,25 @@ class CategoryController extends Controller
         return view('categories.edit', compact('category'));
     }
 
-    public function update(Request $request, Category $category): RedirectResponse
+    public function update(Request $request, Category $category)
     {
         $data = $request->validate([
             'title' => 'required|string|max:255',
             'keywords' => 'nullable|string',
             'description' => 'nullable|string',
+            'is_assembly_enabled' => 'nullable|boolean',
         ]);
 
+        $data['is_assembly_enabled'] = $request->boolean('is_assembly_enabled');
         $category->update($data);
 
-        return redirect()->route('categories.index')->with('success', 'دسته با موفقیت ویرایش شد.');
+        return redirect()->route('admin.categories.index')->with('success', 'دسته با موفقیت ویرایش شد.');
     }
 
     public function destroy(Category $category): RedirectResponse
     {
         $category->delete();
 
-        return redirect()->route('categories.index')->with('success', 'دسته با موفقیت حذف شد.');
+        return redirect()->route('admin.categories.index')->with('success', 'دسته با موفقیت حذف شد.');
     }
 }

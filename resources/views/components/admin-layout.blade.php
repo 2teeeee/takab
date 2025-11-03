@@ -65,19 +65,37 @@
 {{-- Sidebar --}}
 <div class="admin-sidebar">
     <h5 class="text-center text-light mb-3">مدیریت سایت</h5>
-    <a href="{{ route('admin.users.index') }}" class="{{ request()->routeIs('admin.users.*') ? 'active' : '' }}">👤 کاربران</a>
-    <a href="{{ route('admin.categories.index') }}" class="{{ request()->routeIs('admin.categories.*') ? 'active' : '' }}">📂 دسته‌ها</a>
-    <a href="{{ route('admin.products.index') }}" class="{{ request()->routeIs('admin.products.*') ? 'active' : '' }}">🛍 محصولات</a>
+
+    <a href="{{ route('admin.users.index') }}" class="{{ request()->routeIs('admin.users.*') ? 'active' : '' }}">
+        👤 کاربران
+    </a>
+
+    <a href="{{ route('admin.categories.index') }}" class="{{ request()->routeIs('admin.categories.*') ? 'active' : '' }}">
+        📂 دسته‌ها
+    </a>
+
+    <a href="{{ route('admin.products.index') }}" class="{{ request()->routeIs('admin.products.*') ? 'active' : '' }}">
+        🛍 محصولات
+    </a>
+
+    <a href="{{ route('admin.letters.index') }}" class="{{ request()->routeIs('letters.*') ? 'active' : '' }}">
+        📬 اتوماسیون نامه‌ها
+    </a>
+
     <hr class="border-secondary">
+
     <a href="{{ route('main.index') }}">🏠 داشبورد</a>
+
     <a href="{{ route('logout') }}"
        onclick="event.preventDefault(); document.getElementById('logout-form').submit();">
         🚪 خروج
     </a>
+
     <form id="logout-form" action="{{ route('logout') }}" method="POST" class="d-none">
         @csrf
     </form>
 </div>
+
 
 {{-- Main Content --}}
 <div class="admin-content">
