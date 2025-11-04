@@ -78,6 +78,10 @@
         🛍 محصولات
     </a>
 
+    <a href="{{ route('admin.sliders.index') }}" class="{{ request()->routeIs('admin.sliders.*') ? 'active' : '' }}">
+        🛍 اسلایدر
+    </a>
+
     <a href="{{ route('admin.letters.index') }}" class="{{ request()->routeIs('letters.*') ? 'active' : '' }}">
         📬 اتوماسیون نامه‌ها
     </a>

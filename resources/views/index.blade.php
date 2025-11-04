@@ -1,9 +1,11 @@
 <x-main-layout>
     <div id="carouselExampleAutoplaying" class="carousel slide" data-bs-ride="carousel">
         <div class="carousel-inner">
-            <div class="carousel-item active">
-                <img src="{{asset("img/slide.webp")}}" class="d-block w-100" alt="دستگاه تصویه آب">
-            </div>
+            @foreach($sliders as $key => $slider)
+                <div class="carousel-item {{ $key == 0 ? 'active' : '' }}">
+                    <img src="{{ asset('storage/slider/' . $slider->image_path) }}" class="d-block w-100" alt="{{ $slider->title }}">
+                </div>
+            @endforeach
         </div>
         <button class="carousel-control-prev" type="button" data-bs-target="#carouselExampleAutoplaying" data-bs-slide="prev">
             <span class="carousel-control-prev-icon" aria-hidden="true"></span>

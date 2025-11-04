@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\ProfileUpdateRequest;
 use App\Models\Product;
+use App\Models\Slider;
 use Illuminate\Database\Query\JoinClause;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -27,8 +28,11 @@ class MainController extends Controller
             'products.sell_price'
         ]);
 
+        $sliders =Slider::where('is_active',true)->get();
+
         return view('index', [
-            'products' => $products
+            'products' => $products,
+            'sliders' => $sliders
         ]);
     }
     public function admin(): View
