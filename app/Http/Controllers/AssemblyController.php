@@ -40,7 +40,14 @@ class AssemblyController extends Controller
             return back()->with('error', 'هیچ قطعه‌ای انتخاب نشده است.');
         }
 
-        $totalPrice = $selectedProducts->sum('sell_price');
+        $user = auth()->user();
+        $isSeller = $user && $user->hasRole('seller');
+
+        $totalPrice = $selectedProducts->sum(function ($p) use ($isSeller) {
+            return $isSeller
+                ? ($p->seller_price ?? $p->sell_price)
+                : $p->sell_price;
+        });
 
         $assembledProduct = Product::create([
             'title'           => 'دستگاه اسمبل‌شده #' . Str::random(4),

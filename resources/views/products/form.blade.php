@@ -45,13 +45,17 @@
             </div>
 
             <div class="row">
-                <div class="col-md-6 mb-3">
+                <div class="col-md-4 mb-3">
                     <label class="form-label">قیمت اصلی</label>
                     <input type="number" step="0.01" name="main_price" class="form-control" value="{{ old('main_price', $product->main_price) }}">
                 </div>
-                <div class="col-md-6 mb-3">
+                <div class="col-md-4 mb-3">
                     <label class="form-label">قیمت فروش</label>
                     <input type="number" step="0.01" name="sell_price" class="form-control" value="{{ old('sell_price', $product->sell_price) }}">
+                </div>
+                <div class="col-md-4 mb-3">
+                    <label class="form-label">قیمت فروشنده</label>
+                    <input type="number" step="0.01" name="seller_price" class="form-control" value="{{ old('seller_price', $product->seller_price) }}">
                 </div>
             </div>
 

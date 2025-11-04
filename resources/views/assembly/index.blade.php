@@ -30,16 +30,12 @@
                                            id="product{{ $product->id }}"
                                            value="{{ $product->id }}"
                                            data-price="{{ $product->sell_price }}"
+                                           data-seller-price="{{ $product->seller_price ?? $product->sell_price }}"
                                            required>
 
                                     <label class="card h-100 card-product border rounded-3 overflow-hidden position-relative product-option"
                                            for="product{{ $product->id }}"
                                            style="cursor: pointer;">
-                                        @if($product->main_price != $product->sell_price)
-                                            <div class="bg-danger p-1 rounded-2 position-absolute text-white text-small ltr" style="top:5px; left:5px;">
-                                                {{ 100 - round($product->sell_price * 100 / $product->main_price) }}%
-                                            </div>
-                                        @endif
 
                                         <img src="{{ asset('storage/' . $product->small_image_name) }}"
                                              class="card-img-top"
@@ -52,17 +48,18 @@
 
                                         <div class="card-footer bg-light">
                                             <div class="row text-center">
-                                                <div class="col px-1 text-small @if($product->main_price != $product->sell_price) border-end @endif">
-                                                    @if($product->main_price != $product->sell_price)
-                                                        <span class="text-danger text-decoration-line-through">
-                                                            {{ number_format($product->main_price) }}
-                                                        </span>
-                                                        <span class="text-danger text-xsmall">تومان</span>
-                                                    @endif
-                                                </div>
                                                 <div class="col px-1 text-small">
-                                                    {{ number_format($product->sell_price) }}
-                                                    <span class="text-xsmall">تومان</span>
+                                                    @if(auth()->check() && auth()->user()->hasRole('seller') && $product->seller_price)
+                                                        <span class="text-success small">
+                                                            {{ number_format($product->seller_price) }}
+                                                            <span class="text-xsmall">تومان</span>
+                                                        </span>
+                                                    @else
+                                                        <span class="text-muted small">
+                                                            {{ number_format($product->sell_price) }}
+                                                            <span class="text-xsmall">تومان</span>
+                                                        </span>
+                                                    @endif
                                                 </div>
                                             </div>
                                         </div>
@@ -102,24 +99,37 @@
     </style>
 
     <script>
-        document.addEventListener('DOMContentLoaded', function() {
+        document.addEventListener('DOMContentLoaded', function () {
             const radios = document.querySelectorAll('.part-radio');
             const totalPriceElement = document.getElementById('totalPrice');
+            const submitButton = document.querySelector('#assemblyForm button[type="submit"]');
+
+            const totalCategories = {{ $categories->count() }};
+            const isSeller = @json(auth()->check() && auth()->user()->hasRole('seller'));
 
             function updateTotal() {
                 let total = 0;
+                let selectedCount = 0;
+
                 document.querySelectorAll('.part-radio:checked').forEach(radio => {
-                    total += parseFloat(radio.dataset.price);
+                    selectedCount++;
+                    const price = isSeller
+                        ? parseFloat(radio.dataset.sellerPrice)
+                        : parseFloat(radio.dataset.price);
+                    total += price;
                 });
+
                 totalPriceElement.textContent = total.toLocaleString('fa-IR');
+
+                submitButton.disabled = selectedCount < totalCategories;
             }
 
             radios.forEach(radio => {
                 radio.addEventListener('change', updateTotal);
             });
 
-            // مقدار اولیه (اگر قبلاً انتخابی وجود دارد)
             updateTotal();
         });
     </script>
+
 </x-main-layout>

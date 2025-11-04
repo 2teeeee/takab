@@ -18,8 +18,11 @@ class Product extends Model
         'description',
         'main_price',
         'sell_price',
+        'seller_price',
         'category_id',
         'is_assembly_enabled',
+        'is_main_sale',
+        'is_assembled',
         'assembled_parts',
     ];
 
