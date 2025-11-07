@@ -53,7 +53,7 @@
                             <a class="nav-link" href="{{route('main.index')}}#product">محصولات</a>
                         </li>
                         <li class="nav-item px-2 border-start">
-                            <a class="nav-link" href="{{route('page.about')}}">درباره ما</a>
+                            <a class="nav-link" href="{{route('page.show',['slug'=>'about'])}}">درباره ما</a>
                         </li>
                         <li class="nav-item px-2 border-start">
                             <a class="nav-link" href="{{route('page.contact')}}">تماس با ما</a>

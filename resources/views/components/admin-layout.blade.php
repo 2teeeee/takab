@@ -82,6 +82,10 @@
         🛍 اسلایدر
     </a>
 
+    <a href="{{ route('admin.pages.index') }}" class="{{ request()->routeIs('admin.pages.*') ? 'active' : '' }}">
+        🛍 صفحات توضیحی
+    </a>
+
     <a href="{{ route('admin.letters.index') }}" class="{{ request()->routeIs('letters.*') ? 'active' : '' }}">
         📬 اتوماسیون نامه‌ها
     </a>

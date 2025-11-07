@@ -14,7 +14,6 @@ use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/',  [MainController::class, 'index'])->name('main.index');
-Route::get('/about',  [PageController::class, 'about'])->name('page.about');
 Route::get('/contact',  [PageController::class, 'contact'])->name('page.contact');
 
 Route::prefix('product')->group(function () {
@@ -64,6 +63,7 @@ Route::middleware(['auth'])->prefix('admin')->name('admin.')->group(function () 
         Route::resource('categories', CategoryController::class);
         Route::resource('products', ProductController::class);
         Route::resource('sliders', SliderController::class);
+        Route::resource('pages', PageController::class);
         Route::post('/products/upload-image', [ProductController::class, 'uploadImage'])->name('products.uploadImage');
 
         Route::prefix('letters')->name('letters.')->group(function () {
@@ -81,4 +81,6 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/assembly', [AssemblyController::class, 'index'])->name('assembly.index');
     Route::post('/assembly', [AssemblyController::class, 'store'])->name('assembly.store');
 });
+
+Route::get('/{slug}',  [PageController::class, 'show'])->name('page.show');
 
