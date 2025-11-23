@@ -178,8 +178,8 @@
             </div>
             <div class="col-md-4 py-2 text-center d-flex justify-content-center">
                 <div class="bg-light rounded-4 me-2">
-                    <a referrerpolicy='origin' target='_blank' href='https://trustseal.enamad.ir/?id=659859&Code=4fTJ4qUyqpHgv5O5zycG2EO8r9H5ylbs'>
-                        <img referrerpolicy='origin' src='https://trustseal.enamad.ir/logo.aspx?id=659859&Code=4fTJ4qUyqpHgv5O5zycG2EO8r9H5ylbs' alt="enamad" width="100" style='cursor:pointer' code='4fTJ4qUyqpHgv5O5zycG2EO8r9H5ylbs'>
+                    <a referrerpolicy='origin' target='_blank' href='https://trustseal.enamad.ir/?id=675755&Code=L6eJNXqWcqBksxFxbopXAjVnurHzkWsw'>
+                        <img referrerpolicy='origin' src='https://trustseal.enamad.ir/logo.aspx?id=675755&Code=L6eJNXqWcqBksxFxbopXAjVnurHzkWsw' alt="enamad" width="100" style='cursor:pointer' code='L6eJNXqWcqBksxFxbopXAjVnurHzkWsw'>
                     </a>
                 </div>
                 <div class="bg-light rounded-4">
