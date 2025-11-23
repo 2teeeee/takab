@@ -4,9 +4,12 @@ use App\Http\Controllers\AssemblyController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\CartController;
 use App\Http\Controllers\CategoryController;
+use App\Http\Controllers\InstallRequestController;
+use App\Http\Controllers\InstallScheduleController;
 use App\Http\Controllers\LetterController;
 use App\Http\Controllers\MainController;
 use App\Http\Controllers\PageController;
+use App\Http\Controllers\PeriodicServiceController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\SliderController;
@@ -74,6 +77,10 @@ Route::middleware(['auth'])->prefix('admin')->name('admin.')->group(function () 
             Route::post('/{letter}/refer', [LetterController::class, 'refer'])->name('refer');
             Route::get('/attachments/{attachment}/download', [LetterController::class, 'downloadAttachment'])->name('attachments.download');
         });
+
+        Route::resource('install_requests', InstallRequestController::class);
+        Route::resource('install_schedules', InstallScheduleController::class)->only(['index', 'create', 'store', 'destroy']);
+        Route::resource('periodic_services', PeriodicServiceController::class)->only(['index', 'update']);
     });
 });
 

@@ -86,8 +86,24 @@
         🛍 صفحات توضیحی
     </a>
 
+    <hr class="border-secondary">
+
     <a href="{{ route('admin.letters.index') }}" class="{{ request()->routeIs('letters.*') ? 'active' : '' }}">
         📬 اتوماسیون نامه‌ها
+    </a>
+
+    <hr class="border-secondary">
+
+    <a href="{{ route('admin.install_requests.index') }}" class="{{ request()->routeIs('install_requests.*') ? 'active' : '' }}">
+        ثبت درخواست سرویس
+    </a>
+
+    <a href="{{ route('admin.install_schedules.index') }}" class="{{ request()->routeIs('install_schedules.*') ? 'active' : '' }}">
+        زمانبندی سرویس
+    </a>
+
+    <a href="{{ route('admin.periodic_services.index') }}" class="{{ request()->routeIs('periodic_services.*') ? 'active' : '' }}">
+        دوره سرویس
     </a>
 
     <hr class="border-secondary">
