@@ -14,6 +14,7 @@ use App\Http\Controllers\ProductController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\SliderController;
 use App\Http\Controllers\UserController;
+use App\Http\Controllers\ZarinpalController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/',  [MainController::class, 'index'])->name('main.index');
@@ -41,6 +42,9 @@ Route::prefix('cart')->group(function () {
         Route::post('/pay', [CartController::class, 'pay'])->name('cart.pay');
     });
 });
+
+Route::get('/pay/{order}', [ZarinpalController::class, 'pay'])->name('zarinpal.pay');
+Route::get('/callback/zarinpal', [ZarinpalController::class, 'callback'])->name('zarinpal.callback');
 
 Route::get('/register', [AuthController::class, 'create'])->name('register');
 Route::post('/register', [AuthController::class, 'register'])->name('register.create');

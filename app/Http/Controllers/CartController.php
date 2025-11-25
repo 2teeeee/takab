@@ -145,7 +145,7 @@ class CartController extends Controller
             ]);
         }
 
-        return 'در حال انتقال به بانک می باشید...';
+        return redirect()->route('zarinpal.pay',['order'=> $order]);
     }
 
     private function calculateCartTotal(): int
