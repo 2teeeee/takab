@@ -61,6 +61,7 @@ Route::middleware(['auth'])->prefix('profile')->name('profile.')->group(function
     Route::post('/password', [ProfileController::class, 'updatePassword'])->name('password.update');
 
     Route::get('/orders', [ProfileController::class, 'orders'])->name('orders');
+    Route::get('/orders/{id}', [ProfileController::class, 'orderDetails'])->name('order.details');
 });
 
 Route::middleware(['auth'])->prefix('admin')->name('admin.')->group(function () {
