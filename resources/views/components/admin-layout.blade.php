@@ -102,6 +102,9 @@
         زمانبندی سرویس
     </a>
 
+    <a href="{{ route('admin.orders.index') }}" class="{{ request()->routeIs('orders.*') ? 'active' : '' }}">
+        سفارش ها
+    </a>
     <a href="{{ route('admin.periodic_services.index') }}" class="{{ request()->routeIs('periodic_services.*') ? 'active' : '' }}">
         دوره سرویس
     </a>

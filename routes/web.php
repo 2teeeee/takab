@@ -8,6 +8,7 @@ use App\Http\Controllers\InstallRequestController;
 use App\Http\Controllers\InstallScheduleController;
 use App\Http\Controllers\LetterController;
 use App\Http\Controllers\MainController;
+use App\Http\Controllers\OrderController;
 use App\Http\Controllers\PageController;
 use App\Http\Controllers\PeriodicServiceController;
 use App\Http\Controllers\ProductController;
@@ -86,6 +87,12 @@ Route::middleware(['auth'])->prefix('admin')->name('admin.')->group(function () 
         Route::resource('install_requests', InstallRequestController::class);
         Route::resource('install_schedules', InstallScheduleController::class)->only(['index', 'create', 'store', 'destroy']);
         Route::resource('periodic_services', PeriodicServiceController::class)->only(['index', 'update']);
+
+
+        Route::prefix('orders')->name('orders.')->group(function () {
+            Route::get('/', [OrderController::class, 'index'])->name('index');
+            Route::get('/{order}', [OrderController::class, 'show'])->name('show');
+        });
     });
 });
 
