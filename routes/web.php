@@ -92,6 +92,7 @@ Route::middleware(['auth'])->prefix('admin')->name('admin.')->group(function () 
         Route::prefix('orders')->name('orders.')->group(function () {
             Route::get('/', [OrderController::class, 'index'])->name('index');
             Route::get('/{order}', [OrderController::class, 'show'])->name('show');
+            Route::post('/{order}/status', [OrderController::class, 'updateStatus'])->name('updateStatus');
         });
     });
 });

@@ -93,17 +93,14 @@
     </a>
 
     <hr class="border-secondary">
-
+    <a href="{{ route('admin.orders.index') }}" class="{{ request()->routeIs('orders.*') ? 'active' : '' }}">
+        سفارش ها
+    </a>
     <a href="{{ route('admin.install_requests.index') }}" class="{{ request()->routeIs('install_requests.*') ? 'active' : '' }}">
         ثبت درخواست سرویس
     </a>
-
     <a href="{{ route('admin.install_schedules.index') }}" class="{{ request()->routeIs('install_schedules.*') ? 'active' : '' }}">
         زمانبندی سرویس
-    </a>
-
-    <a href="{{ route('admin.orders.index') }}" class="{{ request()->routeIs('orders.*') ? 'active' : '' }}">
-        سفارش ها
     </a>
     <a href="{{ route('admin.periodic_services.index') }}" class="{{ request()->routeIs('periodic_services.*') ? 'active' : '' }}">
         دوره سرویس
