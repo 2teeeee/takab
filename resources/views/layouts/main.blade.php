@@ -108,7 +108,7 @@
                                 </li>
                                 @endif
                                 <li>
-                                    <a class="text-dark text-decoration-none px-2 pb-1 align-self-center d-flex" href="{{route('profile.orders')}}">
+                                    <a class="text-dark text-decoration-none px-2 pb-1 align-self-center d-flex" href="{{route('profile.orders.index')}}">
                                         <i class="bi bi-bag-check me-2"></i>
                                         <span>سفارش ها</span>
                                     </a>

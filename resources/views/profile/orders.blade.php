@@ -37,7 +37,7 @@
                     </td>
                     <td>{{ $order->reference_id ?? '-' }}</td>
                     <td>
-                        <a href="{{ route('profile.order.details', ['id'=>$order->id]) }}" class="btn btn-sm btn-success">
+                        <a href="{{ route('profile.orders.details', ['id'=>$order->id]) }}" class="btn btn-sm btn-success">
                             <i class="bi bi-eye"></i>
                         </a>
                     </td>

@@ -15,6 +15,7 @@ use App\Http\Controllers\ProductController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\SliderController;
 use App\Http\Controllers\UserController;
+use App\Http\Controllers\UserInstallRequestController;
 use App\Http\Controllers\ZarinpalController;
 use Illuminate\Support\Facades\Route;
 
@@ -58,11 +59,21 @@ Route::middleware(['auth'])->prefix('profile')->name('profile.')->group(function
     Route::get('/edit', [ProfileController::class, 'edit'])->name('edit');
     Route::post('/update', [ProfileController::class, 'update'])->name('update');
 
-    Route::get('/password', [ProfileController::class, 'editPassword'])->name('password.edit');
-    Route::post('/password', [ProfileController::class, 'updatePassword'])->name('password.update');
+    Route::prefix('password')->name('password.')->group(function () {
+        Route::get('/', [ProfileController::class, 'editPassword'])->name('edit');
+        Route::post('/', [ProfileController::class, 'updatePassword'])->name('update');
+    });
 
-    Route::get('/orders', [ProfileController::class, 'orders'])->name('orders');
-    Route::get('/orders/{id}', [ProfileController::class, 'orderDetails'])->name('order.details');
+    Route::prefix('orders')->name('orders.')->group(function () {
+        Route::get('/', [ProfileController::class, 'orders'])->name('index');
+        Route::get('/{id}', [ProfileController::class, 'orderDetails'])->name('details');
+    });
+
+    Route::prefix('install-requests')->name('install_requests.')->group(function () {
+        Route::get('/', [UserInstallRequestController::class, 'index'])->name('index');
+        Route::get('/create', [UserInstallRequestController::class, 'create'])->name('create');
+        Route::post('/', [UserInstallRequestController::class, 'store'])->name('store');
+    });
 });
 
 Route::middleware(['auth'])->prefix('admin')->name('admin.')->group(function () {

@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 
 class InstallRequest extends Model
@@ -33,6 +34,11 @@ class InstallRequest extends Model
     public function schedule(): HasOne
     {
         return $this->hasOne(InstallSchedule::class);
+    }
+
+    public function schedules(): HasMany
+    {
+        return $this->hasMany(InstallSchedule::class, 'install_request_id');
     }
 
     public function periodicService(): HasOne

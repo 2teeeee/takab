@@ -33,6 +33,16 @@
                                     <i class="bi bi-person-circle me-1"></i> اطلاعات کاربر
                                 </a>
 
+                                <a href="{{ route('profile.orders.index') }}"
+                                   class="list-group-item list-group-item-action {{ request()->routeIs('profile.orders.*') ? 'active' : '' }}">
+                                    <i class="bi bi-bag-check me-1"></i> سفارش‌های من
+                                </a>
+
+                                <a href="{{ route('profile.install_requests.index') }}"
+                                   class="list-group-item list-group-item-action {{ request()->routeIs('profile.install_requests.*') ? 'active' : '' }}">
+                                    <i class="bi bi-bag-check me-1"></i>ثبت درخواست نصب / سرویس
+                                </a>
+
                                 <a href="{{ route('profile.edit') }}"
                                    class="list-group-item list-group-item-action {{ request()->routeIs('profile.edit') ? 'active' : '' }}">
                                     <i class="bi bi-pencil-square me-1"></i> ویرایش اطلاعات
@@ -41,11 +51,6 @@
                                 <a href="{{ route('profile.password.edit') }}"
                                    class="list-group-item list-group-item-action {{ request()->routeIs('profile.password.edit') ? 'active' : '' }}">
                                     <i class="bi bi-key me-1"></i> تغییر رمز عبور
-                                </a>
-
-                                <a href="{{ route('profile.orders') }}"
-                                   class="list-group-item list-group-item-action {{ request()->routeIs('profile.orders') ? 'active' : '' }}">
-                                    <i class="bi bi-bag-check me-1"></i> سفارش‌های من
                                 </a>
                             </div>
                         </div>
