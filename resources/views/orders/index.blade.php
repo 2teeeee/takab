@@ -59,15 +59,7 @@
                             <td>{{ number_format($order->total) }} تومان</td>
 
                             <td>
-                                @if($order->status === 'paid' || $order->status === 'success')
-                                    <span class="badge bg-success">موفق / پرداخت‌شده</span>
-                                @elseif($order->status === 'pending')
-                                    <span class="badge bg-warning text-dark">در انتظار</span>
-                                @elseif($order->status === 'canceled')
-                                    <span class="badge bg-danger">لغو شده</span>
-                                @else
-                                    <span class="badge bg-secondary">{{ $order->status }}</span>
-                                @endif
+                                <x-status_badge status="{{ $order->status }}" />
                             </td>
 
                             <td>

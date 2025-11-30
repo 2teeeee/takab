@@ -25,9 +25,7 @@
                     <td>{{ $request->user->name ?? '-' }}</td>
                     <td>{{ $request->device_model }}</td>
                     <td>
-                        <span class="badge bg-{{ $request->status === 'installed' ? 'success' : ($request->status === 'scheduled' ? 'info' : 'secondary') }}">
-                            {{ __("statuses.$request->status") ?? $request->status }}
-                        </span>
+                        <x-status_badge status="{{ $request->status }}" />
                     </td>
                     <td>{{ $request->installation_date ? jdate($request->installation_date)->format('Y/m/d') : '-' }}</td>
                     <td>

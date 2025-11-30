@@ -52,7 +52,7 @@
 
                             <div class="text-end">
                                 <div class="mb-2">
-                                    @include('profile.install_requests._status_badge', ['status' => $req->status])
+                                    <x-status_badge status="{{ $req->status }}" />
                                 </div>
                                 <div class="small text-muted">ثبت‌شده: {{ jdate($req->created_at)->format('Y/m/d') }}</div>
 
