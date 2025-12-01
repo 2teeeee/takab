@@ -49,8 +49,21 @@
                         <li class="nav-item px-2">
                             <a class="nav-link active" aria-current="page" href="{{route('main.index')}}#home">خانه</a>
                         </li>
-                        <li class="nav-item px-2 border-start">
-                            <a class="nav-link" href="{{route('main.index')}}#product">محصولات</a>
+                        <li class="nav-item dropdown px-2 border-start">
+                            <a class="nav-link dropdown-toggle" href="#" role="button"
+                               data-bs-toggle="dropdown" aria-expanded="false">
+                                محصولات
+                            </a>
+
+                            <ul class="dropdown-menu">
+                                @foreach($menuCategories as $cat)
+                                    <li>
+                                        <a class="dropdown-item" href="{{ route('search', ['category'=>$cat->id]) }}">
+                                            {{ $cat->title }}
+                                        </a>
+                                    </li>
+                                @endforeach
+                            </ul>
                         </li>
                         <li class="nav-item px-2 border-start">
                             <a class="nav-link" href="{{route('page.show',['slug'=>'about'])}}">درباره ما</a>
