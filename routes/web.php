@@ -13,6 +13,7 @@ use App\Http\Controllers\PageController;
 use App\Http\Controllers\PeriodicServiceController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\SearchController;
 use App\Http\Controllers\SliderController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\UserInstallRequestController;
@@ -25,6 +26,8 @@ Route::get('/contact',  [PageController::class, 'contact'])->name('page.contact'
 Route::prefix('product')->group(function () {
     Route::get('/{id}/{slug}', [ProductController::class, 'view'])->name('product.view');
 });
+
+Route::get('/search', [SearchController::class, 'index'])->name('search');
 
 Route::get('/dashboard', function () {
     return view('dashboard');

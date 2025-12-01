@@ -60,12 +60,13 @@
                         </li>
                     </ul>
 
-                    <form class="d-flex w-50 me-auto" role="search" >
-                        <input class="form-control rounded-end-0 shadow-none" type="text" placeholder="جستجوی محصول"  id="title">
+                    <form action="{{ route('search') }}" method="GET" class="d-flex w-50 me-auto" role="search" >
+                        <input class="form-control rounded-end-0 shadow-none" type="text" placeholder="جستجوی محصول"  id="title" name="q">
                         <button type="submit" class="btn btn-outline-dark rounded-start-0">
                             <i class="bi bi-search"></i>
                         </button>
                     </form>
+
                     <ul class="navbar-nav nav-left py-1">
                         @if(!Auth::check())
                         <li class="nav-item px-2 border-start text-sm text-center d-block th-1">

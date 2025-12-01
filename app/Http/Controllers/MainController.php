@@ -28,13 +28,14 @@ class MainController extends Controller
             'products.sell_price'
         ]);
 
-        $sliders =Slider::where('is_active',true)->get();
+        $sliders = Slider::where('is_active',true)->get();
 
         return view('index', [
             'products' => $products,
             'sliders' => $sliders
         ]);
     }
+
     public function admin(): View
     {
         return view('admin');
