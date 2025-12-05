@@ -124,7 +124,7 @@ class CartController extends Controller
     public function pay(Request $request): string
     {
         $request->validate([
-            'address' => 'required|string|min:10',
+            'address' => 'required',
         ]);
 
         $cart = $this->cartService->getCart();
