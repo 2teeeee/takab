@@ -56,6 +56,14 @@
             justify-content: space-between;
             align-items: center;
         }
+        @media (max-width: 768px) {
+            .admin-sidebar {
+                display: none;
+            }
+            .admin-content {
+                margin-right: 0 !important;
+            }
+        }
     </style>
 
     @stack('styles')
@@ -66,6 +74,7 @@
 <div class="admin-sidebar">
     <h5 class="text-center text-light mb-3">مدیریت سایت</h5>
 
+    @if(auth()->user()->hasRole(['manager', 'admin']))
     <a href="{{ route('admin.users.index') }}" class="{{ request()->routeIs('admin.users.*') ? 'active' : '' }}">
         👤 کاربران
     </a>
@@ -87,12 +96,15 @@
     </a>
 
     <hr class="border-secondary">
+    @endif
 
     <a href="{{ route('admin.letters.index') }}" class="{{ request()->routeIs('letters.*') ? 'active' : '' }}">
         📬 اتوماسیون نامه‌ها
     </a>
 
     <hr class="border-secondary">
+
+    @if(auth()->user()->hasRole(['manager', 'admin']))
     <a href="{{ route('admin.orders.index') }}" class="{{ request()->routeIs('orders.*') ? 'active' : '' }}">
         سفارش ها
     </a>
@@ -107,6 +119,7 @@
     </a>
 
     <hr class="border-secondary">
+    @endif
 
     <a href="{{ route('main.index') }}">🏠 داشبورد</a>
 
@@ -120,12 +133,54 @@
     </form>
 </div>
 
+<!-- Mobile Sidebar -->
+<div class="offcanvas offcanvas-start text-bg-dark d-md-none" tabindex="-1" id="mobileSidebar">
+    <div class="offcanvas-header">
+        <h5 class="offcanvas-title">مدیریت سایت</h5>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="offcanvas"></button>
+    </div>
+
+    <div class="offcanvas-body">
+        @if(auth()->user()->hasRole(['manager', 'admin']))
+            <a href="{{ route('admin.users.index') }}" class="text-light d-block mb-2 text-decoration-none">👤 کاربران</a>
+            <a href="{{ route('admin.categories.index') }}" class="text-light d-block mb-2 text-decoration-none">📂 دسته‌ها</a>
+            <a href="{{ route('admin.products.index') }}" class="text-light d-block mb-2 text-decoration-none">🛍 محصولات</a>
+            <a href="{{ route('admin.sliders.index') }}" class="text-light d-block mb-2 text-decoration-none">🛍 اسلایدر</a>
+            <a href="{{ route('admin.pages.index') }}" class="text-light d-block mb-2 text-decoration-none">🛍 صفحات توضیحی</a>
+
+            <hr class="border-secondary">
+        @endif
+
+        <a href="{{ route('admin.letters.index') }}" class="text-light d-block mb-2 text-decoration-none">📬 اتوماسیون نامه‌ها</a>
+
+        <hr class="border-secondary">
+
+        @if(auth()->user()->hasRole(['manager', 'admin']))
+            <a href="{{ route('admin.orders.index') }}" class="text-light d-block mb-2 text-decoration-none">سفارش‌ها</a>
+            <a href="{{ route('admin.install_requests.index') }}" class="text-light d-block mb-2 text-decoration-none">درخواست سرویس</a>
+            <a href="{{ route('admin.install_schedules.index') }}" class="text-light d-block mb-2 text-decoration-none">زمان‌بندی سرویس</a>
+            <a href="{{ route('admin.periodic_services.index') }}" class="text-light d-block mb-2 text-decoration-none">دوره سرویس</a>
+
+            <hr class="border-secondary">
+        @endif
+
+        <a href="{{ route('main.index') }}" class="text-light d-block mb-2 text-decoration-none">🏠 داشبورد</a>
+        <a href="{{ route('logout') }}" class="text-light d-block text-decoration-none"
+           onclick="event.preventDefault(); document.getElementById('logout-form').submit();">
+            🚪 خروج
+        </a>
+    </div>
+</div>
+
 
 {{-- Main Content --}}
 <div class="admin-content">
 
     {{-- Header --}}
     <div class="admin-header mb-3">
+        <button class="btn btn-dark d-md-none" data-bs-toggle="offcanvas" data-bs-target="#mobileSidebar">
+            ☰
+        </button>
         <div>
             <h5 class="m-0">{{ $header }}</h5>
         </div>

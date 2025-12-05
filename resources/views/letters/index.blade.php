@@ -30,15 +30,10 @@
                     <td>{{ $letter->sender->name }}</td>
                     <td>{{ $letter->receiver->name }}</td>
                     <td>
-                        <span class="badge
-                            @if($letter->priority == 'high') bg-danger
-                            @elseif($letter->priority == 'medium') bg-warning
-                            @else bg-success @endif">
-                            {{ ucfirst($letter->priority) }}
-                        </span>
+                        <x-status_badge status="{{ $letter->priority }}" />
                     </td>
                     <td>
-                        <span class="badge bg-secondary">{{ $letter->status }}</span>
+                        <x-status_badge status="{{ $letter->status }}" />
                     </td>
                     <td>{{ jdate($letter->created_at)->format('Y/m/d H:i') }}</td>
                     <td>
