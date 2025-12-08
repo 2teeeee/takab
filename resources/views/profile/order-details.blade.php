@@ -5,7 +5,7 @@
         <div class="d-flex justify-content-between align-items-center mb-4">
             <h4 class="fw-bold">جزئیات سفارش #{{ $order->id }}</h4>
 
-            <a href="{{ route('profile.orders') }}" class="btn btn-secondary btn-sm">
+            <a href="{{ route('profile.orders.index') }}" class="btn btn-secondary btn-sm">
                 بازگشت
             </a>
         </div>
