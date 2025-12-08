@@ -156,8 +156,9 @@ class ProductController extends Controller
                 $product->images()->create([
                     'large_image_name' => 'products/large/' . $filename,
                     'small_image_name' => 'products/small/' . $filename,
-                    'is_main' => false,
+                    'is_main' => $product->mainImage ? false : true,
                 ]);
+
             }
         }
 
