@@ -37,10 +37,9 @@
                                            for="product{{ $product->id }}"
                                            style="cursor: pointer;">
 
-                                        <img src="{{ asset('storage/' . $product->small_image_name) }}"
+                                        <img src="{{ asset('storage/' . $product->mainImage?->small_image_name) }}"
                                              class="card-img-top"
-                                             alt="{{ $product->title }}"
-                                             style="object-fit: cover; height: 150px;">
+                                             alt="{{ $product->title }}">
 
                                         <div class="card-body pb-1 text-center">
                                             <div class="fw-bold card-title">{{ $product->title }}</div>
