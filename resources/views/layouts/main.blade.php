@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
+<html lang="{{ app()->getLocale() }}" dir="{{ in_array(app()->getLocale(), ['fa','ar']) ? 'rtl' : 'ltr' }}">
     <head>
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -10,7 +10,12 @@
         <meta name="keywords" content="@yield('keywords', 'تک آب, صنعت ارم, تصویه آب, مخزن آب')">
 
         <link rel="stylesheet" href="{{asset("fonts/fontstyle.css")}}">
-        <link rel="stylesheet" href="{{asset("bootstrap/dist/css/bootstrap.rtl.css")}}">
+        @if(app()->getLocale() === 'fa' || app()->getLocale() === 'ar')
+            <link rel="stylesheet" href="{{asset("bootstrap/dist/css/bootstrap.rtl.css")}}">
+        @else
+            <link rel="stylesheet" href="{{asset("bootstrap/dist/css/bootstrap.css")}}">
+        @endif
+
         <link rel="stylesheet" href="{{asset("bootstrap/icons/bootstrap-icons.css")}}">
         <link rel="stylesheet" href="{{asset("css/main.css")}}">
 
@@ -47,12 +52,14 @@
                 <div class="collapse navbar-collapse" id="navbarSupportedContent">
                     <ul class="navbar-nav me-auto mb-2 ms-3 mb-lg-0">
                         <li class="nav-item px-2">
-                            <a class="nav-link active" aria-current="page" href="{{route('main.index')}}#home">خانه</a>
+                            <a class="nav-link active" aria-current="page" href="{{route('main.index')}}#home">
+                                {{ __('app.home') }}
+                            </a>
                         </li>
                         <li class="nav-item dropdown px-2 border-start">
                             <a class="nav-link dropdown-toggle" href="#" role="button"
                                data-bs-toggle="dropdown" aria-expanded="false">
-                                محصولات
+                                {{ __('app.products') }}
                             </a>
 
                             <ul class="dropdown-menu">
@@ -66,32 +73,49 @@
                             </ul>
                         </li>
                         <li class="nav-item px-2 border-start">
-                            <a class="nav-link" href="{{route('page.show',['slug'=>'about'])}}">درباره ما</a>
+                            <a class="nav-link" href="{{route('page.show',['slug'=>'about'])}}">
+                                {{ __('app.about') }}
+                            </a>
                         </li>
                         <li class="nav-item px-2 border-start">
-                            <a class="nav-link" href="{{route('page.contact')}}">تماس با ما</a>
+                            <a class="nav-link" href="{{route('page.contact')}}">
+                                {{ __('app.contact') }}
+                            </a>
                         </li>
                     </ul>
 
                     <form action="{{ route('search') }}" method="GET" class="d-flex w-50 me-auto" role="search" >
-                        <input class="form-control rounded-end-0 shadow-none" type="text" placeholder="جستجوی محصول"  id="title" name="q">
+                        <input class="form-control rounded-end-0 shadow-none" type="text" placeholder="{{ __('app.product_search') }}"  id="title" name="q">
                         <button type="submit" class="btn btn-outline-dark rounded-start-0">
                             <i class="bi bi-search"></i>
                         </button>
                     </form>
 
                     <ul class="navbar-nav nav-left py-1">
-                        @if(!Auth::check())
+                        <li class="nav-item px-2 text-sm text-center d-flex align-items-center th-1 dropdown">
+                            <button type="button"
+                                    class="border-0 bg-transparent shadow-none text-sm text-darkgray nav-link p-0"
+                                    data-bs-toggle="dropdown">
+                                {{ strtoupper(app()->getLocale()) }}
+                            </button>
+
+                            <ul class="dropdown-menu text-sm text-decoration-none pb-1">
+                                <li><a class="dropdown-item" href="{{ route('lang.switch', 'fa') }}">🇮🇷 فارسی</a></li>
+                                <li><a class="dropdown-item" href="{{ route('lang.switch', 'en') }}">🇺🇸 English</a></li>
+                            </ul>
+                        </li>
+
+                    @if(!Auth::check())
                         <li class="nav-item px-2 border-start text-sm text-center d-block th-1">
                             <a class="nav-link" href="{{route('register')}}">
                                 <i class="bi bi-person-add icon-size-2x"></i>
-                                <div>ثبت نام</div>
+                                <div>{{ __('app.signup') }}</div>
                             </a>
                         </li>
                         <li class="nav-item px-2 border-start text-sm text-center d-block th-1">
                             <a class="nav-link" href="{{route('login')}}">
                                 <i class="bi bi-box-arrow-in-left icon-size-2x"></i>
-                                <div>ورود</div>
+                                <div>{{ __('app.login') }}</div>
                             </a>
                         </li>
 
@@ -110,28 +134,28 @@
                                 <li>
                                     <a class="text-dark text-decoration-none px-2 pb-1 align-self-center d-flex" href="{{route('profile.index')}}">
                                         <i class="bi bi-house me-2"></i>
-                                        <span>پروفایل</span>
+                                        <span>{{ __('app.profile') }}</span>
                                     </a>
                                 </li>
                                 @if(Auth::user()->hasRole(['admin','seller']))
                                 <li>
                                     <a class="text-dark text-decoration-none px-2 pb-1 align-self-center d-flex" href="{{route('assembly.index')}}">
                                         <i class="bi bi-bag-check me-2"></i>
-                                        <span>اسمبل کردن دستگاه</span>
+                                        <span>{{ __('app.Assembly') }}</span>
                                     </a>
                                 </li>
                                 @endif
                                 <li>
                                     <a class="text-dark text-decoration-none px-2 pb-1 align-self-center d-flex" href="{{route('profile.orders.index')}}">
                                         <i class="bi bi-bag-check me-2"></i>
-                                        <span>سفارش ها</span>
+                                        <span>{{ __('app.orders') }}</span>
                                     </a>
                                 </li>
                                 @if(Auth::user()->hasRole(['admin','manager']))
                                 <li>
                                     <a class="text-dark text-decoration-none px-2 pb-1 align-self-center d-flex" href="{{route('admin.index')}}">
                                         <i class="bi bi-bag-check me-2"></i>
-                                        <span>پنل مدیریت</span>
+                                        <span>{{ __('app.admin_panel') }}</span>
                                     </a>
                                 </li>
                                 @endif
@@ -144,7 +168,7 @@
                                                          onclick="event.preventDefault();
                                                 this.closest('form').submit();">
                                             <i class="bi bi-box-arrow-right me-2"></i>
-                                            <span>{{ __('logout') }}</span>
+                                            <span>{{ __('app.logout') }}</span>
                                         </a>
                                     </form>
                                 </li>
@@ -159,7 +183,7 @@
                                     0
                                 </span>
                                 <i class="bi bi-cart icon-size-2x"></i>
-                                <div>{{ __('basket') }}</div>
+                                <div>{{ __('app.basket') }}</div>
                             </a>
                         </li>
                     </ul>
@@ -182,12 +206,12 @@
             </div>
             <div class="col-md-4" id="contact">
                 <div class="fw-bold pb-2 mb-2 border-bottom">
-                    ارتباط با ما
+                    {{ __('app.contact') }}
                 </div>
                 <div class="text-start">
-                    <div class="my-1"><i class="bi bi-geo-alt-fill"></i> آدرس: شهرک صنعتی بزرگ شیراز, میدان سوم, کوشش شمالی, میدان ساعی, خیابان ساعی, خیابان پردازش,  خیابان ۸۰۷/۲, سوله پنجم سمت راست</div>
-                    <div class="my-1"><i class="bi bi-telephone-fill"></i> تلفن تماس: ۳۶-۰۷۱۳۷۷۳۴۸۳۴</div>
-                    <div class="my-1"><i class="bi bi-envelope-fill"></i> ایمیل: info@takab-sanat.ir</div>
+                    <div class="my-1"><i class="bi bi-geo-alt-fill"></i> {{ __('app.address') }}: {{ __('messages.address') }}</div>
+                    <div class="my-1"><i class="bi bi-telephone-fill"></i> {{ __('app.phone') }}: ۳۶-۰۷۱۳۷۷۳۴۸۳۴</div>
+                    <div class="my-1"><i class="bi bi-envelope-fill"></i> {{ __('app.email') }}: info@takab-sanat.ir</div>
                 </div>
             </div>
             <div class="col-md-4 py-2 text-center d-flex justify-content-center">

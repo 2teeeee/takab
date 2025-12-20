@@ -5,11 +5,11 @@
         <div class="col-md-9 border rounded-md-4 shadow px-4 py-5 bg-white">
             <div class="row">
                 <div class="col-md">
-                    <h5>تماس با ما</h5>
+                    <h5>{{ __('app.contact') }}</h5>
                     <div class="text-start">
-                        <div class="my-2"><i class="bi bi-geo-alt-fill"></i> آدرس: شهرک صنعتی بزرگ شیراز, میدان سوم, کوشش شمالی, میدان ساعی, خیابان ساعی, خیابان پردازش,  خیابان ۸۰۷/۲, سوله پنجم سمت راست</div>
+                        <div class="my-2"><i class="bi bi-geo-alt-fill"></i>{{ __('app.address') }}: {{ __('messages.address') }}</div>
                         <hr/>
-                        <div class="my-2"><i class="bi bi-telephone-fill"></i> تلفن تماس:
+                        <div class="my-2"><i class="bi bi-telephone-fill"></i> {{ __('app.phone') }}:
                             <div class="list-group text-end mt-2">
                                 <a href="tel:+987137734834" class="list-group-item list-group-item-action">۰۷۱۳۷۷۳۴۸۳۴</a>
                                 <a href="tel:+987137734835" class="list-group-item list-group-item-action">۰۷۱۳۷۷۳۴۸۳۵</a>
@@ -17,7 +17,7 @@
                             </div>
                         </div>
                         <hr/>
-                        <div class="my-1"><i class="bi bi-phone-fill"></i>موبایل:
+                        <div class="my-1"><i class="bi bi-phone-fill"></i>{{ __('app.mobile') }}:
                             <div class="list-group text-end mt-2">
                                 <a href="tel:+989037894834" class="list-group-item list-group-item-action">۰۹۰۳۷۸۹۴۸۳۴</a>
                                 <a href="tel:+989172405441" class="list-group-item list-group-item-action">۰۹۱۷۲۴۰۵۴۴۱</a>
@@ -27,7 +27,7 @@
                             </div>
                         </div>
                         <hr/>
-                        <div class="my-2"><i class="bi bi-envelope-fill"></i> ایمیل: info@takab-sanat.ir</div>
+                        <div class="my-2"><i class="bi bi-envelope-fill"></i> {{ __('app.email') }}: info@takab-sanat.ir</div>
                     </div>
                 </div>
                 <div class="col-md">

@@ -19,9 +19,17 @@ use App\Http\Controllers\UserController;
 use App\Http\Controllers\UserInstallRequestController;
 use App\Http\Controllers\ZarinpalController;
 use Illuminate\Support\Facades\Route;
+use Illuminate\Support\Facades\Session;
 
 Route::get('/',  [MainController::class, 'index'])->name('main.index');
 Route::get('/contact',  [PageController::class, 'contact'])->name('page.contact');
+
+Route::get('lang/{locale}', function ($locale) {
+    if (in_array($locale, ['fa', 'en', 'ar'])) {
+        Session::put('locale', $locale);
+    }
+    return back();
+})->name('lang.switch');
 
 Route::prefix('product')->group(function () {
     Route::get('/{id}/{slug}', [ProductController::class, 'view'])->name('product.view');
