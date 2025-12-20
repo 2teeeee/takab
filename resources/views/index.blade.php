@@ -21,30 +21,30 @@
             <div class="border border-info bg-light rounded-circle wh-100 mx-auto fs-64" >
                 <i class="bi bi-patch-check align-self-center"></i>
             </div>
-            <div>تضمین کیفیت</div>
+            <div>{{ __('app.QA') }}</div>
         </div>
         <div class="col-6 col-md-3 px-4">
             <div class="border border-info bg-light rounded-circle wh-100 mx-auto fs-64" >
                 <i class="bi bi-hand-thumbs-up align-self-center"></i>
             </div>
-            <div>پشتیبانی مستمر</div>
+            <div>{{ __('app.CS') }}</div>
         </div>
         <div class="col-6 col-md-3 px-4">
             <div class="border border-info bg-light rounded-circle wh-100 mx-auto fs-64" >
                 <i class="bi bi-cart-check align-self-center"></i>
             </div>
-            <div>خرید مطمئن</div>
+            <div>{{ __('app.SP') }}</div>
         </div>
         <div class="col-6 col-md-3 px-4">
             <div class="border border-info bg-light rounded-circle wh-100 mx-auto fs-64" >
                 <i class="bi bi-credit-card align-self-center"></i>
             </div>
-            <div>تضمین قیمت</div>
+            <div>{{ __('app.PG') }}</div>
         </div>
     </div>
 
     <div class="py-3 bg-product-gray" id="product">
-        <h3 class="text-center">محصولات تک آب</h3>
+        <h3 class="text-center">{{ __('app.products') }}</h3>
         <div class="row justify-content-center mx-0">
             <div class="col-md-10">
                 <div class="row row-cols-2 row-cols-md-3 row-cols-lg-4 row-cols-xl-5 g-4">
@@ -67,11 +67,11 @@
                                                 <span class="text-danger text-decoration-line-through">
                                                     {{ number_format($product->main_price) }}
                                                 </span>
-                                                <span class="text-danger text-xsmall">تومان</span>
+                                                <span class="text-danger text-xsmall">{{ __('app.toman') }}</span>
                                             @endif
                                         </div>
                                         <div class="col px-1 text-small">
-                                            {{ number_format($product->sell_price) }} <span class="text-xsmall">تومان</span>
+                                            {{ number_format($product->sell_price) }} <span class="text-xsmall">{{ __('app.toman') }}</span>
                                         </div>
                                     </div>
                                 </div>

@@ -27,4 +27,9 @@ return [
     'before_registered' => 'Before Registered',
     'before_not_registered' => 'Before Not Registered',
     'Remember_me' => 'Remember me',
+    'QA' => 'Quality assurance',
+    'CS' => 'Continuous support',
+    'SP' => 'Safe purchase',
+    'PG' => 'Price guarantee',
+    'toman' => 'toman',
 ];
