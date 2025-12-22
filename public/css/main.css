@@ -18,3 +18,5 @@ body {
 
 .th-1{ line-height: 1rem; }
 .text-small { font-size: 0.9em; }
+
+.pointer { cursor: pointer; }

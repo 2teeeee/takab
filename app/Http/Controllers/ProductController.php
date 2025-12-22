@@ -36,7 +36,7 @@ class ProductController extends Controller
 
     public function create(): View
     {
-        $categories = Category::orderBy('title')->get();
+        $categories = Category::all();
         return view('products.form', [
             'product' => new Product(),
             'categories' => $categories,
@@ -45,27 +45,37 @@ class ProductController extends Controller
 
     public function store(Request $request): RedirectResponse
     {
-        $data = $request->validate([
-            'title' => 'required|string|max:255',
-            'small_text' => 'nullable|string',
-            'large_text' => 'nullable|string',
-            'slug' => 'nullable|string|max:255',
-            'keywords' => 'nullable|string',
-            'description' => 'nullable|string',
+        $locales = ['fa', 'en', 'ar'];
+
+        $request->validate([
+            'category_id' => 'required|exists:categories,id',
             'main_price' => 'nullable|numeric',
             'sell_price' => 'nullable|numeric',
-            'category_id' => 'required|exists:categories,id',
+            'slug' => 'nullable|string|max:255',
             'images.*' => 'nullable|image|max:2048',
-            'is_assembly_enabled' => 'nullable|boolean',
-            'is_main_sale' => 'nullable|boolean',
         ]);
 
-        // ساخت اسلاگ در صورت خالی بودن
-        $data['slug'] = $data['slug'] ?: Str::slug($data['title']);
-        $data['is_assembly_enabled'] = $request->boolean('is_assembly_enabled');
-        $data['is_main_sale'] = $request->boolean('is_main_sale');
+        $product = Product::create([
+            'category_id' => $request->category_id,
+            'main_price' => $request->main_price,
+            'sell_price' => $request->sell_price,
+            'slug' => $request->input("slug") ?: Str::slug($request->input("title.fa")),
+            'is_assembly_enabled' => $request->boolean('is_assembly_enabled'),
+            'is_main_sale' => $request->boolean('is_main_sale'),
+        ]);
 
-        $product = Product::create($data);
+        foreach ($locales as $locale) {
+            if (!$request->input("title.$locale")) continue;
+
+            $product->translations()->create([
+                'locale' => $locale,
+                'title' => $request->input("title.$locale"),
+                'small_text' => $request->input("small_text.$locale"),
+                'large_text' => $request->input("large_text.$locale"),
+                'keywords' => $request->input("keywords.$locale"),
+                'description' => $request->input("description.$locale"),
+            ]);
+        }
 
         if ($request->hasFile('images')) {
             $manager = new ImageManager(new Driver());
@@ -97,32 +107,38 @@ class ProductController extends Controller
 
     public function edit(Product $product): View
     {
-        $categories = Category::orderBy('title')->get();
+        $categories = Category::all();
         return view('products.form', compact('product', 'categories'));
     }
 
     public function update(Request $request, Product $product): RedirectResponse
     {
-        $data = $request->validate([
-            'title' => 'required|string|max:255',
-            'small_text' => 'nullable|string',
-            'large_text' => 'nullable|string',
-            'slug' => 'nullable|string|max:255',
-            'keywords' => 'nullable|string',
-            'description' => 'nullable|string',
-            'main_price' => 'nullable|numeric',
-            'sell_price' => 'nullable|numeric',
-            'category_id' => 'required|exists:categories,id',
-            'images.*' => 'nullable|image|max:2048',
-            'delete_images' => 'array',
-            'is_assembly_enabled' => 'nullable|boolean',
-            'is_main_sale' => 'nullable|boolean',
+        $locales = ['fa', 'en', 'ar'];
+
+        $product->update([
+            'category_id' => $request->category_id,
+            'main_price' => $request->main_price,
+            'sell_price' => $request->sell_price,
+            'slug' => $request->input("slug")
+                ?: Str::slug($request->input("title.fa")),
+            'is_assembly_enabled' => $request->boolean('is_assembly_enabled'),
+            'is_main_sale' => $request->boolean('is_main_sale'),
         ]);
 
-        $data['is_assembly_enabled'] = $request->boolean('is_assembly_enabled');
-        $data['is_main_sale'] = $request->boolean('is_main_sale');
+        foreach ($locales as $locale) {
+            if (!$request->input("title.$locale")) continue;
 
-        $product->update($data);
+            $product->translations()->updateOrCreate(
+                ['locale' => $locale],
+                [
+                    'title' => $request->input("title.$locale"),
+                    'small_text' => $request->input("small_text.$locale"),
+                    'large_text' => $request->input("large_text.$locale"),
+                    'keywords' => $request->input("keywords.$locale"),
+                    'description' => $request->input("description.$locale"),
+                ]
+            );
+        }
 
         // حذف تصاویر انتخاب‌شده
         if ($request->delete_images) {
@@ -134,7 +150,6 @@ class ProductController extends Controller
                 }
             }
         }
-
 
         if ($request->hasFile('images')) {
             $manager = new ImageManager(new Driver());

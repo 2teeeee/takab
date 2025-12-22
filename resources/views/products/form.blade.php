@@ -11,37 +11,92 @@
                 @method('PUT')
             @endif
 
+            @php
+                $languages = [
+                    'fa' => '🇮🇷 فارسی',
+                    'en' => '🇺🇸 English',
+                    'ar' => '🇸🇦 العربية',
+                ];
+            @endphp
+
+            <ul class="nav nav-tabs mb-3">
+                @foreach($languages as $key => $label)
+                    <li class="nav-item">
+                        <a href="#{{ $locale }}" class="nav-link {{ $loop->first ? 'active' : '' }}"
+                                data-bs-toggle="tab"
+                                data-bs-target="#lang-{{ $key }}">
+                            {{ $label }}
+                        </a>
+                    </li>
+                @endforeach
+            </ul>
+
+            <div class="tab-content border rounded-2 p-2">
+                @foreach($languages as $locale => $label)
+                    @php
+                        $tr = $product->translations->firstWhere('locale', $locale);
+                    @endphp
+
+                    <div class="tab-pane fade {{ $loop->first ? 'show active' : '' }}" id="lang-{{ $locale }}">
+
+                        <div class="mb-3">
+                            <label class="form-label">نام محصول ({{ $label }})</label>
+                            <input type="text" name="title[{{ $locale }}]"
+                                   class="form-control"
+                                   value="{{ old("title.$locale", $tr->title ?? '') }}">
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">توضیح کوتاه</label>
+                            <textarea name="small_text[{{ $locale }}]"
+                                      class="form-control"
+                                      rows="2">{{ old("small_text.$locale", $tr->small_text ?? '') }}</textarea>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">توضیحات کامل</label>
+                            <textarea name="large_text[{{ $locale }}]"
+                                      class="form-control editor"
+                                      rows="10">{{ old("large_text.$locale", $tr->large_text ?? '') }}</textarea>
+                        </div>
+
+
+
+                        <div class="mb-3">
+                            <label class="form-label">کلمات کلیدی</label>
+                            <textarea name="keywords[{{ $locale }}]"
+                                      class="form-control"
+                                      rows="2">{{ old("keywords.$locale", $tr->keywords ?? '') }}</textarea>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">توضیح موتور جستجو</label>
+                            <textarea name="description[{{ $locale }}]"
+                                      class="form-control"
+                                      rows="2">{{ old("description.$locale", $tr->description ?? '') }}</textarea>
+                        </div>
+
+                    </div>
+                @endforeach
+            </div>
+
             <div class="row">
-                <div class="col-md-6 mb-3">
-                    <label class="form-label">نام محصول</label>
-                    <input type="text" name="title" class="form-control" value="{{ old('title', $product->title) }}" required>
-                </div>
                 <div class="col-md-6 mb-3">
                     <label class="form-label">اسلاگ (اختیاری)</label>
                     <input type="text" name="slug" class="form-control" value="{{ old('slug', $product->slug) }}">
                 </div>
-            </div>
 
-            <div class="mb-3">
-                <label class="form-label">دسته‌بندی محصول</label>
-                <select name="category_id" class="form-select" required>
-                    @foreach($categories as $cat)
-                        <option value="{{ $cat->id }}"
-                            {{ old('category_id', $product->category_id) == $cat->id ? 'selected' : '' }}>
-                            {{ $cat->title }}
-                        </option>
-                    @endforeach
-                </select>
-            </div>
-
-            <div class="mb-3">
-                <label class="form-label">توضیح کوتاه</label>
-                <textarea name="small_text" class="form-control" rows="2">{{ old('small_text', $product->small_text) }}</textarea>
-            </div>
-
-            <div class="mb-3">
-                <label class="form-label">توضیحات کامل</label>
-                <textarea id="editor" name="large_text" class="form-control" rows="10">{{ old('large_text', $product->large_text) }}</textarea>
+                <div class="col-md-6 mb-3">
+                    <label class="form-label">دسته‌بندی محصول</label>
+                    <select name="category_id" class="form-select" required>
+                        @foreach($categories as $cat)
+                            <option value="{{ $cat->id }}"
+                                {{ old('category_id', $product->category_id) == $cat->id ? 'selected' : '' }}>
+                                {{ $cat->title }}
+                            </option>
+                        @endforeach
+                    </select>
+                </div>
             </div>
 
             <div class="row">
@@ -109,13 +164,14 @@
 
     <script src="https://cdn.ckeditor.com/ckeditor5/39.0.1/classic/ckeditor.js"></script>
     <script>
-        ClassicEditor.create(document.querySelector('#editor'), {
-            language: 'fa',
-            ckfinder: {
-                uploadUrl: "{{ route('admin.products.uploadImage') }}?&_token={{ csrf_token() }}"
-            }
-        }).catch(error => {
-            console.error(error);
+        document.querySelectorAll('.editor').forEach(el => {
+            ClassicEditor.create(el, {
+                language: 'fa',
+                ckfinder: {
+                    uploadUrl: "{{ route('admin.products.uploadImage') }}?_token={{ csrf_token() }}"
+                }
+            });
         });
     </script>
+
 </x-admin-layout>

@@ -19,21 +19,32 @@ class CategoryController extends Controller
 
     public function create(): View
     {
-        return view('categories.create');
+        $category = new Category;
+        return view('categories.create', compact('category'));
     }
 
     public function store(Request $request): RedirectResponse
     {
-        $data = $request->validate([
-            'title' => 'required|string|max:255',
-            'keywords' => 'nullable|string',
-            'description' => 'nullable|string',
+        $locales = ['fa', 'en', 'ar'];
+
+        $request->validate([
             'is_assembly_enabled' => 'nullable|boolean',
         ]);
 
-        $data['is_assembly_enabled'] = $request->boolean('is_assembly_enabled');
+        $category = Category::create([
+            'is_assembly_enabled' => $request->boolean('is_assembly_enabled'),
+        ]);
 
-        Category::create($data);
+        foreach ($locales as $locale) {
+            if (!$request->input("title.$locale")) continue;
+
+            $category->translations()->create([
+                'locale' => $locale,
+                'title' => $request->input("title.$locale"),
+                'keywords' => $request->input("keywords.$locale"),
+                'description' => $request->input("description.$locale"),
+            ]);
+        }
 
         return redirect()->route('admin.categories.index')->with('success', 'دسته با موفقیت ایجاد شد.');
     }
@@ -45,15 +56,24 @@ class CategoryController extends Controller
 
     public function update(Request $request, Category $category)
     {
-        $data = $request->validate([
-            'title' => 'required|string|max:255',
-            'keywords' => 'nullable|string',
-            'description' => 'nullable|string',
-            'is_assembly_enabled' => 'nullable|boolean',
+        $locales = ['fa', 'en', 'ar'];
+
+        $category->update([
+            'is_assembly_enabled' => $request->boolean('is_assembly_enabled'),
         ]);
 
-        $data['is_assembly_enabled'] = $request->boolean('is_assembly_enabled');
-        $category->update($data);
+        foreach ($locales as $locale) {
+            if (!$request->input("title.$locale")) continue;
+
+            $category->translations()->updateOrCreate(
+                ['locale' => $locale],
+                [
+                    'title' => $request->input("title.$locale"),
+                    'keywords' => $request->input("keywords.$locale"),
+                    'description' => $request->input("description.$locale"),
+                ]
+            );
+        }
 
         return redirect()->route('admin.categories.index')->with('success', 'دسته با موفقیت ویرایش شد.');
     }

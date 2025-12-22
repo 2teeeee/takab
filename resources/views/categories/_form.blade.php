@@ -1,17 +1,55 @@
 @csrf
-<div class="mb-3">
-    <label for="title" class="form-label">عنوان</label>
-    <input type="text" name="title" class="form-control" value="{{ old('title', $category->title ?? '') }}" required>
-</div>
+@php
+    $languages = [
+        'fa' => '🇮🇷 فارسی',
+        'en' => '🇺🇸 English',
+        'ar' => '🇸🇦 العربية',
+    ];
+@endphp
+<ul class="nav nav-tabs mb-3">
+    @foreach($languages as $locale => $label)
+        <li class="nav-item">
+            <a href="#{{ $locale }}" class="nav-link {{ $loop->first ? 'active' : '' }}"
+                    data-bs-toggle="tab"
+                    data-bs-target="#lang-{{ $locale }}">
+                {{ $label }}
+            </a>
+        </li>
+    @endforeach
+</ul>
 
-<div class="mb-3">
-    <label for="keywords" class="form-label">کلمات کلیدی</label>
-    <textarea name="keywords" class="form-control" rows="2">{{ old('keywords', $category->keywords ?? '') }}</textarea>
-</div>
+<div class="tab-content border rounded-3 p-2">
+    @foreach($languages as $locale => $label)
+        @php
+            $tr = $category->translations->firstWhere('locale', $locale);
+        @endphp
 
-<div class="mb-3">
-    <label for="description" class="form-label">توضیحات</label>
-    <textarea name="description" class="form-control" rows="4">{{ old('description', $category->description ?? '') }}</textarea>
+        <div class="tab-pane fade {{ $loop->first ? 'show active' : '' }}" id="lang-{{ $locale }}">
+
+            <div class="mb-3">
+                <label class="form-label">عنوان ({{ $label }})</label>
+                <input type="text"
+                       name="title[{{ $locale }}]"
+                       class="form-control"
+                       value="{{ old("title.$locale", $tr->title ?? '') }}">
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label">کلمات کلیدی</label>
+                <textarea name="keywords[{{ $locale }}]"
+                          class="form-control"
+                          rows="2">{{ old("keywords.$locale", $tr->keywords ?? '') }}</textarea>
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label">توضیحات</label>
+                <textarea name="description[{{ $locale }}]"
+                          class="form-control"
+                          rows="4">{{ old("description.$locale", $tr->description ?? '') }}</textarea>
+            </div>
+
+        </div>
+    @endforeach
 </div>
 
 <div class="form-check form-switch mb-3">

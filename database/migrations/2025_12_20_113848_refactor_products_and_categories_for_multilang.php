@@ -21,7 +21,6 @@ return new class extends Migration
                 'title',
                 'small_text',
                 'large_text',
-                'slug',
                 'keywords',
                 'description',
             ]);
@@ -78,7 +77,6 @@ return new class extends Migration
             $table->string('title');
             $table->text('small_text')->nullable();
             $table->longText('large_text')->nullable();
-            $table->string('slug')->nullable();
             $table->text('keywords')->nullable();
             $table->text('description')->nullable();
         });
