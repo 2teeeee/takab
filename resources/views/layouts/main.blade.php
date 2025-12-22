@@ -23,7 +23,6 @@
         <script src="{{asset("bootstrap/dist/js/popper.min.js")}}"></script>
         <script src="{{asset("bootstrap/dist/js/bootstrap.js")}}"></script>
 
-        @vite(['resources/js/app.js'])
 
         <script>
             document.addEventListener("DOMContentLoaded", () => {
@@ -66,7 +65,7 @@
                                 @foreach($menuCategories as $cat)
                                     <li>
                                         <a class="dropdown-item" href="{{ route('search', ['category'=>$cat->id]) }}">
-                                            {{ $cat->title }}
+                                            {{ $cat->translation->title }}
                                         </a>
                                     </li>
                                 @endforeach

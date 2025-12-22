@@ -1,13 +1,13 @@
 <x-main-layout>
-    @section('title', 'تک آب صنعت ارم | '.$product->title)
-    @section('description', $product->description)
-    @section('keywords', $product->keywords)
+    @section('title', 'تک آب صنعت ارم | '.$product->translation->title)
+    @section('description', $product->translation->description)
+    @section('keywords', $product->translation->keywords)
 
     <div class="bg-product-detail py-2">
         <div class="container rounded-1 px-0 shadow bg-white">
             <div class="text-small rounded-top-1 mb-2 p-1 bg-product-gray">
-                <a href="{{route('main.index')}}" class="text-secondary text-decoration-none">خانه</a> |
-                <a href="{{route('main.index')}}" class="text-secondary text-decoration-none">{{$product->category?->title}}</a> |
+                <a href="{{route('main.index')}}" class="text-secondary text-decoration-none">{{ __('app.home') }}</a> |
+                <a href="{{route('main.index')}}" class="text-secondary text-decoration-none">{{$product->category?->translation->title}}</a> |
                 <span class="text-dark">{{$product->title}}</span>
             </div>
             <div class="row border-bottom">
@@ -15,10 +15,10 @@
                     <img src="{{ asset('storage/' . $product->mainImage->large_image_name) }}" class="card-img-top" alt="{{$product->title}}">
                 </div>
                 <div class="col-md-9">
-                    <h5 class="border-bottom pb-2">{{$product->title}}</h5>
+                    <h5 class="border-bottom pb-2">{{$product->translation->title}}</h5>
                     <div class="row">
                         <div class="col-md-7 text-small">
-                            {{$product->small_text}}
+                            {{$product->translation->small_text}}
                         </div>
                         <div class="col-md-5 text-center">
                             <div class="py-2 @if($product->main_price != $product->sell_price) border-bottom @endif">
@@ -26,11 +26,11 @@
                                     <span class="text-danger text-decoration-line-through">
                                         {{ number_format($product->main_price) }}
                                     </span>
-                                    <span class="text-danger text-small">تومان</span>
+                                    <span class="text-danger text-small">{{ __('app.toman') }}</span>
                                 @endif
                             </div>
                             <div class="py-2">
-                                {{ number_format($product->sell_price) }} <span class="text-small">تومان</span>
+                                {{ number_format($product->sell_price) }} <span class="text-small">{{ __('app.toman') }}</span>
                             </div>
                             <div class="mt-3">
                                 <div id="cart-actions">
@@ -42,7 +42,7 @@
                                         </div>
                                     @else
                                         <button class="btn btn-outline-success" onclick="updateCart({{ $product->id }}, 1)">
-                                            افزودن به سبد
+                                            {{ __('addToBasket') }}
                                         </button>
                                     @endif
                                 </div>
@@ -52,8 +52,8 @@
                 </div>
             </div>
             <div class="p-3">
-                <h5>توضیحات محصول</h5>
-                {!! $product->large_text !!}
+                <h5>{{ __('app.productDescription') }}</h5>
+                {!! $product->translation->large_text !!}
             </div>
         </div>
     </div>

@@ -5,17 +5,17 @@
         <div class="mb-4">
             <div class="progress" style="height: 20px;">
                 <div class="progress-bar bg-success" role="progressbar" style="width: 33%">
-                    <span class="fw-bold text-small">مرحله ۱ از ۳: سبد خرید</span>
+                    <span class="fw-bold text-small">{{ __('app.step') }} ۱ {{ __('app.from') }} ۳: {{ __('app.basket') }}</span>
                 </div>
             </div>
             <div class="d-flex justify-content-between mt-2 small text-muted">
-                <span>سبد خرید</span>
-                <span>آدرس</span>
-                <span>پرداخت</span>
+                <span>{{ __('app.basket') }}</span>
+                <span>{{ __('app.address') }}</span>
+                <span>{{ __('app.payment') }}</span>
             </div>
         </div>
 
-        <h3 class="mb-4">سبد خرید شما</h3>
+        <h3 class="mb-4">{{ __('basket') }}</h3>
 
         @if($cart->items->count() > 0)
             <div class="row">
@@ -24,44 +24,44 @@
                     <form method="POST" action="{{ route('cart.clear') }}" class="mb-3">
                         @csrf
                         @method('DELETE')
-                        <button class="btn btn-sm btn-danger">خالی کردن سبد</button>
+                        <button class="btn btn-sm btn-danger">{{ __('app.clearBasket') }}</button>
                     </form>
 
                     <div class="table-responsive">
                         <table class="table table-bordered align-middle">
                             <thead class="table-light">
                             <tr>
-                                <th>محصول</th>
-                                <th>قیمت</th>
-                                <th>تعداد</th>
-                                <th>جمع</th>
-                                <th>حذف</th>
+                                <th>{{ __('app.product') }}</th>
+                                <th>{{ __('app.price') }}</th>
+                                <th>{{ __('app.quantity') }}</th>
+                                <th>{{ __('app.total') }}</th>
+                                <th>{{ __('app.delete') }}</th>
                             </tr>
                             </thead>
                             <tbody>
                             @foreach($cart->items as $item)
                                 <tr id="row-{{$item->product->id}}">
                                     <td>
-                                        <strong>{{ $item->product->title }}</strong>
+                                        <strong>{{ $item->product->translation->title }}</strong>
 
                                         {{-- اگر محصول اسمبل‌شده است --}}
                                         @if(!empty($item->meta['parts']))
                                             <div class="mt-2 p-2 bg-light rounded small text-muted">
                                                 <div class="fw-bold text-success mb-1">
-                                                    <i class="bi bi-gear-wide-connected me-1"></i> قطعات دستگاه:
+                                                    <i class="bi bi-gear-wide-connected me-1"></i>{{ __('app.deviceParts') }}:
                                                 </div>
                                                 <ul class="list-unstyled mb-0 ps-2">
                                                     @foreach($item->meta['parts'] as $part)
                                                         <li class="border-bottom pb-1 mb-1">
                                                             <span class="d-block">{{ $part['name'] }}</span>
-                                                            <span class="text-secondary">{{ number_format($part['price']) }} تومان</span>
+                                                            <span class="text-secondary">{{ number_format($part['price']) }} {{ __('app.toman') }}</span>
                                                         </li>
                                                     @endforeach
                                                 </ul>
                                             </div>
                                         @endif
                                     </td>
-                                    <td>{{ number_format($item->price) }} تومان</td>
+                                    <td>{{ number_format($item->price) }} {{ __('app.toman') }}</td>
                                     <td>
                                         <div class="d-flex align-items-center">
                                             <button class="btn btn-sm btn-outline-secondary decrease-btn"
@@ -74,7 +74,7 @@
                                         </div>
                                     </td>
                                     <td class="item-total-{{ $item->product->id }}">
-                                        {{ number_format($item->total) }} تومان
+                                        {{ number_format($item->total) }} {{ __('app.toman') }}
                                     </td>
                                     <td>
                                         <button class="btn btn-sm btn-danger remove-btn"
@@ -93,17 +93,17 @@
                 <div class="col-lg-4">
                     <div class="card shadow-sm">
                         <div class="card-body">
-                            <h5 class="card-title mb-3">خلاصه سفارش</h5>
+                            <h5 class="card-title mb-3">{{ __('app.orderSummary') }}</h5>
                             <p class="mb-2">
-                                جمع کل:
-                                <strong id="cart-total">{{ number_format($cart->items->sum('total')) }} تومان</strong>
+                                {{ __('app.total') }}:
+                                <strong id="cart-total">{{ number_format($cart->items->sum('total')) }} {{ __('app.toman') }}</strong>
                             </p>
                             <p class="mb-3">
-                                تعداد کالاها:
+                                {{ __('app.quantity') }}:
                                 <strong id="cart-count">{{ $cart->items->sum('quantity') }}</strong>
                             </p>
                             <a href="{{route('cart.address')}}" class="btn btn-success w-100">
-                                ادامه به تسویه حساب
+                                {{ __('app.nextToPay') }}
                             </a>
                         </div>
                     </div>
@@ -111,7 +111,7 @@
             </div>
         @else
             <div class="alert alert-info">
-                سبد خرید شما خالی است.
+                {{ __('message.emptyBasket') }}
             </div>
         @endif
     </div>
@@ -125,13 +125,13 @@
 
             if (qtyEl && data.quantity > 0) {
                 qtyEl.textContent = data.quantity;
-                totalEl.textContent = data.item_total + " تومان";
+                totalEl.textContent = data.item_total + " {{ __('app.toman') }}";
             } else {
                 const row = document.querySelector("#row-" + productId);
                 if (row) row.remove();
             }
 
-            document.querySelector("#cart-total").textContent = data.cart_total + " تومان";
+            document.querySelector("#cart-total").textContent = data.cart_total + " {{ __('app.toman') }}";
             document.querySelector("#cart-count").textContent = data.cart_count;
         }
 

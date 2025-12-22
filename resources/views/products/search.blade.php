@@ -6,13 +6,13 @@
         <form action="{{ route('search') }}" method="GET" class="mb-4">
             <div class="input-group">
                 <input type="text" name="q" class="form-control"
-                       value="{{ $query }}" placeholder="جستجو در محصولات...">
-                <button class="btn btn-primary">جستجو</button>
+                       value="{{ $query }}" placeholder="{{ __('app.product_search') }}...">
+                <button class="btn btn-primary">{{ __('app.search') }}</button>
             </div>
         </form>
 
         @if($products->count() == 0)
-            <div class="alert alert-warning">هیچ محصولی یافت نشد.</div>
+            <div class="alert alert-warning">{{ __('message.NoProductsFound') }}</div>
         @endif
 
         <div class="row row-cols-2 row-cols-md-3 row-cols-lg-4 row-cols-xl-5 g-4">
@@ -25,9 +25,9 @@
                                 {{ 100 - round($product->sell_price * 100 / $product->main_price) }}%
                             </div>
                         @endif
-                        <img src="{{ asset('storage/' . $product->small_image_name) }}" class="card-img-top" alt="{{$product->title}}">
+                        <img src="{{ asset('storage/' . $product->small_image_name) }}" class="card-img-top" alt="{{$product->translation->title}}">
                         <div class="card-body pb-1">
-                            <div class="fw-bold card-title text-center">{{$product->title}} - {{$product->category_id}}</div>
+                            <div class="fw-bold card-title text-center">{{$product->translation->title}}</div>
                         </div>
                         <div class="card-footer">
                             <div class="row text-center">
@@ -36,11 +36,11 @@
                                         <span class="text-danger text-decoration-line-through">
                                                     {{ number_format($product->main_price) }}
                                                 </span>
-                                        <span class="text-danger text-xsmall">تومان</span>
+                                        <span class="text-danger text-xsmall">{{ __('app.toman') }}</span>
                                     @endif
                                 </div>
                                 <div class="col px-1 text-small">
-                                    {{ number_format($product->sell_price) }} <span class="text-xsmall">تومان</span>
+                                    {{ number_format($product->sell_price) }} <span class="text-xsmall">{{ __('app.toman') }}</span>
                                 </div>
                             </div>
                         </div>

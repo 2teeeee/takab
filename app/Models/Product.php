@@ -10,24 +10,21 @@ use Illuminate\Database\Eloquent\Relations\HasOne;
 class Product extends Model
 {
     protected $fillable = [
-        'title',
-        'small_text',
-        'large_text',
-        'slug',
-        'keywords',
-        'description',
         'main_price',
         'sell_price',
-        'seller_price',
         'category_id',
         'is_assembly_enabled',
         'is_main_sale',
         'is_assembled',
         'assembled_parts',
+        'slug',
     ];
 
     protected $casts = [
         'assembled_parts' => 'array',
+        'is_assembly_enabled' => 'boolean',
+        'is_main_sale' => 'boolean',
+        'is_assembled' => 'boolean',
     ];
 
     public function category(): BelongsTo
@@ -43,6 +40,17 @@ class Product extends Model
     public function mainImage(): HasOne
     {
         return $this->hasOne(ProductImage::class)->where('is_main', true);
+    }
+
+    public function translations(): HasMany
+    {
+        return $this->hasMany(ProductTranslation::class);
+    }
+
+    public function translation(): HasOne
+    {
+        return $this->hasOne(ProductTranslation::class)
+            ->where('locale', app()->getLocale());
     }
 
 }

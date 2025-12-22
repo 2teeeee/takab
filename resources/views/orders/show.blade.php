@@ -115,7 +115,7 @@
                     <tbody>
                     @foreach($order->items as $item)
                         <tr>
-                            <td>{{ $item->product->title }}</td>
+                            <td>{{ $item->product->translation->title }}</td>
                             <td>{{ $item->quantity }}</td>
                             <td>{{ number_format($item->price) }} تومان</td>
                             <td>{{ number_format($item->price * $item->quantity) }} تومان</td>
