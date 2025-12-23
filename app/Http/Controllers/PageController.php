@@ -34,18 +34,29 @@ class PageController extends Controller
 
     public function update(Request $request, Page $page): RedirectResponse
     {
+        $locales = ['fa', 'en', 'ar'];
+
         $request->validate([
-            'title' => 'required|string|max:255',
             'slug' => 'required|string|max:255|unique:pages,slug,' . $page->id,
-            'content' => 'nullable|string',
         ]);
 
         $page->update([
-            'title' => $request->title,
             'slug' => str($request->slug)->slug(),
-            'content' => $request->get('content'),
             'is_active' => $request->has('is_active'),
         ]);
+
+
+        foreach ($locales as $locale) {
+            if (!$request->input("title.$locale")) continue;
+
+            $page->translations()->updateOrCreate(
+                ['locale' => $locale],
+                [
+                    'title' => $request->input("title.$locale"),
+                    'content' => $request->input("content.$locale"),
+                ]
+            );
+        }
 
         return redirect()->route('admin.pages.index')->with('success', 'صفحه با موفقیت ویرایش شد.');
     }

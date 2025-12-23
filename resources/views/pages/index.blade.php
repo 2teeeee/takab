@@ -19,7 +19,7 @@
             @forelse($pages as $page)
                 <tr>
                     <td>{{ $loop->iteration }}</td>
-                    <td>{{ $page->title }}</td>
+                    <td>{{ $page->translation?->title }}</td>
                     <td>{{ $page->slug }}</td>
                     <td>
                         @if($page->is_active)

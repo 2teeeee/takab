@@ -88,7 +88,7 @@ Route::middleware(['auth'])->prefix('profile')->name('profile.')->group(function
 });
 
 Route::middleware(['auth'])->prefix('admin')->name('admin.')->group(function () {
-    Route::middleware(['role:admin,manager'])->group(function () {
+    Route::middleware(['role:admin,manager,nasab,seller,personel'])->group(function () {
         Route::get('/', [MainController::class, 'admin'])->name('index');
         Route::resource('users', UserController::class);
         Route::resource('categories', CategoryController::class);

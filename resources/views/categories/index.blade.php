@@ -18,9 +18,9 @@
             <tbody>
             @foreach ($categories as $category)
                 <tr>
-                    <td>{{ $category->title }}</td>
-                    <td>{{ $category->keywords }}</td>
-                    <td>{{ Str::limit($category->description, 80) }}</td>
+                    <td>{{ $category->translation->title }}</td>
+                    <td>{{ $category->translation->keywords }}</td>
+                    <td>{{ Str::limit($category->translation?->description, 80) }}</td>
                     <td>
                         <a href="{{ route('admin.categories.edit', $category) }}" class="btn btn-sm btn-warning">ویرایش</a>
                         <form action="{{ route('admin.categories.destroy', $category) }}" method="POST" class="d-inline">

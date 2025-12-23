@@ -150,7 +150,7 @@
                                         <span>{{ __('app.orders') }}</span>
                                     </a>
                                 </li>
-                                @if(Auth::user()->hasRole(['admin','manager']))
+                                @if(!Auth::user()->hasRole(['user']))
                                 <li>
                                     <a class="text-dark text-decoration-none px-2 pb-1 align-self-center d-flex" href="{{route('admin.index')}}">
                                         <i class="bi bi-bag-check me-2"></i>
@@ -198,10 +198,7 @@
     <div class="footer bg-footer text-light pt-3">
         <div class="row mx-0">
             <div class="col-md-4 pt-2">
-                <p>                تک آب صنعت ارم، با سال‌ها تجربه در زمینه طراحی و تولید دستگاه‌های تصفیه آب و مخزن های ذخیره آب، همراه مطمئن شما در تأمین آب سالم و باکیفیت است.
-                </p>
-                <p>                ما با بهره‌گیری از دانش فنی روز و استفاده از بهترین متریال، محصولاتی بادوام و کارآمد ارائه می‌دهیم تا نیاز خانواده‌ها، صنایع و سازمان‌ها را به بهترین شکل برآورده کنیم.
-                </p>
+                {!! $footerAbout->translation?->content !!}
             </div>
             <div class="col-md-4" id="contact">
                 <div class="fw-bold pb-2 mb-2 border-bottom">

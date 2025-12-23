@@ -38,12 +38,28 @@ class LetterController extends Controller
 
     public function create(): View
     {
-        $users = User::whereHas('roles', function ($q) {
-            $q->where('name', '!=', 'user');
-        })->where('id', '!=', auth()->id())->get();
+        $user = auth()->user();
+
+        $usersQuery = User::query()
+            ->where('id', '!=', $user->id);
+
+        if ($user->hasRole(['nasab', 'seller'])) {
+            $usersQuery->whereHas('roles', function ($q) {
+                $q->where('name', 'personel');
+                $q->where('name', '!=', 'user');
+            });
+        }
+        else {
+            $usersQuery->whereHas('roles', function ($q) {
+                $q->where('name', '!=', 'user');
+            });
+        }
+
+        $users = $usersQuery->get();
 
         return view('letters.create', compact('users'));
     }
+
 
     public function store(Request $request): RedirectResponse
     {
@@ -90,10 +106,23 @@ class LetterController extends Controller
 
         $references = $letter->references()->with(['from', 'to'])->latest()->get();
 
-        // کاربران قابل ارجاع (غیر از user)
-        $referableUsers = User::whereHas('roles', fn($q) => $q->where('name', '!=', 'user'))
-            ->where('id', '!=', $user->id)
-            ->get();
+        $usersQuery = User::query()
+            ->where('id', '!=', $user->id);
+
+        // اگر nasab یا seller بود
+        if ($user->hasRole(['nasab', 'seller'])) {
+            $usersQuery->whereHas('roles', function ($q) {
+                $q->where('name', 'personel');
+                $q->where('name', '!=', 'user');
+            });
+        }
+        else {
+            $usersQuery->whereHas('roles', function ($q) {
+                $q->where('name', '!=', 'user');
+            });
+        }
+
+        $referableUsers = $usersQuery->get();
 
         return view('letters.show', compact('letter', 'references', 'referableUsers'));
     }

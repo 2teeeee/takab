@@ -20,11 +20,11 @@
             @endphp
 
             <ul class="nav nav-tabs mb-3">
-                @foreach($languages as $key => $label)
+                @foreach($languages as $locale => $label)
                     <li class="nav-item">
                         <a href="#{{ $locale }}" class="nav-link {{ $loop->first ? 'active' : '' }}"
                                 data-bs-toggle="tab"
-                                data-bs-target="#lang-{{ $key }}">
+                                data-bs-target="#lang-{{ $locale }}">
                             {{ $label }}
                         </a>
                     </li>

@@ -21,8 +21,8 @@
             @forelse ($products as $product)
                 <tr>
                     <td>{{ $loop->iteration + ($products->currentPage() - 1) * $products->perPage() }}</td>
-                    <td>{{ $product->title }}</td>
-                    <td>{{ $product->category?->title ?? '-' }}</td>
+                    <td>{{ $product->translation?->title }}</td>
+                    <td>{{ $product->category?->translation?->title ?? '-' }}</td>
                     <td>{{ number_format($product->main_price) }} تومان</td>
                     <td>{{ number_format($product->sell_price) }} تومان</td>
                     <td>
