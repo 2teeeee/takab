@@ -103,6 +103,8 @@ Route::middleware(['auth'])->prefix('admin')->name('admin.')->group(function () 
             Route::post('/', [LetterController::class, 'store'])->name('store');
             Route::get('/{letter}', [LetterController::class, 'show'])->name('show');
             Route::post('/{letter}/refer', [LetterController::class, 'refer'])->name('refer');
+            Route::post('/{letter}/attachments',[LetterController::class, 'storeAttachment'])->name('attachments.store');
+            Route::delete('/attachments/{attachment}',[LetterController::class, 'destroyAttachment'])->name('attachments.destroy');
             Route::get('/attachments/{attachment}/download', [LetterController::class, 'downloadAttachment'])->name('attachments.download');
         });
 

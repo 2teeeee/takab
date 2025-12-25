@@ -24,16 +24,58 @@
                     <h6>ضمائم:</h6>
                     <ul>
                         @foreach($letter->attachments as $attachment)
-                            <li>
-                                <a href="{{ route('admin.letters.attachments.download', $attachment) }}" class="text-decoration-none">
-                                    <i class="bi bi-paperclip"></i> {{ $attachment->file_name }}
+                            <li class="list-group-item d-flex justify-content-between align-items-center mb-1">
+                                <a href="{{ route('admin.letters.attachments.download', $attachment) }}"
+                                   class="text-decoration-none">
+                                    <i class="bi bi-paperclip"></i>
+                                    {{ $attachment->file_name }}
                                 </a>
+
+                                <form action="{{ route('admin.letters.attachments.destroy', $attachment) }}"
+                                      method="POST"
+                                      onsubmit="return confirm('آیا از حذف این فایل مطمئن هستید؟')">
+                                    @csrf
+                                    @method('DELETE')
+
+                                    <button type="submit" class="btn btn-sm btn-outline-danger">
+                                        <i class="bi bi-trash"></i>
+                                    </button>
+                                </form>
                             </li>
                         @endforeach
                     </ul>
                 @endif
             </div>
         </div>
+
+        {{-- افزودن ضمیمه جدید --}}
+        <form action="{{ route('admin.letters.attachments.store', $letter) }}"
+              method="POST"
+              enctype="multipart/form-data"
+              id="attachmentForm" class="mb-3 pb-2 border-bottom">
+            @csrf
+
+            <div class="mb-3">
+                <label class="form-label">انتخاب فایل‌ها</label>
+                <input type="file"
+                       name="attachments[]"
+                       class="form-control"
+                       multiple
+                       required>
+            </div>
+
+            <button type="submit" class="btn btn-success" id="submitBtn">
+        <span class="btn-text">
+            <i class="bi bi-paperclip"></i>
+            افزودن ضمیمه
+        </span>
+
+                <span class="spinner-border spinner-border-sm d-none"
+                      role="status"
+                      aria-hidden="true"></span>
+                <span class="loading-text d-none">در حال آپلود...</span>
+            </button>
+        </form>
 
         {{-- فرم ارجاع --}}
         <div class="card shadow-sm mb-4">
@@ -100,4 +142,17 @@
         </div>
 
     </div>
+
+    <script>
+        document.getElementById('attachmentForm').addEventListener('submit', function () {
+            const btn = document.getElementById('submitBtn');
+
+            btn.disabled = true;
+
+            btn.querySelector('.btn-text').classList.add('d-none');
+            btn.querySelector('.spinner-border').classList.remove('d-none');
+            btn.querySelector('.loading-text').classList.remove('d-none');
+        });
+    </script>
+
 </x-admin-layout>

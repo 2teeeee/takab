@@ -11,6 +11,7 @@ use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Str;
 use Symfony\Component\HttpFoundation\StreamedResponse;
 
 class LetterController extends Controller
@@ -42,8 +43,12 @@ class LetterController extends Controller
 
         $usersQuery = User::query()
             ->where('id', '!=', $user->id);
-
-        if ($user->hasRole(['nasab', 'seller'])) {
+        if ($user->hasRole('personel')) {
+            $usersQuery->whereHas('roles', function ($q) {
+                $q->where('name', '!=', 'user');
+            });
+        }
+        elseif ($user->hasAnyRole(['nasab', 'seller'])) {
             $usersQuery->whereHas('roles', function ($q) {
                 $q->where('name', 'personel');
                 $q->where('name', '!=', 'user');
@@ -60,7 +65,6 @@ class LetterController extends Controller
         return view('letters.create', compact('users'));
     }
 
-
     public function store(Request $request): RedirectResponse
     {
         $validated = $request->validate([
@@ -74,14 +78,24 @@ class LetterController extends Controller
         $validated['sender_id'] = Auth::id();
         $letter = Letter::create($validated);
 
-        // ذخیره فایل‌های ضمیمه
         if ($request->hasFile('attachments')) {
             foreach ($request->file('attachments') as $file) {
-                $path = $file->store('attachments', 'public');
+                $originalName = pathinfo(
+                    $file->getClientOriginalName(),
+                    PATHINFO_FILENAME
+                );
+                $extension = $file->getClientOriginalExtension();
+                $random = Str::random(8);
+                $fileName = $originalName . '_' . $random . '.' . $extension;
+                $path = $file->storeAs(
+                    'attachments',
+                    $fileName,
+                    'public'
+                );
                 Attachment::create([
                     'letter_id' => $letter->id,
                     'file_path' => $path,
-                    'file_name' => $file->getClientOriginalName(),
+                    'file_name' => $fileName,
                 ]);
             }
         }
@@ -108,9 +122,12 @@ class LetterController extends Controller
 
         $usersQuery = User::query()
             ->where('id', '!=', $user->id);
-
-        // اگر nasab یا seller بود
-        if ($user->hasRole(['nasab', 'seller'])) {
+        if ($user->hasRole('personel')) {
+            $usersQuery->whereHas('roles', function ($q) {
+                $q->where('name', '!=', 'user');
+            });
+        }
+        elseif ($user->hasAnyRole(['nasab', 'seller'])) {
             $usersQuery->whereHas('roles', function ($q) {
                 $q->where('name', 'personel');
                 $q->where('name', '!=', 'user');
@@ -147,6 +164,63 @@ class LetterController extends Controller
         $letter->update(['status' => 'referred']);
 
         return back()->with('success', 'نامه با موفقیت ارجاع داده شد.');
+    }
+
+    public function storeAttachment(Request $request, Letter $letter): RedirectResponse
+    {
+        $this->authorizeView($letter);
+
+        $request->validate([
+            'attachments.*' => 'required|file|max:2048',
+        ]);
+
+        foreach ($request->file('attachments') as $file) {
+
+            $originalName = pathinfo(
+                $file->getClientOriginalName(),
+                PATHINFO_FILENAME
+            );
+
+            $extension = $file->getClientOriginalExtension();
+            $random = Str::random(8);
+
+            $fileName = $originalName . '_' . $random . '.' . $extension;
+
+            $path = $file->storeAs(
+                'attachments',
+                $fileName,
+                'public'
+            );
+
+            Attachment::create([
+                'letter_id' => $letter->id,
+                'file_path' => $path,
+                'file_name' => $fileName,
+            ]);
+        }
+
+        return back()->with('success', 'ضمیمه‌ها با موفقیت اضافه شدند.');
+    }
+
+    public function destroyAttachment(Attachment $attachment): RedirectResponse
+    {
+        $letter = $attachment->letter;
+
+        if (
+            $letter->sender_id !== Auth::id() &&
+            $letter->receiver_id !== Auth::id() &&
+            ! Auth::user()->hasRole('admin')
+        ) {
+            abort(403, 'شما اجازه حذف این ضمیمه را ندارید.');
+        }
+
+        if (Storage::disk('public')->exists($attachment->file_path)) {
+            Storage::disk('public')->delete($attachment->file_path);
+        }
+
+        $attachment->delete();
+
+        return back()->with('success', 'ضمیمه با موفقیت حذف شد.');
     }
 
     public function downloadAttachment(Attachment $attachment): StreamedResponse

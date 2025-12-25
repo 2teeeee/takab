@@ -8,6 +8,7 @@
     {{-- Bootstrap 5 --}}
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.rtl.min.css" rel="stylesheet">
 
+    <link rel="stylesheet" href="{{asset("bootstrap/icons/bootstrap-icons.css")}}">
     <link rel="stylesheet" href="{{asset("fonts/fontstyle.css")}}">
 
     <style>
