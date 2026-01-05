@@ -6,6 +6,7 @@ use App\Models\Letter;
 use App\Models\LetterReference;
 use App\Models\Attachment;
 use App\Models\User;
+use App\Services\Sms\NikSmsService;
 use Illuminate\Contracts\View\View;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -65,7 +66,7 @@ class LetterController extends Controller
         return view('letters.create', compact('users'));
     }
 
-    public function store(Request $request): RedirectResponse
+    public function store(Request $request, NikSmsService $sms): RedirectResponse
     {
         $validated = $request->validate([
             'receiver_id' => 'required|exists:users,id',
@@ -99,6 +100,8 @@ class LetterController extends Controller
                 ]);
             }
         }
+
+        $sms->sendSingle($letter->receiver->mobile, "یک نامه جدید برای شما ثبت شده است.");
 
         return redirect()->route('admin.letters.show', $letter->id)
             ->with('success', 'نامه با موفقیت ارسال شد.');
@@ -144,7 +147,7 @@ class LetterController extends Controller
         return view('letters.show', compact('letter', 'references', 'referableUsers'));
     }
 
-    public function refer(Request $request, Letter $letter): RedirectResponse
+    public function refer(Request $request, Letter $letter, NikSmsService $sms): RedirectResponse
     {
         $this->authorizeView($letter);
 
@@ -162,6 +165,8 @@ class LetterController extends Controller
 
         // به‌روزرسانی وضعیت نامه
         $letter->update(['status' => 'referred']);
+
+        $sms->sendSingle($letter->to->mobile, "یک نامه جدید برای شما ثبت شده است.");
 
         return back()->with('success', 'نامه با موفقیت ارجاع داده شد.');
     }

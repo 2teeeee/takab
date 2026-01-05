@@ -13,7 +13,8 @@
         "laravel/tinker": "^2.10.1",
         "morilog/jalali": "^3.4",
         "twbs/bootstrap": "5.3.7",
-      "ext-curl": "*"
+      "ext-curl": "*",
+      "ext-soap": "*"
     },
     "require-dev": {
         "fakerphp/faker": "^1.23",

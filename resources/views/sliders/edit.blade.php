@@ -14,49 +14,59 @@
         <form action="{{ route('admin.sliders.update', $slider) }}" method="POST" enctype="multipart/form-data">
             @csrf
             @method('PUT')
+            <div class="roe">
+                <div class="mb-3 col-md-3">
+                    <label class="form-label">زبان</label>
+                    <select name="lang" class="form-select">
+                        <option value="fa" {{ ($slider->lang == 'fa')?'selected':''}}>فارسی</option>
+                        <option value="en" {{ ($slider->lang == 'en')?'selected':''}}>انگلیسی</option>
+                        <option value="ar" {{ ($slider->lang == 'ar')?'selected':''}}>عربی</option>
+                    </select>
+                </div>
 
-            {{-- عنوان --}}
-            <div class="mb-3">
-                <label class="form-label">عنوان</label>
-                <input type="text" name="title" class="form-control" value="{{ old('title', $slider->title) }}">
-            </div>
+                {{-- عنوان --}}
+                <div class="mb-3 col-md-3">
+                    <label class="form-label">عنوان</label>
+                    <input type="text" name="title" class="form-control" value="{{ old('title', $slider->title) }}">
+                </div>
 
-            {{-- زیرعنوان --}}
-            <div class="mb-3">
-                <label class="form-label">زیرعنوان</label>
-                <input type="text" name="subtitle" class="form-control" value="{{ old('subtitle', $slider->subtitle) }}">
-            </div>
+                {{-- زیرعنوان --}}
+                <div class="mb-3 col-md-3">
+                    <label class="form-label">زیرعنوان</label>
+                    <input type="text" name="subtitle" class="form-control" value="{{ old('subtitle', $slider->subtitle) }}">
+                </div>
 
-            {{-- تصویر فعلی --}}
-            <div class="mb-3">
-                <label class="form-label d-block">تصویر فعلی</label>
-                <img src="{{ asset('storage/' . $slider->image_path) }}" alt="تصویر اسلاید" class="rounded shadow-sm" width="200">
-            </div>
+                {{-- تصویر فعلی --}}
+                <div class="mb-3 col-md-3">
+                    <label class="form-label d-block">تصویر فعلی</label>
+                    <img src="{{ asset('storage/' . $slider->image_path) }}" alt="تصویر اسلاید" class="rounded shadow-sm" width="200">
+                </div>
 
-            {{-- آپلود تصویر جدید --}}
-            <div class="mb-3">
-                <label class="form-label">تغییر تصویر (اختیاری)</label>
-                <input type="file" name="image_path" class="form-control">
-                <small class="text-muted">در صورت عدم انتخاب، تصویر فعلی باقی می‌ماند.</small>
-            </div>
+                {{-- آپلود تصویر جدید --}}
+                <div class="mb-3 col-md-3">
+                    <label class="form-label">تغییر تصویر (اختیاری)</label>
+                    <input type="file" name="image_path" class="form-control">
+                    <small class="text-muted">در صورت عدم انتخاب، تصویر فعلی باقی می‌ماند.</small>
+                </div>
 
-            {{-- متن دکمه --}}
-            <div class="mb-3">
-                <label class="form-label">متن دکمه</label>
-                <input type="text" name="button_text" class="form-control" value="{{ old('button_text', $slider->button_text) }}">
-            </div>
+                {{-- متن دکمه --}}
+                <div class="mb-3 col-md-3">
+                    <label class="form-label">متن دکمه</label>
+                    <input type="text" name="button_text" class="form-control" value="{{ old('button_text', $slider->button_text) }}">
+                </div>
 
-            {{-- لینک دکمه --}}
-            <div class="mb-3">
-                <label class="form-label">لینک دکمه</label>
-                <input type="url" name="button_link" class="form-control" value="{{ old('button_link', $slider->button_link) }}">
-            </div>
+                {{-- لینک دکمه --}}
+                <div class="mb-3 col-md-3">
+                    <label class="form-label">لینک دکمه</label>
+                    <input type="url" name="button_link" class="form-control" value="{{ old('button_link', $slider->button_link) }}">
+                </div>
 
-            {{-- وضعیت فعال بودن --}}
-            <div class="form-check mb-3">
-                <input class="form-check-input" type="checkbox" name="is_active" id="is_active"
-                    {{ old('is_active', $slider->is_active) ? 'checked' : '' }}>
-                <label class="form-check-label" for="is_active">فعال باشد</label>
+                {{-- وضعیت فعال بودن --}}
+                <div class="form-check mb-3 col-md-3">
+                    <input class="form-check-input" type="checkbox" name="is_active" id="is_active"
+                        {{ old('is_active', $slider->is_active) ? 'checked' : '' }}>
+                    <label class="form-check-label" for="is_active">فعال باشد</label>
+                </div>
             </div>
 
             <div class="d-flex justify-content-between">

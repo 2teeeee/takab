@@ -23,6 +23,7 @@ use Illuminate\Support\Facades\Session;
 
 Route::get('/',  [MainController::class, 'index'])->name('main.index');
 Route::get('/contact',  [PageController::class, 'contact'])->name('page.contact');
+Route::get('/sendsms',  [MainController::class, 'sendTestSms']);
 
 Route::get('lang/{locale}', function ($locale) {
     if (in_array($locale, ['fa', 'en', 'ar'])) {

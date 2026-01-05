@@ -2,16 +2,16 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Requests\ProfileUpdateRequest;
 use App\Models\Product;
 use App\Models\Slider;
+use App\Services\Sms\NikSmsService;
 use Illuminate\Database\Query\JoinClause;
-use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Redirect;
 use Illuminate\View\View;
+use NiksmsWebserviceServiceGroup;
+use NiksmsWebserviceStructAuthenticationModel;
+use NiksmsWebserviceStructGroupSms;
+use NiksmsWebserviceStructGroupSmsModel;
 
 class MainController extends Controller
 {
@@ -38,7 +38,7 @@ class MainController extends Controller
                 'products.sell_price',
             ]);
 
-        $sliders = Slider::where('is_active',true)->get();
+        $sliders = Slider::where('lang', $locale)->where('is_active',true)->get();
 
         return view('index', [
             'products' => $products,
@@ -50,4 +50,29 @@ class MainController extends Controller
     {
         return view('admin');
     }
+
+    public function sendTestSms(NikSmsService $sms)
+    {
+        $result = $sms->sendSingle('09173326706', "تست پنل پیامک");
+
+        if ($result['error']) {
+            return response()->json($result, 500);
+        }
+
+        return response()->json($result);
+    }
+    /*
+    public function sendTestSms()
+    {
+
+
+        $sms = new NikSmsService();
+
+        $result = $sms->sendGroupSms(
+            numbers: ['09173326706'],
+            message: 'سلام! تست ارسال پیامک نیک اس ام اس',
+        );
+
+        dd($result);
+    }*/
 }

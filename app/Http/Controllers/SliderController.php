@@ -25,6 +25,7 @@ class SliderController extends Controller
     public function store(Request $request): RedirectResponse
     {
         $request->validate([
+            'lang' => 'required',
             'title' => 'nullable|string|max:255',
             'subtitle' => 'nullable|string|max:255',
             'image_path' => 'required|image|max:2048',
@@ -39,6 +40,7 @@ class SliderController extends Controller
         $image->toWebp()->save($imagePath);
 
         Slider::create([
+            'lang' => $request->lang,
             'title' => $request->title,
             'subtitle' => $request->subtitle,
             'image_path' => $filename,
@@ -58,6 +60,7 @@ class SliderController extends Controller
     public function update(Request $request, Slider $slider): RedirectResponse
     {
         $request->validate([
+            'lang' => 'required',
             'title' => 'nullable|string|max:255',
             'subtitle' => 'nullable|string|max:255',
             'image_path' => 'nullable|image|max:2048',

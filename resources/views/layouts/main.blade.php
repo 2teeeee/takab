@@ -99,8 +99,9 @@
                             </button>
 
                             <ul class="dropdown-menu text-sm text-decoration-none pb-1">
-                                <li><a class="dropdown-item" href="{{ route('lang.switch', 'fa') }}">🇮🇷 فارسی</a></li>
-                                <li><a class="dropdown-item" href="{{ route('lang.switch', 'en') }}">🇺🇸 English</a></li>
+                                <li><a class="dropdown-item" href="{{ route('lang.switch', 'fa') }}">فارسی</a></li>
+                                <li><a class="dropdown-item" href="{{ route('lang.switch', 'en') }}">English</a></li>
+                                <li><a class="dropdown-item" href="{{ route('lang.switch', 'ar') }}">العربی</a></li>
                             </ul>
                         </li>
 
