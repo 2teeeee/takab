@@ -14,6 +14,7 @@ body {
 .card-product { border-bottom-width: 2px; }
 .card-product:hover { border-bottom-color: #0dcaf0; }
 
+.icon-size-1x { font-size: 1.2rem; }
 .icon-size-2x { font-size: 2rem; }
 
 .th-1{ line-height: 1rem; }
