@@ -19,7 +19,7 @@ class ProductController extends Controller
 {
     public function index(): View
     {
-        $products = Product::with('category')->whereNotNull('category_id')->latest()->paginate(10);
+        $products = Product::with('category')->whereNotNull('category_id')->orderBy('id','desc')->paginate(10);
 
         return view('products.index', compact('products'));
     }

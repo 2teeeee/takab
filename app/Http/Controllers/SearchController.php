@@ -13,6 +13,8 @@ class SearchController extends Controller
 {
     public function index(Request $request): View
     {
+        $locale = app()->getLocale();
+
         $query = trim($request->input('q', ''));
         $categoryId = $request->input('category');
 
@@ -34,6 +36,10 @@ class SearchController extends Controller
 
         // کوئری پایه
         $products = Product::query()
+            ->join('product_translations as t', function (JoinClause $join) use ($locale) {
+                $join->on('t.product_id', '=', 'products.id')
+                    ->where('t.locale', '=', $locale);
+            })
             ->leftJoin('product_images as image', fn (JoinClause $image) =>
                 $image->on('image.product_id', '=', 'products.id')->on('image.is_main', '=', DB::raw('1'))
             )
@@ -45,13 +51,13 @@ class SearchController extends Controller
             ->when($words, function ($q) use ($words) {
                 $q->where(function ($sub) use ($words) {
                     foreach ($words as $word) {
-                        $sub->orWhere('products.title', 'LIKE', "%{$word}%");
+                        $sub->orWhere('t.title', 'LIKE', "%{$word}%");
                     }
                 });
             })
             ->get([
                 'products.id',
-                'products.title',
+                't.title',
                 'products.slug',
                 'image.small_image_name',
                 'products.main_price',

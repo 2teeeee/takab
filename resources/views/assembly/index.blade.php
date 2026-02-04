@@ -39,10 +39,10 @@
 
                                         <img src="{{ asset('storage/' . $product->mainImage?->small_image_name) }}"
                                              class="card-img-top"
-                                             alt="{{ $product->title }}">
+                                             alt="{{ $product->translation->title }}">
 
                                         <div class="card-body pb-1 text-center">
-                                            <div class="fw-bold card-title">{{ $product->title }}</div>
+                                            <div class="fw-bold card-title">{{ $product->translation->title }}</div>
                                         </div>
 
                                         <div class="card-footer bg-light">
