@@ -56,7 +56,11 @@
                                         {{ 100 - round($product->sell_price * 100 / $product->main_price) }}%
                                     </div>
                                 @endif
-                                <img src="{{ asset('storage/' . $product->small_image_name) }}" class="card-img-top" alt="{{$product->title}}">
+                                @if($product->small_image_name)
+                                    <img src="{{ asset('storage/' . $product->small_image_name) }}" class="card-img-top" alt="{{$product->title}}">
+                                @else
+                                    <img src="{{ asset('img/no-image.png') }}" class="card-img-top" alt="{{$product->title}}">
+                                @endif
                                 <div class="card-body pb-1">
                                     <div class="fw-bold card-title text-center">{{$product->title}}</div>
                                 </div>

@@ -12,7 +12,12 @@
             </div>
             <div class="row border-bottom">
                 <div class="col-md-3 py-2">
-                    <img src="{{ asset('storage/' . $product->mainImage->large_image_name) }}" class="card-img-top" alt="{{$product->title}}">
+                    @if($product->mainImage)
+                        <img src="{{ asset('storage/' . $product->mainImage->large_image_name) }}" class="card-img-top" alt="{{$product->title}}">
+                    @else
+                        <img src="{{ asset('img/no-image.png') }}" class="card-img-top" alt="{{$product->title}}">
+                    @endif
+
                 </div>
                 <div class="col-md-9">
                     <h5 class="border-bottom pb-2">{{$product->translation->title}}</h5>

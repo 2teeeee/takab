@@ -36,11 +36,15 @@
                                     <label class="card h-100 card-product border rounded-3 overflow-hidden position-relative product-option"
                                            for="product{{ $product->id }}"
                                            style="cursor: pointer;">
-
+                                        @if($product->mainImage)
                                         <img src="{{ asset('storage/' . $product->mainImage?->small_image_name) }}"
                                              class="card-img-top"
                                              alt="{{ $product->translation->title }}">
-
+                                        @else
+                                            <img src="{{ asset('img/no-image.png') }}"
+                                                 class="card-img-top"
+                                                 alt="{{ $product->translation->title }}">
+                                        @endif
                                         <div class="card-body pb-1 text-center">
                                             <div class="fw-bold card-title">{{ $product->translation->title }}</div>
                                         </div>
