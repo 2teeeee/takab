@@ -1,9 +1,11 @@
 <x-main-layout>
     <div id="carouselExampleAutoplaying" class="carousel slide" data-bs-ride="carousel">
         <div class="carousel-inner">
-            <div class="carousel-item active">
-                <img src="{{asset("img/slide.webp")}}" class="d-block w-100" alt="دستگاه تصویه آب">
-            </div>
+            @foreach($sliders as $key => $slider)
+                <div class="carousel-item {{ $key == 0 ? 'active' : '' }}">
+                    <img src="{{ asset('storage/slider/' . $slider->image_path) }}" class="d-block w-100" alt="{{ $slider->title }}">
+                </div>
+            @endforeach
         </div>
         <button class="carousel-control-prev" type="button" data-bs-target="#carouselExampleAutoplaying" data-bs-slide="prev">
             <span class="carousel-control-prev-icon" aria-hidden="true"></span>
@@ -19,30 +21,30 @@
             <div class="border border-info bg-light rounded-circle wh-100 mx-auto fs-64" >
                 <i class="bi bi-patch-check align-self-center"></i>
             </div>
-            <div>تضمین کیفیت</div>
+            <div>{{ __('app.QA') }}</div>
         </div>
         <div class="col-6 col-md-3 px-4">
             <div class="border border-info bg-light rounded-circle wh-100 mx-auto fs-64" >
                 <i class="bi bi-hand-thumbs-up align-self-center"></i>
             </div>
-            <div>پشتیبانی مستمر</div>
+            <div>{{ __('app.CS') }}</div>
         </div>
         <div class="col-6 col-md-3 px-4">
             <div class="border border-info bg-light rounded-circle wh-100 mx-auto fs-64" >
                 <i class="bi bi-cart-check align-self-center"></i>
             </div>
-            <div>خرید مطمئن</div>
+            <div>{{ __('app.SP') }}</div>
         </div>
         <div class="col-6 col-md-3 px-4">
             <div class="border border-info bg-light rounded-circle wh-100 mx-auto fs-64" >
                 <i class="bi bi-credit-card align-self-center"></i>
             </div>
-            <div>تضمین قیمت</div>
+            <div>{{ __('app.PG') }}</div>
         </div>
     </div>
 
     <div class="py-3 bg-product-gray" id="product">
-        <h3 class="text-center">محصولات تک آب</h3>
+        <h3 class="text-center">{{ __('app.products') }}</h3>
         <div class="row justify-content-center mx-0">
             <div class="col-md-10">
                 <div class="row row-cols-2 row-cols-md-3 row-cols-lg-4 row-cols-xl-5 g-4">
@@ -54,7 +56,11 @@
                                         {{ 100 - round($product->sell_price * 100 / $product->main_price) }}%
                                     </div>
                                 @endif
-                                <img src="{{asset("img/product/".$product->image_name)}}" class="card-img-top" alt="{{$product->title}}">
+                                @if($product->small_image_name)
+                                    <img src="{{ asset('storage/' . $product->small_image_name) }}" class="card-img-top" alt="{{$product->title}}">
+                                @else
+                                    <img src="{{ asset('img/no-image.png') }}" class="card-img-top" alt="{{$product->title}}">
+                                @endif
                                 <div class="card-body pb-1">
                                     <div class="fw-bold card-title text-center">{{$product->title}}</div>
                                 </div>
@@ -65,11 +71,11 @@
                                                 <span class="text-danger text-decoration-line-through">
                                                     {{ number_format($product->main_price) }}
                                                 </span>
-                                                <span class="text-danger text-xsmall">تومان</span>
+                                                <span class="text-danger text-xsmall">{{ __('app.toman') }}</span>
                                             @endif
                                         </div>
                                         <div class="col px-1 text-small">
-                                            {{ number_format($product->sell_price) }} <span class="text-xsmall">تومان</span>
+                                            {{ number_format($product->sell_price) }} <span class="text-xsmall">{{ __('app.toman') }}</span>
                                         </div>
                                     </div>
                                 </div>

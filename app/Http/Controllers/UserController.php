@@ -27,7 +27,7 @@ class UserController extends Controller
     {
         $data = $request->validate([
             'name' => 'required|string|max:255',
-            'email' => 'required|email|unique:users,email',
+            'mobile' => 'required|unique:users,mobile',
             'password' => 'required|string|min:6|confirmed',
             'roles' => 'nullable|array',
             'roles.*' => 'exists:roles,id',
@@ -41,7 +41,7 @@ class UserController extends Controller
             $user->roles()->sync($data['roles']);
         }
 
-        return redirect()->route('users.index')->with('success', 'کاربر با موفقیت ایجاد شد.');
+        return redirect()->route('admin.users.index')->with('success', 'کاربر با موفقیت ایجاد شد.');
     }
 
     public function edit(User $user): View
@@ -54,7 +54,7 @@ class UserController extends Controller
     {
         $data = $request->validate([
             'name' => 'required|string|max:255',
-            'email' => 'required|email|unique:users,email,' . $user->id,
+            'mobile' => 'required|unique:users,mobile,' . $user->id,
             'password' => 'nullable|string|min:6|confirmed',
             'roles' => 'nullable|array',
             'roles.*' => 'exists:roles,id',
@@ -70,7 +70,7 @@ class UserController extends Controller
 
         $user->roles()->sync($data['roles'] ?? []);
 
-        return redirect()->route('users.index')->with('success', 'کاربر با موفقیت ویرایش شد.');
+        return redirect()->route('admin.users.index')->with('success', 'کاربر با موفقیت ویرایش شد.');
     }
 
     public function destroy(User $user): RedirectResponse

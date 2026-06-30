@@ -69,11 +69,38 @@ class User extends Authenticatable
         return in_array($roles, $userRoles);
     }
 
-    public function assignRole(string $roleName)
+    public function hasAnyRole(array|string $roles): bool
+    {
+        $roles = is_array($roles) ? $roles : [$roles];
+
+        return $this->roles()
+            ->whereIn('name', $roles)
+            ->exists();
+    }
+
+    public function assignRole(string $roleName): void
     {
         $role = Role::where('name', $roleName)->firstOrFail();
         $this->roles()->syncWithoutDetaching([$role->id]);
     }
 
+    public function sentLetters(): HasMany
+    {
+        return $this->hasMany(Letter::class, 'sender_id');
+    }
 
+    public function receivedLetters(): HasMany
+    {
+        return $this->hasMany(Letter::class, 'receiver_id');
+    }
+
+    public function installRequests(): HasMany
+    {
+        return $this->hasMany(InstallRequest::class);
+    }
+
+    public function schedules(): HasMany
+    {
+        return $this->hasMany(InstallSchedule::class, 'installer_id');
+    }
 }

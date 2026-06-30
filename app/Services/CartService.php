@@ -4,6 +4,7 @@ namespace App\Services;
 
 use App\Enums\StatusCarts;
 use App\Models\Cart;
+use App\Models\Product;
 use Illuminate\Support\Facades\Auth;
 
 class CartService
@@ -44,11 +45,26 @@ class CartService
             }
         } else {
             if ($quantity > 0) {
+                $meta = null;
+
+                // اگر محصول اسمبل‌شده است، قطعاتش را در meta ذخیره کن
+                if ($product->is_assembled && $product->assembled_parts) {
+                    $parts = Product::whereIn('id', $product->assembled_parts)->get(['id', 'title', 'sell_price']);
+                    $meta = [
+                        'parts' => $parts->map(fn($p) => [
+                            'id' => $p->id,
+                            'name' => $p->title,
+                            'price' => $p->sell_price,
+                        ])->toArray()
+                    ];
+                }
+
                 $cart->items()->create([
                     'product_id' => $product->id,
-                    'quantity' => $quantity,
-                    'price' => $product->sell_price,
-                    'total' => $quantity * $product->sell_price,
+                    'quantity'   => $quantity,
+                    'price'      => $product->sell_price,
+                    'total'      => $quantity * $product->sell_price,
+                    'meta'       => $meta ? json_encode($meta) : null,
                 ]);
             }
         }

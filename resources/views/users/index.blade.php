@@ -1,6 +1,6 @@
 <x-admin-layout title="لیست کاربران" header="لیست کاربران">
     <div class="container py-4">
-        <a href="{{ route('users.create') }}" class="btn btn-primary mb-3">افزودن کاربر جدید</a>
+        <a href="{{ route('admin.users.create') }}" class="btn btn-primary mb-3">افزودن کاربر جدید</a>
 
         @if(session('success'))
             <div class="alert alert-success">{{ session('success') }}</div>
@@ -11,7 +11,7 @@
             <tr>
                 <th>#</th>
                 <th>نام</th>
-                <th>ایمیل</th>
+                <th>موبایل</th>
                 <th>نقش‌ها</th>
                 <th>عملیات</th>
             </tr>
@@ -21,11 +21,11 @@
                 <tr>
                     <td>{{ $loop->iteration + ($users->currentPage() - 1) * $users->perPage() }}</td>
                     <td>{{ $user->name }}</td>
-                    <td>{{ $user->email }}</td>
+                    <td>{{ $user->mobile }}</td>
                     <td>{{ $user->roles->pluck('name')->join(', ') }}</td>
                     <td>
-                        <a href="{{ route('users.edit', $user) }}" class="btn btn-sm btn-warning">ویرایش</a>
-                        <form action="{{ route('users.destroy', $user) }}" method="POST" class="d-inline">
+                        <a href="{{ route('admin.users.edit', $user) }}" class="btn btn-sm btn-warning">ویرایش</a>
+                        <form action="{{ route('admin.users.destroy', $user) }}" method="POST" class="d-inline">
                             @csrf
                             @method('DELETE')
                             <button type="submit" class="btn btn-sm btn-danger"

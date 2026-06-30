@@ -124,7 +124,7 @@ class CartController extends Controller
     public function pay(Request $request): string
     {
         $request->validate([
-            'address' => 'required|string|min:10',
+            'address' => 'required',
         ]);
 
         $cart = $this->cartService->getCart();
@@ -145,7 +145,7 @@ class CartController extends Controller
             ]);
         }
 
-        return 'در حال انتقال به بانک می باشید...';
+        return redirect()->route('zarinpal.pay',['order'=> $order]);
     }
 
     private function calculateCartTotal(): int
