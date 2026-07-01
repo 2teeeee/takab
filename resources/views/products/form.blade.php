@@ -40,22 +40,22 @@
                     <div class="tab-pane fade {{ $loop->first ? 'show active' : '' }}" id="lang-{{ $locale }}">
 
                         <div class="mb-3">
-                            <label class="form-label">نام محصول ({{ $label }})</label>
-                            <input type="text" name="title[{{ $locale }}]"
+                            <label class="form-label" for="title-{{ $locale }}">نام محصول ({{ $label }})</label>
+                            <input type="text" name="title[{{ $locale }}]" id="title-{{ $locale }}"
                                    class="form-control"
                                    value="{{ old("title.$locale", $tr->title ?? '') }}">
                         </div>
 
                         <div class="mb-3">
-                            <label class="form-label">توضیح کوتاه</label>
-                            <textarea name="small_text[{{ $locale }}]"
+                            <label class="form-label" for="small_text-{{ $locale }}">توضیح کوتاه</label>
+                            <textarea name="small_text[{{ $locale }}]" id="small_text-{{ $locale }}"
                                       class="form-control"
                                       rows="2">{{ old("small_text.$locale", $tr->small_text ?? '') }}</textarea>
                         </div>
 
                         <div class="mb-3">
-                            <label class="form-label">توضیحات کامل</label>
-                            <textarea name="large_text[{{ $locale }}]"
+                            <label class="form-label" for="large_text-{{ $locale }}">توضیحات کامل</label>
+                            <textarea name="large_text[{{ $locale }}]" id="large_text-{{ $locale }}"
                                       class="form-control editor"
                                       rows="10">{{ old("large_text.$locale", $tr->large_text ?? '') }}</textarea>
                         </div>
@@ -63,15 +63,15 @@
 
 
                         <div class="mb-3">
-                            <label class="form-label">کلمات کلیدی</label>
-                            <textarea name="keywords[{{ $locale }}]"
+                            <label class="form-label" for="keywords-{{ $locale }}">کلمات کلیدی</label>
+                            <textarea name="keywords[{{ $locale }}]" id="keywords-{{ $locale }}"
                                       class="form-control"
                                       rows="2">{{ old("keywords.$locale", $tr->keywords ?? '') }}</textarea>
                         </div>
 
                         <div class="mb-3">
-                            <label class="form-label">توضیح موتور جستجو</label>
-                            <textarea name="description[{{ $locale }}]"
+                            <label class="form-label" for="description-{{ $locale }}">توضیح موتور جستجو</label>
+                            <textarea name="description[{{ $locale }}]" id="description-{{ $locale }}"
                                       class="form-control"
                                       rows="2">{{ old("description.$locale", $tr->description ?? '') }}</textarea>
                         </div>
@@ -82,13 +82,13 @@
 
             <div class="row">
                 <div class="col-md-6 mb-3">
-                    <label class="form-label">اسلاگ (اختیاری)</label>
-                    <input type="text" name="slug" class="form-control" value="{{ old('slug', $product->slug) }}">
+                    <label class="form-label" for="slug">اسلاگ (اختیاری)</label>
+                    <input type="text" name="slug" id="slug" class="form-control" value="{{ old('slug', $product->slug) }}">
                 </div>
 
                 <div class="col-md-6 mb-3">
-                    <label class="form-label">دسته‌بندی محصول</label>
-                    <select name="category_id" class="form-select" required>
+                    <label class="form-label" for="category_id">دسته‌بندی محصول</label>
+                    <select name="category_id" class="form-select" id="category_id" required>
                         @foreach($categories as $cat)
                             <option value="{{ $cat->id }}"
                                 {{ old('category_id', $product->category_id) == $cat->id ? 'selected' : '' }}>
@@ -101,30 +101,37 @@
 
             <div class="row">
                 <div class="col-md-4 mb-3">
-                    <label class="form-label">قیمت اصلی</label>
-                    <input type="number" step="0.01" name="main_price" class="form-control" value="{{ old('main_price', $product->main_price) }}">
+                    <label class="form-label" for="main_price">قیمت اصلی</label>
+                    <input type="number" step="0.01" name="main_price" id="main_price" class="form-control" value="{{ old('main_price', $product->main_price) }}">
                 </div>
                 <div class="col-md-4 mb-3">
-                    <label class="form-label">قیمت فروش</label>
-                    <input type="number" step="0.01" name="sell_price" class="form-control" value="{{ old('sell_price', $product->sell_price) }}">
+                    <label class="form-label" for="sell_price">قیمت فروش</label>
+                    <input type="number" step="0.01" name="sell_price" id="sell_price" class="form-control" value="{{ old('sell_price', $product->sell_price) }}">
                 </div>
                 <div class="col-md-4 mb-3">
-                    <label class="form-label">قیمت فروشنده</label>
-                    <input type="number" step="0.01" name="seller_price" class="form-control" value="{{ old('seller_price', $product->seller_price) }}">
+                    <label class="form-label" for="seller_price">قیمت فروشنده</label>
+                    <input type="number" step="0.01" name="seller_price" id="seller_price" class="form-control" value="{{ old('seller_price', $product->seller_price) }}">
                 </div>
             </div>
 
             <div class="row">
-                <div class="col-md-6 mb-3">
+                <div class="col-md-4 mb-3">
+                    <div class="form-check form-switch mb-3">
+                        <input class="form-check-input" type="checkbox" name="status" id="status"
+                               value="1" {{ old('status', $product->status) ? 'checked' : '' }}>
+                        <label class="form-check-label" for="status">فعال باشد</label>
+                    </div>
+                </div>
+                <div class="col-md-4 mb-3">
                     <div class="form-check form-switch mb-3">
                         <input class="form-check-input" type="checkbox" name="is_assembly_enabled" id="is_assembly_enabled"
                                value="1" {{ old('is_assembly_enabled', $product->is_assembly_enabled) ? 'checked' : '' }}>
                         <label class="form-check-label" for="is_assembly_enabled">این محصول قابلیت اسمبل دارد</label>
                     </div>
                 </div>
-                <div class="col-md-6 mb-3">
+                <div class="col-md-4 mb-3">
                     <div class="form-check form-switch mb-3">
-                        <input class="form-check-input" type="checkbox" name="is_main_sale" id="is_main_sale" checked
+                        <input class="form-check-input" type="checkbox" name="is_main_sale" id="is_main_sale"
                                value="1" {{ old('is_main_sale', $product->is_main_sale) ? 'checked' : '' }}>
                         <label class="form-check-label" for="is_main_sale">نمایش در فروش اصلی</label>
                     </div>
@@ -146,8 +153,8 @@
                         @foreach($product->images as $img)
                             <div class="position-relative">
                                 <img src="{{ asset('storage/' . $img->small_image_name) }}" class="img-thumbnail" width="120">
-                                <label class="position-absolute top-0 start-0 bg-white px-1">
-                                    <input type="checkbox" name="delete_images[]" value="{{ $img->id }}"> حذف
+                                <label class="position-absolute top-0 start-0 bg-white px-1" for="delete_images">
+                                    <input type="checkbox" name="delete_images[]" id="delete_images" value="{{ $img->id }}"> حذف
                                 </label>
                                 @if($img->is_main)
                                     <span class="badge bg-success position-absolute bottom-0 start-0">اصلی</span>

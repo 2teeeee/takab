@@ -43,6 +43,7 @@ class SearchController extends Controller
             ->leftJoin('product_images as image', fn (JoinClause $image) =>
                 $image->on('image.product_id', '=', 'products.id')->on('image.is_main', '=', DB::raw('1'))
             )
+            ->where('status',1)
             ->whereNotNull('slug')
             ->whereNotNull('category_id')
             ->when($categoryId, function ($q) use ($categoryId) {

@@ -14,6 +14,7 @@
                 <th>دسته</th>
                 <th>قیمت اصلی</th>
                 <th>قیمت فروش</th>
+                <th>وضعیت</th>
                 <th>عملیات</th>
             </tr>
             </thead>
@@ -25,6 +26,9 @@
                     <td>{{ $product->category?->translation?->title ?? '-' }}</td>
                     <td>{{ number_format($product->main_price) }} تومان</td>
                     <td>{{ number_format($product->sell_price) }} تومان</td>
+                    <td>
+                        <span class="badge {{ $product->status ? 'text-bg-success' : 'text-bg-danger' }}">{{ $product->statusText() }}</span>
+                    </td>
                     <td>
                         <a href="{{ route('admin.products.edit', $product) }}" class="btn btn-sm btn-warning">ویرایش</a>
                         <form action="{{ route('admin.products.destroy', $product) }}" method="POST" class="d-inline">

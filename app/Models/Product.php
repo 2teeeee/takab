@@ -18,6 +18,7 @@ class Product extends Model
         'is_assembled',
         'assembled_parts',
         'slug',
+        'status',
     ];
 
     protected $casts = [
@@ -25,6 +26,7 @@ class Product extends Model
         'is_assembly_enabled' => 'boolean',
         'is_main_sale' => 'boolean',
         'is_assembled' => 'boolean',
+        'status' => 'boolean',
     ];
 
     public function category(): BelongsTo
@@ -51,6 +53,11 @@ class Product extends Model
     {
         return $this->hasOne(ProductTranslation::class)
             ->where('locale', app()->getLocale());
+    }
+
+    public function statusText(): string
+    {
+        return $this->status? "فعال" : "غیر فعال";
     }
 
 }

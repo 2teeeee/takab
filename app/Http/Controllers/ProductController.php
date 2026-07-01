@@ -37,8 +37,13 @@ class ProductController extends Controller
     public function create(): View
     {
         $categories = Category::all();
+
+        $product = new Product;
+        $product->is_main_sale = true;
+        $product->status = TRUE;
+
         return view('products.form', [
-            'product' => new Product(),
+            'product' => $product,
             'categories' => $categories,
         ]);
     }
@@ -62,6 +67,7 @@ class ProductController extends Controller
             'slug' => $request->input("slug") ?: Str::slug($request->input("title.fa")),
             'is_assembly_enabled' => $request->boolean('is_assembly_enabled'),
             'is_main_sale' => $request->boolean('is_main_sale'),
+            'status' => $request->boolean('status'),
         ]);
 
         foreach ($locales as $locale) {
@@ -123,6 +129,7 @@ class ProductController extends Controller
                 ?: Str::slug($request->input("title.fa")),
             'is_assembly_enabled' => $request->boolean('is_assembly_enabled'),
             'is_main_sale' => $request->boolean('is_main_sale'),
+            'status' => $request->boolean('status'),
         ]);
 
         foreach ($locales as $locale) {
