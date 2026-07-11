@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\User;
+use App\Services\Sms\NikSmsService;
 use Illuminate\Auth\Events\Registered;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -17,7 +18,7 @@ class AuthController extends Controller
         return view('auth.register');
     }
 
-    public function register(Request $request): RedirectResponse
+    public function register(Request $request, NikSmsService $sms): RedirectResponse
     {
         $request->validate([
             'name' => ['required', 'string', 'max:255'],
@@ -25,11 +26,15 @@ class AuthController extends Controller
             'password' => ['required', 'confirmed'],
         ]);
 
+        $moarefCode = 'm'.rand(111111,999999);
         $user = User::create([
             'name' => $request->name,
             'mobile' => $request->mobile,
             'password' => Hash::make($request->password),
+            'moaref_code' => $moarefCode
         ]);
+
+        $sms->sendSingle($request->mobile, "به جمع تک آبی ها خوش آمدید."."\n"."کد معرف شما:".$moarefCode);
 
         event(new Registered($user));
 

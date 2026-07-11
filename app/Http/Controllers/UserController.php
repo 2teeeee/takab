@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Role;
 use App\Models\User;
+use App\Services\Sms\NikSmsService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
@@ -23,19 +24,25 @@ class UserController extends Controller
         return view('users.create', compact('roles'));
     }
 
-    public function store(Request $request): RedirectResponse
+    public function store(Request $request, NikSmsService $sms): RedirectResponse
     {
         $data = $request->validate([
             'name' => 'required|string|max:255',
             'mobile' => 'required|unique:users,mobile',
             'password' => 'required|string|min:6|confirmed',
+            'moaref_id' => 'nullable',
             'roles' => 'nullable|array',
             'roles.*' => 'exists:roles,id',
         ]);
 
         $data['password'] = Hash::make($data['password']);
+        $data['moaref_code'] = rand(111111,999999);
 
         $user = User::create($data);
+        $user->moaref_code = $user->id.rand(111111,999999);
+        $user->save();
+
+        $sms->sendSingle($request->mobile, "به جمع تک آبی ها خوش آمدید."."\n"."کد معرف شما:".$user->moaref_code);
 
         if (!empty($data['roles'])) {
             $user->roles()->sync($data['roles']);

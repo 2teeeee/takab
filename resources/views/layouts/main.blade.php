@@ -148,13 +148,21 @@
                                         <span>{{ __('app.orders') }}</span>
                                     </a>
                                 </li>
+                                @if(Auth::user()->hasRole(['seller']))
+                                    <li>
+                                        <a class="text-dark text-decoration-none px-2 pb-1 align-self-center d-flex" href="{{route('profile.store.index')}}">
+                                            <i class="bi bi-bag-check me-2"></i>
+                                            <span>فروش دستگاه</span>
+                                        </a>
+                                    </li>
+                                @endif
                                 @if(!Auth::user()->hasRole(['user']))
-                                <li>
-                                    <a class="text-dark text-decoration-none px-2 pb-1 align-self-center d-flex" href="{{route('admin.index')}}">
-                                        <i class="bi bi-bag-check me-2"></i>
-                                        <span>{{ __('app.admin_panel') }}</span>
-                                    </a>
-                                </li>
+                                    <li>
+                                        <a class="text-dark text-decoration-none px-2 pb-1 align-self-center d-flex" href="{{route('admin.index')}}">
+                                            <i class="bi bi-bag-check me-2"></i>
+                                            <span>{{ __('app.admin_panel') }}</span>
+                                        </a>
+                                    </li>
                                 @endif
                                 <li><hr class="dropdown-divider my-1"></li>
                                 <li>

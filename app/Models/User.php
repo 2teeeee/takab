@@ -23,6 +23,8 @@ class User extends Authenticatable
         'name',
         'mobile',
         'password',
+        'moaref_code',
+        'moaref_id',
     ];
 
     /**

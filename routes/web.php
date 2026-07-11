@@ -15,6 +15,7 @@ use App\Http\Controllers\ProductController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\SearchController;
 use App\Http\Controllers\SliderController;
+use App\Http\Controllers\StoreController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\UserInstallRequestController;
 use App\Http\Controllers\ZarinpalController;
@@ -85,6 +86,12 @@ Route::middleware(['auth'])->prefix('profile')->name('profile.')->group(function
         Route::get('/', [UserInstallRequestController::class, 'index'])->name('index');
         Route::get('/create', [UserInstallRequestController::class, 'create'])->name('create');
         Route::post('/', [UserInstallRequestController::class, 'store'])->name('store');
+    });
+
+    Route::prefix('store')->name('store.')->group(function () {
+        Route::get('/', [StoreController::class, 'index'])->name('index');
+        Route::get('/sell', [StoreController::class, 'sell'])->name('sell');
+        Route::post('/sell', [StoreController::class, 'create'])->name('create');
     });
 });
 

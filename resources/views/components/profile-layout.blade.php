@@ -43,6 +43,13 @@
                                     <i class="bi bi-bag-check me-1"></i>ثبت درخواست نصب / سرویس
                                 </a>
 
+                                @if(Auth::user()->hasRole('seller'))
+                                <a href="{{ route('profile.store.index') }}"
+                                   class="list-group-item list-group-item-action {{ request()->routeIs('profile.store.*') ? 'active' : '' }}">
+                                    <i class="bi bi-bag-check me-1"></i>فروش دستگاه
+                                </a>
+                                @endif
+
                                 <a href="{{ route('profile.edit') }}"
                                    class="list-group-item list-group-item-action {{ request()->routeIs('profile.edit') ? 'active' : '' }}">
                                     <i class="bi bi-pencil-square me-1"></i> ویرایش اطلاعات
@@ -82,4 +89,6 @@
             }
         </style>
     @endpush
+
+    @stack('scripts')
 </x-main-layout>

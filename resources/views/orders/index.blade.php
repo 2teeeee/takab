@@ -41,6 +41,8 @@
                         <th>وضعیت</th>
                         <th>کد تراکنش</th>
                         <th>تاریخ</th>
+                        <th>فروشگاه</th>
+                        <th>معرف</th>
                         <th>عملیات</th>
                     </tr>
                     </thead>
@@ -72,6 +74,8 @@
 
                             <td>{{ jdate($order->created_at)->format('Y/m/d H:i') }}</td>
 
+                            <td>{{ $order->moarefStore?->name }}</td>
+                            <td>{{ $order->moaref?->name }}</td>
                             <td>
                                 <a href="{{ route('admin.orders.show', $order->id) }}"
                                    class="btn btn-sm btn-outline-primary">
