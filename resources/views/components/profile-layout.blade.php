@@ -15,7 +15,7 @@
 
             <!-- Sidebar (Offcanvas در موبایل) -->
             <div class="col-md-3 mb-3">
-                <div class="offcanvas-md offcanvas-end show" tabindex="-1" id="profileSidebar"
+                <div class="offcanvas offcanvas-end offcanvas-md" tabindex="-1" id="profileSidebar"
                      aria-labelledby="profileSidebarLabel">
                     <div class="offcanvas-header d-md-none">
                         <h5 class="offcanvas-title" id="profileSidebarLabel">منوی پروفایل</h5>
