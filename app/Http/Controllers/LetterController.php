@@ -43,23 +43,10 @@ class LetterController extends Controller
         $user = auth()->user();
 
         $usersQuery = User::query()
-            ->where('id', '!=', $user->id);
-        if ($user->hasRole('personel')) {
-            $usersQuery->whereHas('roles', function ($q) {
+            ->where('id', '!=', $user->id)
+            ->whereHas('roles', function ($q) {
                 $q->where('name', '!=', 'user');
             });
-        }
-        elseif ($user->hasAnyRole(['nasab', 'seller'])) {
-            $usersQuery->whereHas('roles', function ($q) {
-                $q->where('name', 'personel');
-                $q->where('name', '!=', 'user');
-            });
-        }
-        else {
-            $usersQuery->whereHas('roles', function ($q) {
-                $q->where('name', '!=', 'user');
-            });
-        }
 
         $users = $usersQuery->get();
 
@@ -124,23 +111,10 @@ class LetterController extends Controller
         $references = $letter->references()->with(['from', 'to'])->latest()->get();
 
         $usersQuery = User::query()
-            ->where('id', '!=', $user->id);
-        if ($user->hasRole('personel')) {
-            $usersQuery->whereHas('roles', function ($q) {
+            ->where('id', '!=', $user->id)
+            ->whereHas('roles', function ($q) {
                 $q->where('name', '!=', 'user');
             });
-        }
-        elseif ($user->hasAnyRole(['nasab', 'seller'])) {
-            $usersQuery->whereHas('roles', function ($q) {
-                $q->where('name', 'personel');
-                $q->where('name', '!=', 'user');
-            });
-        }
-        else {
-            $usersQuery->whereHas('roles', function ($q) {
-                $q->where('name', '!=', 'user');
-            });
-        }
 
         $referableUsers = $usersQuery->get();
 
@@ -166,7 +140,9 @@ class LetterController extends Controller
         // به‌روزرسانی وضعیت نامه
         $letter->update(['status' => 'referred']);
 
-        $sms->sendSingle($letter->to->mobile, "یک نامه جدید برای شما ثبت شده است.");
+        $userRef = User::find($validated['to_user_id']);
+
+        $sms->sendSingle($userRef->mobile, "یک نامه جدید برای شما ثبت شده است.");
 
         return back()->with('success', 'نامه با موفقیت ارجاع داده شد.');
     }
