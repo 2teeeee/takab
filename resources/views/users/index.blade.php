@@ -22,7 +22,7 @@
                     <td>{{ $loop->iteration + ($users->currentPage() - 1) * $users->perPage() }}</td>
                     <td>{{ $user->name }}</td>
                     <td>{{ $user->mobile }}</td>
-                    <td>{{ $user->roles->pluck('name')->join(', ') }}</td>
+                    <td>{{ $user->roles->pluck('label')->join(', ') }}</td>
                     <td>
                         <a href="{{ route('admin.users.edit', $user) }}" class="btn btn-sm btn-warning">ویرایش</a>
                         <form action="{{ route('admin.users.destroy', $user) }}" method="POST" class="d-inline">
