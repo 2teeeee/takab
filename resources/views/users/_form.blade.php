@@ -1,5 +1,17 @@
 @csrf
 
+@if ($errors->any())
+    <div class="alert alert-danger">
+        <strong>لطفاً خطاهای زیر را برطرف کنید:</strong>
+
+        <ul class="mb-0 mt-2">
+            @foreach ($errors->all() as $error)
+                <li>{{ $error }}</li>
+            @endforeach
+        </ul>
+    </div>
+@endif
+
 <div class="card shadow-sm border-0 rounded-3">
     <div class="card-body p-4">
 
@@ -12,7 +24,7 @@
             <input type="text" name="name"
                    class="form-control @error('name') is-invalid @enderror"
                    placeholder="مثلاً علی رضایی"
-                   value="{{ old('name', $user->name ?? '') }}" required>
+                   value="{{ old('name', $user->name ?? '') }}">
             @error('name')
             <div class="invalid-feedback">{{ $message }}</div>
             @enderror
@@ -24,8 +36,19 @@
             <input type="text" name="mobile"
                    class="form-control @error('mobile') is-invalid @enderror"
                    placeholder="0912xxxxxxx"
-                   value="{{ old('mobile', $user->mobile ?? '') }}" required>
+                   value="{{ old('mobile', $user->mobile ?? '') }}">
             @error('mobile')
+            <div class="invalid-feedback">{{ $message }}</div>
+            @enderror
+        </div>
+
+        <!-- کد ملی -->
+        <div class="mb-3">
+            <label class="form-label fw-semibold">کد ملی <span class="text-danger">*</span></label>
+            <input type="text" name="national_code"
+                   class="form-control @error('national_code') is-invalid @enderror"
+                   value="{{ old('national_code', $user->national_code ?? '') }}">
+            @error('national_code')
             <div class="invalid-feedback">{{ $message }}</div>
             @enderror
         </div>
@@ -35,8 +58,7 @@
             <label class="form-label fw-semibold">رمز عبور {{ isset($user) ? '(اختیاری)' : '' }}</label>
             <input type="password" name="password"
                    class="form-control @error('password') is-invalid @enderror"
-                   placeholder="رمز عبور خود را وارد کنید"
-                {{ isset($user) ? '' : 'required' }}>
+                   placeholder="رمز عبور خود را وارد کنید">
             @if(isset($user))
                 <small class="text-muted">در صورت عدم تغییر رمز عبور، این فیلد را خالی بگذارید.</small>
             @endif
@@ -45,22 +67,10 @@
             @enderror
         </div>
 
-        <!-- تکرار رمز عبور -->
-        <div class="mb-3">
-            <label class="form-label fw-semibold">تکرار رمز عبور {{ isset($user) ? '(اختیاری)' : '' }}</label>
-            <input type="password" name="password_confirmation"
-                   class="form-control @error('password_confirmation') is-invalid @enderror"
-                   placeholder="تکرار رمز عبور"
-                {{ isset($user) ? '' : 'required' }}>
-            @error('password_confirmation')
-            <div class="invalid-feedback">{{ $message }}</div>
-            @enderror
-        </div>
-
         <!-- نقش‌ها -->
         <div class="mb-4">
             <label class="form-label fw-semibold d-block mb-2">نقش‌ها</label>
-            <div class="row g-2">
+            <div class="row g-2 @error('roles') border border-danger rounded p-2 @enderror">
                 @foreach($roles as $role)
                     <div class="col-md-4 col-sm-6">
                         <div class="form-check border rounded-3 p-2 ps-4 bg-light hover-shadow-sm">
@@ -78,6 +88,10 @@
                 @endforeach
             </div>
             @error('roles')
+            <div class="text-danger small mt-2">{{ $message }}</div>
+            @enderror
+
+            @error('roles.*')
             <div class="text-danger small mt-1">{{ $message }}</div>
             @enderror
         </div>

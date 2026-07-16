@@ -5,8 +5,10 @@ namespace App\Http\Controllers;
 use App\Models\Role;
 use App\Models\User;
 use App\Services\Sms\NikSmsService;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\View\View;
 
@@ -20,7 +22,8 @@ class UserController extends Controller
 
     public function create(): View
     {
-        $roles = Role::all();
+        $roles = self::getRoles();
+
         return view('users.create', compact('roles'));
     }
 
@@ -29,7 +32,8 @@ class UserController extends Controller
         $data = $request->validate([
             'name' => 'required|string|max:255',
             'mobile' => 'required|unique:users,mobile',
-            'password' => 'required|string|min:6|confirmed',
+            'password' => 'required|string|min:6',
+            'national_code' => 'required|string|min:10|max:10',
             'moaref_id' => 'nullable',
             'roles' => 'nullable|array',
             'roles.*' => 'exists:roles,id',
@@ -37,9 +41,11 @@ class UserController extends Controller
 
         $data['password'] = Hash::make($data['password']);
         $data['moaref_code'] = rand(111111,999999);
+        $data['registered_by'] = Auth::id();
 
         $user = User::create($data);
         $user->moaref_code = $user->id.rand(111111,999999);
+
         $user->save();
 
         $sms->sendSingle($request->mobile, "به جمع تک آبی ها خوش آمدید."."\n"."کد معرف شما:".$user->moaref_code);
@@ -53,7 +59,8 @@ class UserController extends Controller
 
     public function edit(User $user): View
     {
-        $roles = Role::all();
+        $roles = self::getRoles();
+
         return view('users.edit', compact('user', 'roles'));
     }
 
@@ -62,7 +69,8 @@ class UserController extends Controller
         $data = $request->validate([
             'name' => 'required|string|max:255',
             'mobile' => 'required|unique:users,mobile,' . $user->id,
-            'password' => 'nullable|string|min:6|confirmed',
+            'password' => 'nullable|string|min:6',
+            'national_code' => 'required|string|min:10|max:10',
             'roles' => 'nullable|array',
             'roles.*' => 'exists:roles,id',
         ]);
@@ -84,5 +92,26 @@ class UserController extends Controller
     {
         $user->delete();
         return redirect()->route('users.index')->with('success', 'کاربر حذف شد.');
+    }
+
+    static function getRoles(): Collection
+    {
+        $user = Auth::user();
+
+        $rolesQuery = Role::query();
+        if ($user->hasRole('admin'))
+            $rolesQuery->whereIn('name', ['manager', 'personel', 'wholesaler', 'marketer', 'seller', 'nasab', 'user']);
+        elseif ($user->hasRole('manager'))
+            $rolesQuery->whereIn('name', ['personel', 'wholesaler', 'marketer', 'seller', 'nasab', 'user']);
+        elseif ($user->hasRole('personel'))
+            $rolesQuery->whereIn('name', ['wholesaler', 'marketer', 'seller', 'nasab', 'user']);
+        elseif ($user->hasRole('wholesaler'))
+            $rolesQuery->whereIn('name', ['marketer', 'seller', 'user']);
+        elseif ($user->hasRole('marketer'))
+            $rolesQuery->wherIn('name', ['seller', 'user']);
+        elseif ($user->hasRole('seller'))
+            $rolesQuery->wherIn('name', ['nasab', 'user']);
+
+        return $rolesQuery->get();
     }
 }

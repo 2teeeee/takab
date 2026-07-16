@@ -25,6 +25,8 @@ class User extends Authenticatable
         'password',
         'moaref_code',
         'moaref_id',
+        'national_code',
+        'registered_by'
     ];
 
     /**
