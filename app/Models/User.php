@@ -107,4 +107,16 @@ class User extends Authenticatable
     {
         return $this->hasMany(InstallSchedule::class, 'installer_id');
     }
+
+    public function inventories(): HasMany
+    {
+        return $this->hasMany(ProductUser::class);
+    }
+
+    public function products(): BelongsToMany
+    {
+        return $this->belongsToMany(Product::class, 'product_user')
+            ->withPivot('quantity')
+            ->withTimestamps();
+    }
 }

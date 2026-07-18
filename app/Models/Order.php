@@ -17,6 +17,10 @@ class Order extends Model
         'authority',
         'moarefStore_id',
         'moaref_id',
+        'seller_id',
+        'seller_role',
+        'discount',
+        'final_total'
     ];
 
     public function user(): BelongsTo

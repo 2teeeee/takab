@@ -116,9 +116,15 @@
     @endif
 
     @if(auth()->user()->hasRole(['admin', 'manager', 'personel']))
-    <a href="{{ route('admin.orders.index') }}" class="{{ request()->routeIs('orders.*') ? 'active' : '' }}">
-        سفارش ها
-    </a>
+        <a href="{{ route('admin.orders.index') }}" class="{{ request()->routeIs('orders.*') ? 'active' : '' }}">
+            سفارش ها
+        </a>
+    @endif
+
+    @if(auth()->user()->hasRole('wholesaler'))
+        <a href="{{ route('wholesaler.products') }}" class="{{ request()->routeIs('wholeseler.*') ? 'active' : '' }}">
+            درخواست خرید محصول
+        </a>
     @endif
 
     @if(auth()->user()->hasRole(['admin', 'manager', 'personel', 'wholeseler', 'seller']))
@@ -186,7 +192,10 @@
         @if(auth()->user()->hasRole(['admin', 'manager', 'personel']))
             <a href="{{ route('admin.periodic_services.index') }}" class="text-light d-block mb-2 text-decoration-none">دوره سرویس</a>
         @endif
-            <hr class="border-secondary">
+        @if(auth()->user()->hasRole(['wholeseler']))
+            <a href="{{ route('wholesaler.products') }}" class="text-light d-block mb-2 text-decoration-none">درخواست خرید محصول</a>
+        @endif
+        <hr class="border-secondary">
 
         <a href="{{ route('main.index') }}" class="text-light d-block mb-2 text-decoration-none">🏠 داشبورد</a>
         <a href="{{ route('logout') }}" class="text-light d-block text-decoration-none"

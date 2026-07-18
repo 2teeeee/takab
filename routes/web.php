@@ -6,6 +6,7 @@ use App\Http\Controllers\CartController;
 use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\InstallRequestController;
 use App\Http\Controllers\InstallScheduleController;
+use App\Http\Controllers\InventoryController;
 use App\Http\Controllers\LetterController;
 use App\Http\Controllers\MainController;
 use App\Http\Controllers\OrderController;
@@ -18,6 +19,7 @@ use App\Http\Controllers\SliderController;
 use App\Http\Controllers\StoreController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\UserInstallRequestController;
+use App\Http\Controllers\WholesaleProductController;
 use App\Http\Controllers\ZarinpalController;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Session;
@@ -96,9 +98,10 @@ Route::middleware(['auth'])->prefix('profile')->name('profile.')->group(function
 });
 
 Route::middleware(['auth'])->prefix('admin')->name('admin.')->group(function () {
-    Route::middleware(['role:admin,manager,nasab,seller,personel'])->group(function () {
+    Route::middleware(['role:admin,manager,nasab,wholesaler,marketer,seller,personel'])->group(function () {
         Route::get('/', [MainController::class, 'admin'])->name('index');
         Route::resource('users', UserController::class);
+        Route::resource('users.product-user', InventoryController::class);
         Route::resource('categories', CategoryController::class);
         Route::resource('products', ProductController::class);
         Route::resource('sliders', SliderController::class);
@@ -127,6 +130,13 @@ Route::middleware(['auth'])->prefix('admin')->name('admin.')->group(function () 
             Route::post('/{order}/status', [OrderController::class, 'updateStatus'])->name('updateStatus');
         });
     });
+});
+
+Route::middleware(['auth'])->prefix('wholesaler')->name('wholesaler.')->middleware(['role:wholesaler'])->group(function () {
+    Route::get('/products', [WholesaleProductController::class, 'index'])->name('products');
+    Route::post('/products/{product}/cart', [WholesaleProductController::class, 'addToCart'])->name('products.cart');
+    Route::get('/cart', [WholesaleProductController::class, 'cart'])->name('cart');
+    Route::post('/checkout',[WholesaleProductController::class, 'checkout'])->name('checkout');
 });
 
 Route::middleware(['auth'])->group(function () {

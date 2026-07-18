@@ -83,4 +83,13 @@ class CartService
         $cart = $this->getCart();
         $cart->items()->delete();
     }
+
+    public function getWholesaleDiscount(): int
+    {
+        $cart = $this->getCart();
+
+        return $cart->items->sum(function ($item) {
+            return $item->quantity * 1000000;
+        });
+    }
 }

@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 
@@ -60,4 +61,15 @@ class Product extends Model
         return $this->status? "فعال" : "غیر فعال";
     }
 
+    public function inventories(): HasMany
+    {
+        return $this->hasMany(ProductUser::class);
+    }
+
+    public function users(): BelongsToMany
+    {
+        return $this->belongsToMany(User::class, 'product_user')
+            ->withPivot('quantity')
+            ->withTimestamps();
+    }
 }
