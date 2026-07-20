@@ -33,4 +33,9 @@ return [
         'store' => env('APP_MAINTENANCE_STORE', 'database'),
     ],
 
+    'image_storage_path' => env(
+        'IMAGE_STORAGE_PATH',
+        storage_path('app/public')
+    ),
+
 ];

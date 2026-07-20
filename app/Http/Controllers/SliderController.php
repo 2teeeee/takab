@@ -34,7 +34,8 @@ class SliderController extends Controller
         $manager = new ImageManager(new Driver());
         $file = $request->file('image_path');
         $filename = uniqid() . '.webp';
-        $imagePath = public_path('storage/slider/' . $filename);
+        $basePath = config('app.image_storage_path');
+        $imagePath = $basePath . '/slider/' . $filename;
         $image = $manager->read($file);
         $image->resize(1800,600);
         $image->toWebp()->save($imagePath);
