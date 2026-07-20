@@ -92,4 +92,13 @@ class CartService
             return $item->quantity * 1000000;
         });
     }
+
+    public function getStoreDiscount(): int
+    {
+        $cart = $this->getCart();
+
+        return $cart->items->sum(function ($item) {
+            return $item->quantity * 2000000;
+        });
+    }
 }

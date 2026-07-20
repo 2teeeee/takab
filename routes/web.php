@@ -17,6 +17,7 @@ use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\SearchController;
 use App\Http\Controllers\SliderController;
 use App\Http\Controllers\StoreController;
+use App\Http\Controllers\StoreProductController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\UserInstallRequestController;
 use App\Http\Controllers\WholesaleProductController;
@@ -139,6 +140,13 @@ Route::middleware(['auth'])->prefix('wholesaler')->name('wholesaler.')->middlewa
     Route::post('/checkout', [WholesaleProductController::class, 'checkout'])->name('checkout');
     Route::post('/products/{product}/quantity', [WholesaleProductController::class, 'updateQuantity'])->name('products.quantity');
 });
+
+Route::middleware(['auth'])->prefix('store')->name('store.')->middleware(['role:store'])->group(function () {
+    Route::get('/products', [StoreProductController::class, 'index'])->name('products');
+    Route::post('/products/{product}/cart', [StoreProductController::class, 'addToCart'])->name('products.cart');
+    Route::get('/cart', [StoreProductController::class, 'cart'])->name('cart');
+    Route::post('/checkout', [StoreProductController::class, 'checkout'])->name('checkout');
+    Route::post('/products/{product}/quantity', [StoreProductController::class, 'updateQuantity'])->name('products.quantity');
 });
 
 Route::middleware(['auth'])->group(function () {
