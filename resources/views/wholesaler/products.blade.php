@@ -61,9 +61,10 @@
                             @else
                                 <div class="d-flex align-items-center justify-content-center gap-1">
 
-                                    <form action="{{ route('wholesaler.products.decrease',$product) }}" method="POST" class="m-0">
+                                    <form action="{{ route('wholesaler.products.quantity',$product) }}" method="POST">
                                         @csrf
-                                        <button type="submit" class="btn btn-outline-warning btn-sm">
+                                        <input type="hidden" name="quantity" value="{{ max(0, $quantity - 1) }}">
+                                        <button class="btn btn-outline-secondary btn-sm">
                                             <i class="bi bi-dash"></i>
                                         </button>
                                     </form>
@@ -74,18 +75,19 @@
                                            readonly
                                            style="width:70px;">
 
-                                    <form action="{{ route('wholesaler.products.increase',$product) }}" method="POST" class="m-0">
+                                    <form action="{{ route('wholesaler.products.quantity',$product) }}" method="POST">
                                         @csrf
-                                        <button type="submit" class="btn btn-outline-success btn-sm">
+                                        <input type="hidden" name="quantity" value="{{ $quantity + 1 }}">
+                                        <button class="btn btn-outline-secondary btn-sm">
                                             <i class="bi bi-plus"></i>
                                         </button>
                                     </form>
 
-                                    <form action="{{ route('wholesaler.products.remove',$product) }}" method="POST" class="m-0">
+                                    <form action="{{ route('wholesaler.products.quantity',$product) }}" method="POST">
                                         @csrf
-                                        @method('DELETE')
+                                        <input type="hidden" name="quantity" value="0">
 
-                                        <button type="submit" class="btn btn-outline-danger btn-sm">
+                                        <button class="btn btn-outline-danger btn-sm">
                                             <i class="bi bi-trash"></i>
                                         </button>
                                     </form>

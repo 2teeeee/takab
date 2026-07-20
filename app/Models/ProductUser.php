@@ -41,4 +41,17 @@ class ProductUser extends Model
 
         return $inventory;
     }
+
+    public static function decrease($userId, $productId, $quantity)
+    {
+        $inventory = static::firstOrNew([
+            'user_id' => $userId,
+            'product_id' => $productId,
+        ]);
+
+        $inventory->quantity -= $quantity;
+        $inventory->save();
+
+        return $inventory;
+    }
 }

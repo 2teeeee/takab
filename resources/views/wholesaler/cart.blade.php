@@ -31,21 +31,21 @@
                     </td>
                     <td>
                         <div class="btn-group">
-                            <form action="{{ route('wholesaler.products.decrease',$item->product) }}"
-                                  method="POST">
+                            <form action="{{ route('wholesaler.products.quantity',$item->product) }}" method="POST">
                                 @csrf
-                                <button class="btn btn-warning">
-                                    -
+                                <input type="hidden" name="quantity" value="{{ max(0, $item->quantity - 1) }}">
+                                <button class="btn btn-outline-secondary btn-sm">
+                                    <i class="bi bi-dash"></i>
                                 </button>
                             </form>
                             <span class="btn btn-light">
                                 {{ $item->quantity }}
                             </span>
-                            <form action="{{ route('wholesaler.products.increase',$item->product) }}"
-                                  method="POST">
+                            <form action="{{ route('wholesaler.products.quantity',$item->product) }}" method="POST">
                                 @csrf
-                                <button class="btn btn-success">
-                                    +
+                                <input type="hidden" name="quantity" value="{{ $item->quantity + 1 }}">
+                                <button class="btn btn-outline-secondary btn-sm">
+                                    <i class="bi bi-plus"></i>
                                 </button>
                             </form>
                         </div>
@@ -57,14 +57,12 @@
                         {{ number_format($item->total) }}
                     </td>
                     <td>
-                        <form
-                                action="{{ route('wholesaler.products.remove',$item->product) }}"
-                                method="POST">
+                        <form action="{{ route('wholesaler.products.quantity',$item->product) }}" method="POST">
                             @csrf
-                            @method('DELETE')
-                            <button
-                                    class="btn btn-danger">
-                                حذف
+                            <input type="hidden" name="quantity" value="0">
+
+                            <button class="btn btn-outline-danger btn-sm">
+                                <i class="bi bi-trash"></i>
                             </button>
                         </form>
                     </td>

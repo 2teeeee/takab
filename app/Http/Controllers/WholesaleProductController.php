@@ -61,6 +61,16 @@ class WholesaleProductController extends Controller
             'quantity' => ['required', 'integer', 'min:1'],
         ]);
 
+        if (!$product->status) {
+            return back()->with('error','محصول غیرفعال است.');
+        }
+
+        $availableQuantity = $this->getAvailableQuantity($product);
+
+        if($request->quantity > $availableQuantity){
+            return back()->with('error','موجودی کافی نیست.');
+        }
+
         $cartService->addProduct(
             $product,
             $request->quantity
@@ -126,6 +136,12 @@ class WholesaleProductController extends Controller
                     'total'      => $item->total,
                 ]);
 
+                ProductUser::decrease(
+                    $this->inventoryOwnerId(),
+                    $item->product_id,
+                    $item->quantity
+                );
+
                 ProductUser::increase(
                     auth()->id(),
                     $item->product_id,
@@ -142,48 +158,63 @@ class WholesaleProductController extends Controller
             ->with('success', 'سفارش با موفقیت ثبت شد.');
     }
 
-    public function increase(Product $product, CartService $cartService): RedirectResponse
-    {
+    public function updateQuantity(
+        Request $request,
+        Product $product,
+        CartService $cartService
+    ): RedirectResponse {
+
+        $request->validate([
+            'quantity' => ['required', 'integer', 'min:0'],
+        ]);
+
         $cart = $cartService->getCart();
 
-        $item = $cart->items()->where('product_id', $product->id)->first();
+        $item = $cart->items()
+            ->where('product_id', $product->id)
+            ->first();
 
-        if ($item) {
-            $item->quantity++;
-            $item->total = $item->quantity * $item->price;
+        // موجودی قابل خرید
+        $availableQuantity = $this->getAvailableQuantity($product);
+
+        // حذف
+        if ($request->quantity == 0) {
+            if ($item) {
+                $item->delete();
+            }
+            return back()->with('success', 'محصول حذف شد.');
+        }
+
+        // بررسی موجودی
+        if ($request->quantity > $availableQuantity) {
+            return back()->with(
+                'error',
+                "حداکثر موجودی قابل خرید {$availableQuantity} عدد است."
+            );
+        }
+
+        // محصول داخل سبد نیست
+        if (!$item) {
+            $cartService->addProduct($product, $request->quantity);
+        } else {
+            $item->quantity = $request->quantity;
+            $item->total = $item->price * $request->quantity;
             $item->save();
         }
 
-        return back();
+        return back()->with('success', 'سبد خرید بروزرسانی شد.');
     }
 
-    public function decrease(Product $product, CartService $cartService): RedirectResponse
+    protected function inventoryOwnerId(): int
     {
-        $cart = $cartService->getCart();
-
-        $item = $cart->items()->where('product_id', $product->id)->first();
-
-        if ($item) {
-            if ($item->quantity > 1) {
-                $item->quantity--;
-                $item->total = $item->quantity * $item->price;
-                $item->save();
-            } else {
-                $item->delete();
-            }
-        }
-
-        return back();
+        return config('shop.company_user_id');
     }
 
-    public function remove(Product $product, CartService $cartService): RedirectResponse
+    protected function getAvailableQuantity(Product $product): int
     {
-        $cart = $cartService->getCart();
-
-        $cart->items()
-            ->where('product_id', $product->id)
-            ->delete();
-
-        return back()->with('success','محصول حذف شد.');
+        return ProductUser::where([
+            'user_id' => $this->inventoryOwnerId(),
+            'product_id' => $product->id,
+        ])->value('quantity') ?? 1000;
     }
 }
