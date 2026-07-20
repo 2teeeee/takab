@@ -75,7 +75,7 @@
 <div class="admin-sidebar">
     <h5 class="text-center text-light mb-3">مدیریت سایت</h5>
 
-    @if(auth()->user()->hasRole(['admin', 'manager', 'personel', 'wholeseler', 'seller', 'maketer']))
+    @if(auth()->user()->hasRole(['admin', 'manager', 'personel', 'wholesaler', 'seller', 'marketer']))
     <a href="{{ route('admin.users.index') }}" class="{{ request()->routeIs('admin.users.*') ? 'active' : '' }}">
         👤 کاربران
     </a>
@@ -107,7 +107,7 @@
 
     <hr class="border-secondary">
 
-    @if(auth()->user()->hasRole(['admin', 'manager', 'personel', 'wholeseler', 'seller', 'maketer', 'nasab']))
+    @if(auth()->user()->hasRole(['admin', 'manager', 'personel', 'wholeseler', 'seller', 'marketer', 'nasab']))
     <a href="{{ route('admin.letters.index') }}" class="{{ request()->routeIs('letters.*') ? 'active' : '' }}">
         📬 اتوماسیون نامه‌ها
     </a>
@@ -167,7 +167,7 @@
     </div>
 
     <div class="offcanvas-body">
-        @if(auth()->user()->hasRole(['admin', 'manager', 'personel', 'wholeseler', 'seller', 'maketer']))
+        @if(auth()->user()->hasRole(['admin', 'manager', 'personel', 'wholeseler', 'seller', 'marketer']))
             <a href="{{ route('admin.users.index') }}" class="text-light d-block mb-2 text-decoration-none">👤 کاربران</a>
         @endif
         @if(auth()->user()->hasRole(['admin', 'manager', 'personel']))

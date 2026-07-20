@@ -136,7 +136,10 @@ Route::middleware(['auth'])->prefix('wholesaler')->name('wholesaler.')->middlewa
     Route::get('/products', [WholesaleProductController::class, 'index'])->name('products');
     Route::post('/products/{product}/cart', [WholesaleProductController::class, 'addToCart'])->name('products.cart');
     Route::get('/cart', [WholesaleProductController::class, 'cart'])->name('cart');
-    Route::post('/checkout',[WholesaleProductController::class, 'checkout'])->name('checkout');
+    Route::post('/checkout', [WholesaleProductController::class, 'checkout'])->name('checkout');
+    Route::post('/products/{product}/increase', [WholesaleProductController::class,'increase'])->name('products.increase');
+    Route::post('/products/{product}/decrease', [WholesaleProductController::class,'decrease'])->name('products.decrease');
+    Route::delete('/products/{product}', [WholesaleProductController::class,'remove'])->name('products.remove');
 });
 
 Route::middleware(['auth'])->group(function () {

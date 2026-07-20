@@ -14,7 +14,7 @@ use Illuminate\View\View;
 
 class WholesaleProductController extends Controller
 {
-    public function index(): View
+    public function index(CartService $cartService): View
     {
         $locale = app()->getLocale();
 
@@ -39,7 +39,13 @@ class WholesaleProductController extends Controller
             ])
             ->paginate(20);
 
-        return view('wholesaler.products', compact('products'));
+        $cart = $cartService->getCart();
+
+        $cartItems = $cart->items()
+            ->pluck('quantity', 'product_id')
+            ->toArray();
+
+        return view('wholesaler.products', compact('products', 'cartItems'));
     }
 
     /**
@@ -134,5 +140,50 @@ class WholesaleProductController extends Controller
         return redirect()
             ->route('wholesaler.products')
             ->with('success', 'سفارش با موفقیت ثبت شد.');
+    }
+
+    public function increase(Product $product, CartService $cartService): RedirectResponse
+    {
+        $cart = $cartService->getCart();
+
+        $item = $cart->items()->where('product_id', $product->id)->first();
+
+        if ($item) {
+            $item->quantity++;
+            $item->total = $item->quantity * $item->price;
+            $item->save();
+        }
+
+        return back();
+    }
+
+    public function decrease(Product $product, CartService $cartService): RedirectResponse
+    {
+        $cart = $cartService->getCart();
+
+        $item = $cart->items()->where('product_id', $product->id)->first();
+
+        if ($item) {
+            if ($item->quantity > 1) {
+                $item->quantity--;
+                $item->total = $item->quantity * $item->price;
+                $item->save();
+            } else {
+                $item->delete();
+            }
+        }
+
+        return back();
+    }
+
+    public function remove(Product $product, CartService $cartService): RedirectResponse
+    {
+        $cart = $cartService->getCart();
+
+        $cart->items()
+            ->where('product_id', $product->id)
+            ->delete();
+
+        return back()->with('success','محصول حذف شد.');
     }
 }

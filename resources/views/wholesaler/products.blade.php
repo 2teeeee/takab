@@ -36,23 +36,62 @@
                         </div>
 
                         <div class="card-footer">
-                            <form action="{{ route('wholesaler.products.cart',$product) }}"
-                                  method="POST">
-                                @csrf
-                                <div class="mb-2">
-                                    <input
-                                            type="number"
-                                            name="quantity"
-                                            value="1"
-                                            min="1"
-                                            class="form-control">
+                            @php
+                                $quantity = $cartItems[$product->id] ?? 0;
+                            @endphp
+                            @if($quantity == 0)
+                                <form action="{{ route('wholesaler.products.cart',$product) }}"
+                                      method="POST"
+                                      class="d-flex align-items-center justify-content-center gap-1">
+
+                                    @csrf
+
+                                    <input type="number"
+                                           name="quantity"
+                                           value="1"
+                                           min="1"
+                                           class="form-control form-control-sm text-center"
+                                           style="width:70px;">
+
+                                    <button type="submit" class="btn btn-success btn-sm">
+                                        <i class="bi bi-cart-plus"></i>
+                                    </button>
+
+                                </form>
+                            @else
+                                <div class="d-flex align-items-center justify-content-center gap-1">
+
+                                    <form action="{{ route('wholesaler.products.decrease',$product) }}" method="POST" class="m-0">
+                                        @csrf
+                                        <button type="submit" class="btn btn-outline-warning btn-sm">
+                                            <i class="bi bi-dash"></i>
+                                        </button>
+                                    </form>
+
+                                    <input type="text"
+                                           class="form-control form-control-sm text-center"
+                                           value="{{ $quantity }}"
+                                           readonly
+                                           style="width:70px;">
+
+                                    <form action="{{ route('wholesaler.products.increase',$product) }}" method="POST" class="m-0">
+                                        @csrf
+                                        <button type="submit" class="btn btn-outline-success btn-sm">
+                                            <i class="bi bi-plus"></i>
+                                        </button>
+                                    </form>
+
+                                    <form action="{{ route('wholesaler.products.remove',$product) }}" method="POST" class="m-0">
+                                        @csrf
+                                        @method('DELETE')
+
+                                        <button type="submit" class="btn btn-outline-danger btn-sm">
+                                            <i class="bi bi-trash"></i>
+                                        </button>
+                                    </form>
+
                                 </div>
-                                <button
-                                        class="btn btn-success w-100">
-                                    <i class="bi bi-cart-plus"></i>
-                                    افزودن به سبد خرید
-                                </button>
-                            </form>
+                            @endif
                         </div>
                     </div>
                 </div>

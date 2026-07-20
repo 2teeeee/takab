@@ -16,6 +16,7 @@
                 <th>تعداد</th>
                 <th>قیمت</th>
                 <th>جمع</th>
+                <th></th>
             </tr>
             </thead>
 
@@ -29,13 +30,43 @@
                         {{ $item->product->translation->title }}
                     </td>
                     <td>
-                        {{ $item->quantity }}
+                        <div class="btn-group">
+                            <form action="{{ route('wholesaler.products.decrease',$item->product) }}"
+                                  method="POST">
+                                @csrf
+                                <button class="btn btn-warning">
+                                    -
+                                </button>
+                            </form>
+                            <span class="btn btn-light">
+                                {{ $item->quantity }}
+                            </span>
+                            <form action="{{ route('wholesaler.products.increase',$item->product) }}"
+                                  method="POST">
+                                @csrf
+                                <button class="btn btn-success">
+                                    +
+                                </button>
+                            </form>
+                        </div>
                     </td>
                     <td>
                         {{ number_format($item->price) }}
                     </td>
                     <td>
                         {{ number_format($item->total) }}
+                    </td>
+                    <td>
+                        <form
+                                action="{{ route('wholesaler.products.remove',$item->product) }}"
+                                method="POST">
+                            @csrf
+                            @method('DELETE')
+                            <button
+                                    class="btn btn-danger">
+                                حذف
+                            </button>
+                        </form>
                     </td>
                 </tr>
             @endforeach

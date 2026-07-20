@@ -16,7 +16,13 @@ class UserController extends Controller
 {
     public function index(): View
     {
-        $users = User::with('roles')->latest()->paginate(10);
+        $user = Auth::user();
+
+        $usersQuery = User::query();
+        if(!$user->hasRole(['admin', 'manager','personel']))
+            $usersQuery->where('registered_by', $user->id);
+        $users = $usersQuery->with('roles')->latest()->paginate(10);
+
         return view('users.index', compact('users'));
     }
 
@@ -100,7 +106,7 @@ class UserController extends Controller
 
         $rolesQuery = Role::query();
         if ($user->hasRole('admin'))
-            $rolesQuery->whereIn('name', ['manager', 'personel', 'wholesaler', 'marketer', 'seller', 'nasab', 'user']);
+            $rolesQuery->whereIn('name', ['admin','manager', 'personel', 'wholesaler', 'marketer', 'seller', 'nasab', 'user']);
         elseif ($user->hasRole('manager'))
             $rolesQuery->whereIn('name', ['personel', 'wholesaler', 'marketer', 'seller', 'nasab', 'user']);
         elseif ($user->hasRole('personel'))
@@ -108,9 +114,9 @@ class UserController extends Controller
         elseif ($user->hasRole('wholesaler'))
             $rolesQuery->whereIn('name', ['marketer', 'seller', 'user']);
         elseif ($user->hasRole('marketer'))
-            $rolesQuery->wherIn('name', ['seller', 'user']);
+            $rolesQuery->whereIn('name', ['seller', 'user']);
         elseif ($user->hasRole('seller'))
-            $rolesQuery->wherIn('name', ['nasab', 'user']);
+            $rolesQuery->whereIn('name', ['nasab', 'user']);
 
         return $rolesQuery->get();
     }
