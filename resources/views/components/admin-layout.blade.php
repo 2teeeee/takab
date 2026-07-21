@@ -144,19 +144,6 @@
         دوره سرویس
     </a>
     @endif
-
-    <hr class="border-secondary">
-
-    <a href="{{ route('main.index') }}">🏠 داشبورد</a>
-
-    <a href="{{ route('logout') }}"
-       onclick="event.preventDefault(); document.getElementById('logout-form').submit();">
-        🚪 خروج
-    </a>
-
-    <form id="logout-form" action="{{ route('logout') }}" method="POST" class="d-none">
-        @csrf
-    </form>
 </div>
 
 <!-- Mobile Sidebar -->
@@ -214,11 +201,23 @@
         <button class="btn btn-dark d-md-none" data-bs-toggle="offcanvas" data-bs-target="#mobileSidebar">
             ☰
         </button>
-        <div>
-            <h5 class="m-0">{{ $header }}</h5>
-        </div>
-        <div>
-            <span class="text-muted small">{{ auth()->user()->name ?? 'مدیر' }}</span>
+        <div class="row w-100">
+            <div class="col-md-3">
+                <h5 class="m-0">{{ $header }}</h5>
+            </div>
+            <div class="col-md-9 text-end text-decoration-none">
+                <a class="btn btn-link text-decoration-none" href="{{ route('main.index') }}">🏠 صفحه اصلی</a>
+
+                <span class="text-muted small">{{ auth()->user()->name ?? 'مدیر' }}</span>
+
+                <a class="btn btn-link ms-2  text-danger text-decoration-none" href="{{ route('logout') }}"
+                   onclick="event.preventDefault(); document.getElementById('logout-form').submit();">
+                    🚪 خروج
+                </a>
+                <form id="logout-form" action="{{ route('logout') }}" method="POST" class="d-none">
+                    @csrf
+                </form>
+            </div>
         </div>
     </div>
 

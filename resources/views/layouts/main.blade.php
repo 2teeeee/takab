@@ -388,6 +388,11 @@
         </div>
         <div class="offcanvas-body p-0 px-2 position-relative">
             <div class="list-group">
+                <a href="{{route('hydrojoy.login')}}" class="list-group-item list-group-item-action border-0 my-1 px-2 py-1">
+                    <img src="{{asset("img/hydrojoy-logo.png")}}" alt="heydojoy logo" width="100">
+                </a>
+            </div>
+            <div class="list-group">
                 <a href="{{route('page.show',['slug'=>'about'])}}" class="list-group-item list-group-item-action border-0 my-1 px-2 py-1">
                     <i class="bi bi-info-circle icon-size-0x me-1 text-main"></i>
                     <span>{{ __('app.about') }}</span>
