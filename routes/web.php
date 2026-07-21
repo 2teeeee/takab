@@ -70,6 +70,11 @@ Route::get('/login', [AuthController::class, 'login'])->name('login');
 Route::post('/login', [AuthController::class, 'authenticate'])->name('authenticate');
 Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 
+Route::prefix('hydrojoy')->name('hydrojoy.')->group(function () {
+    Route::get('/login', [\App\Http\Controllers\hydrojoy\AuthController::class, 'login'])->name('login');
+    Route::post('/login', [\App\Http\Controllers\hydrojoy\AuthController::class, 'authenticate'])->name('authenticate');
+});
+
 Route::middleware(['auth'])->prefix('profile')->name('profile.')->group(function () {
     Route::get('/', [ProfileController::class, 'index'])->name('index'); // صفحه اصلی پروفایل
     Route::get('/edit', [ProfileController::class, 'edit'])->name('edit');

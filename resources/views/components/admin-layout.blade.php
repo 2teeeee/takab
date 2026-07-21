@@ -107,7 +107,7 @@
 
     <hr class="border-secondary">
 
-    @if(auth()->user()->hasRole(['admin', 'manager', 'personel', 'wholeseler', 'seller', 'marketer', 'nasab']))
+    @if(auth()->user()->hasRole(['admin', 'manager', 'personel', 'wholesaler', 'seller', 'marketer', 'nasab']))
     <a href="{{ route('admin.letters.index') }}" class="{{ request()->routeIs('letters.*') ? 'active' : '' }}">
         📬 اتوماسیون نامه‌ها
     </a>

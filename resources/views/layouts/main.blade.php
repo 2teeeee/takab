@@ -78,9 +78,14 @@
                                 {{ __('app.contact') }}
                             </a>
                         </li>
+                        <li class="nav-item px-2 border-start">
+                            <a class="nav-link" href="{{route('hydrojoy.login')}}">
+                                <img src="{{asset("img/hydrojoy-logo.png")}}" alt="heydojoy logo" width="100">
+                            </a>
+                        </li>
                     </ul>
 
-                    <form action="{{ route('search') }}" method="GET" class="d-flex w-50 me-auto" role="search" >
+                    <form action="{{ route('search') }}" method="GET" class="d-flex w-40 ms-auto me-2" role="search" >
                         <input class="form-control rounded-end-0 shadow-none" type="text" placeholder="{{ __('app.product_search') }}"  id="title" name="q">
                         <button type="submit" class="btn btn-outline-dark rounded-start-0">
                             <i class="bi bi-search"></i>
