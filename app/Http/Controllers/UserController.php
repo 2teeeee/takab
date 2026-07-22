@@ -14,14 +14,32 @@ use Illuminate\View\View;
 
 class UserController extends Controller
 {
-    public function index(): View
+    public function index(Request $request): View
     {
-        $user = Auth::user();
+        $authUser = Auth::user();
 
         $usersQuery = User::query();
-        if(!$user->hasRole(['admin', 'manager','personel']))
-            $usersQuery->where('registered_by', $user->id);
-        $users = $usersQuery->with('roles')->latest()->paginate(10);
+
+        // محدودیت دسترسی
+        if (!$authUser->hasRole(['admin', 'manager', 'personel'])) {
+            $usersQuery->where('registered_by', $authUser->id);
+        }
+
+        // جستجو
+        if ($request->filled('search')) {
+            $search = trim($request->search);
+            $usersQuery->where(function ($query) use ($search) {
+                $query->where('name', 'like', "%{$search}%")
+                    ->orWhere('mobile', 'like', "%{$search}%")
+                    ->orWhere('national_code', 'like', "%{$search}%");
+            });
+        }
+
+        $users = $usersQuery
+            ->with('roles')
+            ->latest()
+            ->paginate(10)
+            ->withQueryString();
 
         return view('users.index', compact('users'));
     }

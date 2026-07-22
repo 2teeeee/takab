@@ -1,10 +1,39 @@
 <x-admin-layout title="لیست کاربران" header="لیست کاربران">
     <div class="container py-4">
-        <a href="{{ route('admin.users.create') }}" class="btn btn-primary mb-3">افزودن کاربر جدید</a>
+
+        <a href="{{ route('admin.users.create') }}" class="btn btn-sm btn-primary mb-3">افزودن کاربر جدید</a>
 
         @if(session('success'))
             <div class="alert alert-success">{{ session('success') }}</div>
         @endif
+
+        <form method="GET"
+              action="{{ route('admin.users.index') }}"
+              class="row g-2 mb-3">
+            <div class="col-md-5">
+                <input
+                        type="text"
+                        name="search"
+                        class="form-control form-control-sm"
+                        placeholder="جستجو بر اساس نام، موبایل یا کد ملی..."
+                        value="{{ request('search') }}">
+            </div>
+            <div class="col-auto">
+                <button class="btn btn-dark btn-sm">
+                    <i class="bi bi-search"></i>
+                    جستجو
+                </button>
+            </div>
+
+            @if(request()->filled('search'))
+                <div class="col-auto">
+                    <a href="{{ route('admin.users.index') }}"
+                       class="btn btn-danger btn-sm">
+                        حذف جستجو
+                    </a>
+                </div>
+            @endif
+        </form>
 
         <table class="table table-bordered align-middle">
             <thead>
