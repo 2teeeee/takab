@@ -6,6 +6,7 @@ use App\Models\Order;
 use Illuminate\Contracts\View\View;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class OrderController extends Controller
 {
@@ -27,6 +28,10 @@ class OrderController extends Controller
         // فیلتر وضعیت
         if ($request->status) {
             $query->where('status', $request->status);
+        }
+
+        if(Auth::user()->hasRole('seller')){
+            $query->where('seller_id', Auth::id());
         }
 
         $orders = $query->latest()->paginate(15);

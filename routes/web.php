@@ -4,6 +4,7 @@ use App\Http\Controllers\AssemblyController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\CartController;
 use App\Http\Controllers\CategoryController;
+use App\Http\Controllers\CustomerSaleController;
 use App\Http\Controllers\InstallRequestController;
 use App\Http\Controllers\InstallScheduleController;
 use App\Http\Controllers\InventoryController;
@@ -146,12 +147,15 @@ Route::middleware(['auth'])->prefix('wholesaler')->name('wholesaler.')->middlewa
     Route::post('/products/{product}/quantity', [WholesaleProductController::class, 'updateQuantity'])->name('products.quantity');
 });
 
-Route::middleware(['auth'])->prefix('store')->name('store.')->middleware(['role:store'])->group(function () {
+Route::middleware(['auth','role:admin,seller'])->prefix('store')->name('store.')->group(function () {
     Route::get('/products', [StoreProductController::class, 'index'])->name('products');
     Route::post('/products/{product}/cart', [StoreProductController::class, 'addToCart'])->name('products.cart');
     Route::get('/cart', [StoreProductController::class, 'cart'])->name('cart');
     Route::post('/checkout', [StoreProductController::class, 'checkout'])->name('checkout');
     Route::post('/products/{product}/quantity', [StoreProductController::class, 'updateQuantity'])->name('products.quantity');
+
+    Route::get('customers/{customer}/sale', [CustomerSaleController::class, 'create'])->name('customers.sale');
+    Route::post('customers/{customer}/sale', [CustomerSaleController::class, 'store'])->name('customers.sale.store');
 });
 
 Route::middleware(['auth'])->group(function () {

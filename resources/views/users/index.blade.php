@@ -25,12 +25,17 @@
                     <td>{{ $user->roles->pluck('label')->join(', ') }}</td>
                     <td>
                         <a href="{{ route('admin.users.edit', $user) }}" class="btn btn-sm btn-warning">ویرایش</a>
+                        @if(auth()->user()->hasRole(['admin','manager','personel','seller']))
+                        <a href="{{ route('store.customers.sale',$user) }}" class="btn btn-sm btn-success">فروش کالا</a>
+                        @endif
+                        @if(auth()->user()->hasRole(['admin','manager','personel']))
                         <form action="{{ route('admin.users.destroy', $user) }}" method="POST" class="d-inline">
                             @csrf
                             @method('DELETE')
                             <button type="submit" class="btn btn-sm btn-danger"
                                     onclick="return confirm('آیا از حذف کاربر اطمینان دارید؟')">حذف</button>
                         </form>
+                        @endif
                     </td>
                 </tr>
             @empty

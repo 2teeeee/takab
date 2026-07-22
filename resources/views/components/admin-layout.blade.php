@@ -105,17 +105,17 @@
     </a>
     @endif
 
-    <hr class="border-secondary">
+    <hr class="border-secondary my-1">
 
     @if(auth()->user()->hasRole(['admin', 'manager', 'personel', 'wholesaler', 'seller', 'marketer', 'nasab']))
     <a href="{{ route('admin.letters.index') }}" class="{{ request()->routeIs('letters.*') ? 'active' : '' }}">
         📬 اتوماسیون نامه‌ها
     </a>
 
-    <hr class="border-secondary">
+    <hr class="border-secondary my-1">
     @endif
 
-    @if(auth()->user()->hasRole(['admin', 'manager', 'personel']))
+    @if(auth()->user()->hasRole(['admin', 'manager', 'personel','seller']))
         <a href="{{ route('admin.orders.index') }}" class="{{ request()->routeIs('orders.*') ? 'active' : '' }}">
             سفارش ها
         </a>
@@ -127,13 +127,19 @@
         </a>
     @endif
 
-    @if(auth()->user()->hasRole(['admin', 'manager', 'personel', 'wholeseler', 'seller']))
+    @if(auth()->user()->hasRole('seller'))
+        <a href="{{ route('store.products') }}" class="{{ request()->routeIs('wholeseler.*') ? 'active' : '' }}">
+            خرید محصول
+        </a>
+    @endif
+
+    @if(auth()->user()->hasRole(['admin', 'manager', 'personel']))
     <a href="{{ route('admin.install_requests.index') }}" class="{{ request()->routeIs('install_requests.*') ? 'active' : '' }}">
         ثبت درخواست سرویس
     </a>
     @endif
 
-    @if(auth()->user()->hasRole(['admin', 'manager', 'personel', 'wholeseler', 'seller']))
+    @if(auth()->user()->hasRole(['admin', 'manager', 'personel']))
     <a href="{{ route('admin.install_schedules.index') }}" class="{{ request()->routeIs('install_schedules.*') ? 'active' : '' }}">
         زمانبندی سرویس
     </a>
