@@ -1,6 +1,13 @@
 <x-admin-layout :title="'جزئیات نامه: ' . $letter->subject" header="جزئیات نامه">
     <div class="container py-4">
 
+        <a href="{{ route('admin.letters.index') }}" class="btn btn-sm btn-secondary mb-3">
+            <i class="bi bi-chevron-double-right"></i> بازگشت به لیست نامه ها
+        </a>
+        <a href="{{ route('admin.letters.create') }}" class="btn btn-sm btn-primary mb-3">
+            <i class="bi bi-plus-circle"></i> ایجاد نامه جدید
+        </a>
+
         <div class="card shadow-sm mb-4">
             <div class="card-header bg-light fw-bold">
                 موضوع: {{ $letter->subject }}

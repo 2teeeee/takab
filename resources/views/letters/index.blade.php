@@ -1,7 +1,7 @@
 <x-admin-layout title="لیست نامه‌ها" header="لیست نامه‌ها">
     <div class="container py-4">
 
-        <a href="{{ route('admin.letters.create') }}" class="btn btn-primary mb-3">
+        <a href="{{ route('admin.letters.create') }}" class="btn btn-sm btn-primary mb-3">
             <i class="bi bi-plus-circle"></i> ایجاد نامه جدید
         </a>
 

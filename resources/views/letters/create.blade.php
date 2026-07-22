@@ -1,5 +1,10 @@
 <x-admin-layout title="ایجاد نامه جدید" header="ایجاد نامه جدید">
     <div class="container py-4">
+
+        <a href="{{ route('admin.letters.index') }}" class="btn btn-sm btn-secondary mb-3">
+            <i class="bi bi-chevron-double-right"></i> بازگشت به لیست نامه ها
+        </a>
+
         <form action="{{ route('admin.letters.store') }}" method="POST" enctype="multipart/form-data" class="card shadow-sm p-4">
             @csrf
 
