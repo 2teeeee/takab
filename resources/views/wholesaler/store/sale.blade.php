@@ -161,7 +161,7 @@
                     .querySelector(".line-total")
                     .innerHTML=rowTotal.toLocaleString();
                 total+=rowTotal;
-                discount+=qty*2000000;
+                discount+=qty*0;
             });
 
             document.getElementById("total").innerHTML=

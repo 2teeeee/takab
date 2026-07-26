@@ -92,7 +92,7 @@ class StoreProductController extends Controller
     ): View {
 
         $cart = $cartService->getCart();
-        $discount = $cartService->getStoreDiscount();
+        $discount = 0;
         $total = $cart->items->sum('total');
         $final = max(0, $total - $discount);
 
@@ -116,7 +116,7 @@ class StoreProductController extends Controller
 
         DB::transaction(function () use ($cart, $cartService) {
 
-            $discount = $cartService->getStoreDiscount();
+            $discount = 0;
 
             $total = $cart->items->sum('total');
 
