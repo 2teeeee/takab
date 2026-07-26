@@ -207,13 +207,13 @@
                     <img src="{{asset("img/logo.png")}}" class="pt-2" alt="takab logo" style="width: 100%;">
                 </a>
             </div>
-            <div class="col-6 px-0">
-                <form action="{{ route('search') }}" method="GET" class="d-flex w-100 me-auto" role="search" >
-                    <input class="form-control rounded-end-0 shadow-none" type="text" placeholder="{{ __('app.product_search') }}"  id="title" name="q">
-                    <button type="submit" class="btn btn-outline-dark rounded-start-0">
-                        <i class="bi bi-search"></i>
-                    </button>
-                </form>
+            <div class="col-6 px-0 pt-2 text-end">
+                <a href="{{route('search')}}" class="border-0 text-decoration-none text-dark my-2 px-2 py-1">
+                    <i class="bi bi-search"></i>
+                </a>
+                <a href="{{route('hydrojoy.login')}}" class="border-0 my-1 px-2 py-1">
+                    <img src="{{asset("img/hydrojoy-logo.png")}}" alt="heydojoy logo" width="100">
+                </a>
             </div>
             <div class="col-1 px-0">
                 <div class="nav-item px-2 text-sm text-center d-flex align-items-center th-1 dropdown">
@@ -387,11 +387,6 @@
             <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
         </div>
         <div class="offcanvas-body p-0 px-2 position-relative">
-            <div class="list-group">
-                <a href="{{route('hydrojoy.login')}}" class="list-group-item list-group-item-action border-0 my-1 px-2 py-1">
-                    <img src="{{asset("img/hydrojoy-logo.png")}}" alt="heydojoy logo" width="100">
-                </a>
-            </div>
             <div class="list-group">
                 <a href="{{route('page.show',['slug'=>'about'])}}" class="list-group-item list-group-item-action border-0 my-1 px-2 py-1">
                     <i class="bi bi-info-circle icon-size-0x me-1 text-main"></i>
