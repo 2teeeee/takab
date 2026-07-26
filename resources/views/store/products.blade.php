@@ -1,12 +1,6 @@
-<x-admin-layout title="خرید محصولات" header="خرید محصولات">
+<x-admin-layout title="خرید از شرکت" header="خرید محصولات">
 
     <div class="container py-4">
-        <div class="text-end">
-            <a href="{{ route('store.cart') }}" class="btn btn-sm btn-primary mb-3">
-                <i class="bi bi-basket"></i>
-                سبد خرید
-            </a>
-        </div>
 
         @if(session('success'))
             <div class="alert alert-success">
@@ -14,99 +8,193 @@
             </div>
         @endif
 
-        <div class="row">
-            @foreach($products as $product)
-                <div class="col-lg-3 col-md-4 col-sm-6 mb-4">
-                    <div class="card h-100 shadow-sm">
-                        @if($product->small_image_name)
-                            <img src="{{ asset('storage/' . $product->small_image_name) }}" class="card-img-top" alt="{{$product->title}}">
-                        @else
-                            <img src="{{ asset('img/no-image.png') }}" class="card-img-top" alt="{{$product->title}}">
-                        @endif
+        @if(session('error'))
+            <div class="alert alert-danger">
+                {{ session('error') }}
+            </div>
+        @endif
 
-                        <div class="card-body">
-                            <h6>
-                                {{ $product->title }}
-                            </h6>
+        @if($errors->any())
+            <div class="alert alert-danger">
+                {{ $errors->first() }}
+            </div>
+        @endif
 
-                            <div class="text-success fw-bold">
-                                {{ number_format($product->sell_price) }}
-                                تومان
-                            </div>
-                            <div class="text-muted">
-                                <small>
-                                    موجودی:
-                                    {{ $product->stock }}
-                                </small>
-                            </div>
-                        </div>
+        <form method="POST" action="{{ route('store.products.store') }}">
+            @csrf
 
-                        <div class="card-footer">
-                            @php
-                                $quantity = $cartItems[$product->id] ?? 0;
-                            @endphp
-                            @if($quantity == 0)
-                                <form action="{{ route('store.products.cart',$product) }}"
-                                      method="POST"
-                                      class="d-flex align-items-center justify-content-center gap-1">
+            <table class="table table-bordered table-hover align-middle">
+                <thead class="table-light">
+                <tr>
+                    <th width="80">تصویر</th>
+                    <th>نام محصول</th>
+                    <th width="170">قیمت</th>
+                    <th width="120">موجودی</th>
+                    <th width="150">تعداد خرید</th>
+                    <th width="170">جمع</th>
+                </tr>
+                </thead>
 
-                                    @csrf
+                <tbody>
 
-                                    <input type="number"
-                                           name="quantity"
-                                           value="1"
-                                           min="1"
-                                           max="{{ $product->stock }}"
-                                           class="form-control form-control-sm text-center"
-                                           style="width:70px;">
+                @foreach($products as $product)
 
-                                    <button type="submit" class="btn btn-success btn-sm">
-                                        <i class="bi bi-cart-plus"></i>
-                                    </button>
+                    <tr>
 
-                                </form>
-                            @else
-                                <div class="d-flex align-items-center justify-content-center gap-1">
+                        <td class="text-center">
+                            <img src="{{ asset('storage/'.$product->small_image_name) }}"
+                                 width="60">
+                        </td>
 
-                                    <form action="{{ route('store.products.quantity',$product) }}" method="POST">
-                                        @csrf
-                                        <input type="hidden" name="quantity" value="{{ max(0, $quantity - 1) }}">
-                                        <button class="btn btn-outline-secondary btn-sm">
-                                            <i class="bi bi-dash"></i>
-                                        </button>
-                                    </form>
+                        <td>
+                            {{ $product->title }}
+                        </td>
 
-                                    <input type="text"
-                                           class="form-control form-control-sm text-center"
-                                           value="{{ $quantity }}"
-                                           readonly
-                                           style="width:70px;">
+                        <td class="price"
+                            data-price="{{ $product->sell_price }}">
+                            {{ number_format($product->sell_price) }}
+                        </td>
 
-                                    <form action="{{ route('store.products.quantity',$product) }}" method="POST">
-                                        @csrf
-                                        <input type="hidden" name="quantity" value="{{ $quantity + 1 }}">
-                                        <button class="btn btn-outline-secondary btn-sm">
-                                            <i class="bi bi-plus"></i>
-                                        </button>
-                                    </form>
+                        <td>
+                            {{ number_format($product->stock) }}
+                        </td>
 
-                                    <form action="{{ route('store.products.quantity',$product) }}" method="POST">
-                                        @csrf
-                                        <input type="hidden" name="quantity" value="0">
+                        <td>
 
-                                        <button class="btn btn-outline-danger btn-sm">
-                                            <i class="bi bi-trash"></i>
-                                        </button>
-                                    </form>
+                            <input
+                                    type="number"
+                                    min="0"
+                                    max="{{ $product->stock }}"
+                                    value="0"
+                                    class="form-control quantity"
+                                    name="products[{{ $product->id }}]"
+                            >
 
-                                </div>
-                            @endif
-                        </div>
-                    </div>
-                </div>
+                        </td>
 
-            @endforeach
+                        <td class="row-total">
+                            0
+                        </td>
+
+                    </tr>
+
+                @endforeach
+
+                </tbody>
+
+                <tfoot>
+
+                <tr class="table-light">
+
+                    <th colspan="5" class="text-end">
+                        جمع کل
+                    </th>
+
+                    <th id="totalPrice">
+                        0
+                    </th>
+
+                </tr>
+
+                <tr>
+
+                    <th colspan="5" class="text-end text-danger">
+                        پورسانت
+                    </th>
+
+                    <th class="text-danger" id="discount">
+                        0
+                    </th>
+
+                </tr>
+
+                <tr class="table-success">
+
+                    <th colspan="5" class="text-end">
+                        مبلغ نهایی
+                    </th>
+
+                    <th id="finalPrice">
+                        0
+                    </th>
+
+                </tr>
+
+                </tfoot>
+
+            </table>
+
+            <button class="btn btn-success btn-lg">
+                ثبت سفارش
+            </button>
+
+        </form>
+
+        <div class="mt-3">
+            {{ $products->links() }}
         </div>
-        {{ $products->links() }}
+
     </div>
+
 </x-admin-layout>
+
+<script>
+
+    document.addEventListener('DOMContentLoaded', function () {
+
+        const discountPerProduct = 0;
+
+        function calculate() {
+
+            let total = 0;
+            let discount = 0;
+
+            document.querySelectorAll("tbody tr").forEach(function(row){
+
+                const price =
+                    parseInt(
+                        row.querySelector(".price")
+                            .dataset.price
+                    );
+
+                const qty =
+                    parseInt(
+                        row.querySelector(".quantity")
+                            .value
+                    ) || 0;
+
+                const rowTotal = price * qty;
+
+                row.querySelector(".row-total")
+                    .innerHTML =
+                    rowTotal.toLocaleString();
+
+                total += rowTotal;
+
+                discount += qty * discountPerProduct;
+
+            });
+
+            document.getElementById("totalPrice").innerHTML =
+                total.toLocaleString();
+
+            document.getElementById("discount").innerHTML =
+                discount.toLocaleString();
+
+            document.getElementById("finalPrice").innerHTML =
+                Math.max(0,total-discount).toLocaleString();
+
+        }
+
+        document.querySelectorAll(".quantity")
+            .forEach(function(item){
+
+                item.addEventListener("input",calculate);
+
+            });
+
+        calculate();
+
+    });
+
+</script>

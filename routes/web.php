@@ -142,7 +142,6 @@ Route::middleware(['auth'])->prefix('admin')->name('admin.')->group(function () 
 Route::middleware(['auth'])->prefix('wholesaler')->name('wholesaler.')->middleware(['role:wholesaler'])->group(function () {
     Route::get('/products', [WholesaleProductController::class, 'index'])->name('products');
     Route::post('/products', [WholesaleProductController::class, 'store'])->name('products.store');
-    Route::post('/products/{product}/quantity', [WholesaleProductController::class, 'updateQuantity'])->name('products.quantity');
 
     Route::get('/stores/list', [StoreSaleController::class, 'index'])->name('stores.index');
     Route::get('stores/{store}/sale', [StoreSaleController::class, 'create'])->name('stores.sale');
@@ -151,10 +150,7 @@ Route::middleware(['auth'])->prefix('wholesaler')->name('wholesaler.')->middlewa
 
 Route::middleware(['auth','role:admin,seller'])->prefix('store')->name('store.')->group(function () {
     Route::get('/products', [StoreProductController::class, 'index'])->name('products');
-    Route::post('/products/{product}/cart', [StoreProductController::class, 'addToCart'])->name('products.cart');
-    Route::get('/cart', [StoreProductController::class, 'cart'])->name('cart');
-    Route::post('/checkout', [StoreProductController::class, 'checkout'])->name('checkout');
-    Route::post('/products/{product}/quantity', [StoreProductController::class, 'updateQuantity'])->name('products.quantity');
+    Route::post('/products', [StoreProductController::class, 'store'])->name('products.store');
 
     Route::get('customers/{customer}/sale', [CustomerSaleController::class, 'create'])->name('customers.sale');
     Route::post('customers/{customer}/sale', [CustomerSaleController::class, 'store'])->name('customers.sale.store');

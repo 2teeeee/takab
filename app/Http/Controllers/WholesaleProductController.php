@@ -2,12 +2,11 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Order;
 use App\Models\Product;
 use App\Models\ProductUser;
+use App\Services\InventoryTransferService;
 use Illuminate\Database\Query\JoinClause;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\View\View;
 
@@ -47,82 +46,19 @@ class WholesaleProductController extends Controller
     public function store(Request $request): RedirectResponse
     {
         $request->validate([
-            'products' => ['required', 'array'],
-            'products.*' => ['nullable', 'integer', 'min:0'],
+            'products' => 'required|array',
         ]);
 
-        DB::transaction(function () use ($request) {
-
-            $order = Order::create([
-                'user_id' => auth()->id(),
-                'status' => 'pending',
-                'address' => '-',
-                'discount' => 0,
-                'total' => 0,
-                'final_total' => 0,
-            ]);
-
-            $total = 0;
-            $discount = 0;
-
-            foreach ($request->products as $productId => $quantity) {
-
-                if ($quantity <= 0) {
-                    continue;
-                }
-
-                $product = Product::findOrFail($productId);
-
-                $stock = $this->getAvailableQuantity($product);
-
-                if ($quantity > $stock) {
-                    throw new \Exception("موجودی {$product->translate()->title} کافی نیست.");
-                }
-
-                $price = $product->sell_price;
-
-                $lineTotal = $price * $quantity;
-
-                $lineDiscount = $quantity * 1000000;
-
-                $order->items()->create([
-                    'product_id' => $product->id,
-                    'quantity' => $quantity,
-                    'price' => $price,
-                    'total' => $lineTotal,
-                ]);
-
-                ProductUser::decrease(
-                    $this->inventoryOwnerId(),
-                    $product->id,
-                    $quantity
-                );
-
-                ProductUser::increase(
-                    auth()->id(),
-                    $product->id,
-                    $quantity
-                );
-
-                $total += $lineTotal;
-                $discount += $lineDiscount;
-            }
-
-            if ($total == 0) {
-                throw new \Exception('هیچ محصولی انتخاب نشده است.');
-            }
-
-            $order->update([
-                'total' => $total,
-                'discount' => $discount,
-                'final_total' => max(0, $total - $discount),
-            ]);
-
-        });
+        app(InventoryTransferService::class)->transfer(
+            fromUserId: config('shop.company_user_id'),
+            toUserId: auth()->id(),
+            products: $request->products,
+            discountPerItem: 1_000_000
+        );
 
         return redirect()
             ->route('wholesaler.products')
-            ->with('success', 'سفارش ثبت شد.');
+            ->with('success', 'خرید با موفقیت ثبت شد.');
     }
 
     protected function inventoryOwnerId(): int
