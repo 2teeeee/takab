@@ -19,6 +19,7 @@ use App\Http\Controllers\SearchController;
 use App\Http\Controllers\SliderController;
 use App\Http\Controllers\StoreController;
 use App\Http\Controllers\StoreProductController;
+use App\Http\Controllers\StoreSaleController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\UserInstallRequestController;
 use App\Http\Controllers\WholesaleProductController;
@@ -130,7 +131,6 @@ Route::middleware(['auth'])->prefix('admin')->name('admin.')->group(function () 
         Route::resource('install_schedules', InstallScheduleController::class)->only(['index', 'create', 'store', 'destroy']);
         Route::resource('periodic_services', PeriodicServiceController::class)->only(['index', 'update']);
 
-
         Route::prefix('orders')->name('orders.')->group(function () {
             Route::get('/', [OrderController::class, 'index'])->name('index');
             Route::get('/{order}', [OrderController::class, 'show'])->name('show');
@@ -145,6 +145,10 @@ Route::middleware(['auth'])->prefix('wholesaler')->name('wholesaler.')->middlewa
     Route::get('/cart', [WholesaleProductController::class, 'cart'])->name('cart');
     Route::post('/checkout', [WholesaleProductController::class, 'checkout'])->name('checkout');
     Route::post('/products/{product}/quantity', [WholesaleProductController::class, 'updateQuantity'])->name('products.quantity');
+
+    Route::get('/stores/list', [StoreSaleController::class, 'index'])->name('stores.index');
+    Route::get('stores/{store}/sale', [StoreSaleController::class, 'create'])->name('stores.sale');
+    Route::post('stores/{store}/sale', [StoreSaleController::class, 'store'])->name('stores.sale.store');
 });
 
 Route::middleware(['auth','role:admin,seller'])->prefix('store')->name('store.')->group(function () {
