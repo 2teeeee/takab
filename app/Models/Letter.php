@@ -36,4 +36,9 @@ class Letter extends Model
     {
         return $this->hasMany(LetterReference::class);
     }
+
+    public function getUrlAttribute(): string
+    {
+        return route('admin.letters.show', $this);
+    }
 }

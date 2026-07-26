@@ -88,7 +88,19 @@ class LetterController extends Controller
             }
         }
 
-        $sms->sendSingle($letter->receiver->mobile, "یک نامه جدید برای شما ثبت شده است.");
+        $message = <<<TEXT
+        یک نامه جدید برای شما ثبت شده است.
+        
+        موضوع:
+        {$letter->subject}
+        
+        $letter->url
+        TEXT;
+
+        $sms->sendSingle(
+            $letter->receiver->mobile,
+            $message
+        );
 
         return redirect()->route('admin.letters.show', $letter->id)
             ->with('success', 'نامه با موفقیت ارسال شد.');
@@ -142,7 +154,19 @@ class LetterController extends Controller
 
         $userRef = User::find($validated['to_user_id']);
 
-        $sms->sendSingle($userRef->mobile, "یک نامه جدید برای شما ثبت شده است.");
+        $message = <<<TEXT
+        یک نامه جدید برای شما ثبت شده است.
+        
+        موضوع:
+        {$letter->subject}
+        
+        $letter->url
+        TEXT;
+
+        $sms->sendSingle(
+            $userRef->mobile,
+            $message
+        );
 
         return back()->with('success', 'نامه با موفقیت ارجاع داده شد.');
     }
