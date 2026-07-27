@@ -16,31 +16,37 @@
             <span class="visually-hidden">Next</span>
         </button>
     </div>
-    <div class="row mx-0 justify-content-center bg-main-light py-4 text-center" id="about">
-        <div class="col-6 col-md-3 px-4">
-            <div class="border border-info bg-light rounded-circle wh-100 mx-auto fs-64" >
-                <i class="bi bi-patch-check align-self-center"></i>
+
+    <div class="row mx-0 bg-main-light py-3 text-center" id="about">
+
+        <div class="col-3">
+            <div class="feature-icon mx-auto mb-2">
+                <i class="bi bi-patch-check"></i>
             </div>
-            <div>{{ __('app.QA') }}</div>
+            <div class="small fw-bold">{{ __('app.QA') }}</div>
         </div>
-        <div class="col-6 col-md-3 px-4">
-            <div class="border border-info bg-light rounded-circle wh-100 mx-auto fs-64" >
-                <i class="bi bi-hand-thumbs-up align-self-center"></i>
+
+        <div class="col-3">
+            <div class="feature-icon mx-auto mb-2">
+                <i class="bi bi-hand-thumbs-up"></i>
             </div>
-            <div>{{ __('app.CS') }}</div>
+            <div class="small fw-bold">{{ __('app.CS') }}</div>
         </div>
-        <div class="col-6 col-md-3 px-4">
-            <div class="border border-info bg-light rounded-circle wh-100 mx-auto fs-64" >
-                <i class="bi bi-cart-check align-self-center"></i>
+
+        <div class="col-3">
+            <div class="feature-icon mx-auto mb-2">
+                <i class="bi bi-cart-check"></i>
             </div>
-            <div>{{ __('app.SP') }}</div>
+            <div class="small fw-bold">{{ __('app.SP') }}</div>
         </div>
-        <div class="col-6 col-md-3 px-4">
-            <div class="border border-info bg-light rounded-circle wh-100 mx-auto fs-64" >
-                <i class="bi bi-credit-card align-self-center"></i>
+
+        <div class="col-3">
+            <div class="feature-icon mx-auto mb-2">
+                <i class="bi bi-credit-card"></i>
             </div>
-            <div>{{ __('app.PG') }}</div>
+            <div class="small fw-bold">{{ __('app.PG') }}</div>
         </div>
+
     </div>
 
     <div class="py-3 bg-product-gray" id="product">
