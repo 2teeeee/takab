@@ -17,7 +17,7 @@
         @endif
 
         <link rel="stylesheet" href="{{asset("bootstrap/icons/bootstrap-icons.css")}}">
-        <link rel="stylesheet" href="{{asset("css/main.css")}}">
+        <link rel="stylesheet" href="{{asset("css/main.css")}}?v=2">
 
         <script src="{{asset("bootstrap/dist/js/bootstrap.esm.js")}}"></script>
         <script src="{{asset("bootstrap/dist/js/popper.min.js")}}"></script>

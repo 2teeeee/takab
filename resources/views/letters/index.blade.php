@@ -65,69 +65,71 @@
             <div class="alert alert-success">{{ session('success') }}</div>
         @endif
 
-        <table class="table table-bordered align-middle">
-            <thead class="table-light">
-            <tr>
-                <th>#</th>
-                <th>موضوع</th>
-                <th>فرستنده</th>
-                <th>گیرنده</th>
-                <th>اولویت</th>
-                <th>وضعیت</th>
-                <th>تاریخ</th>
-                <th>عملیات</th>
-            </tr>
-            </thead>
-            <tbody>
-            @forelse ($letters as $letter)
-                <tr class="{{ auth()->id() == $letter->receiver_id && $letter->status == 'new' ? 'table-warning fw-bold' : '' }}">
-                    <td>{{ $loop->iteration + ($letters->currentPage() - 1) * $letters->perPage() }}</td>
-
-                    <td>
-                        @if(auth()->id() == $letter->receiver_id && $letter->status == 'new')
-                            <i class="bi bi-envelope-fill text-danger me-1"></i>
-                        @else
-                            <i class="bi bi-envelope-open text-success me-1"></i>
-                        @endif
-
-                        {{ $letter->subject }}
-                    </td>
-
-                    <td>{{ $letter->sender->name }}</td>
-                    <td>{{ $letter->receiver->name }}</td>
-
-                    <td>
-                        <x-status_badge status="{{ $letter->priority }}" />
-                    </td>
-
-                    <td>
-                        @if(auth()->id() == $letter->receiver_id)
-                            @if($letter->status == 'new')
-                                <span class="badge bg-danger">خوانده نشده</span>
-                            @else
-                                <span class="badge bg-success">خوانده شده</span>
-                            @endif
-                        @else
-                            <span class="badge bg-secondary">ارسالی</span>
-                        @endif
-                    </td>
-
-                    <td>{{ jdate($letter->created_at)->format('Y/m/d H:i') }}</td>
-
-                    <td>
-                        <a href="{{ route('admin.letters.show', $letter) }}"
-                           class="btn btn-sm btn-info text-white">
-                            <i class="bi bi-eye"></i>
-                            مشاهده
-                        </a>
-                    </td>
+        <div class="table-responsive">
+            <table class="table table-bordered align-middle">
+                <thead class="table-light">
+                <tr>
+                    <th>#</th>
+                    <th>موضوع</th>
+                    <th>فرستنده</th>
+                    <th>گیرنده</th>
+                    <th>اولویت</th>
+                    <th>وضعیت</th>
+                    <th>تاریخ</th>
+                    <th>عملیات</th>
                 </tr>
-            @empty
-                <tr><td colspan="8" class="text-center">هیچ نامه‌ای یافت نشد.</td></tr>
-            @endforelse
-            </tbody>
-        </table>
+                </thead>
+                <tbody>
+                @forelse ($letters as $letter)
+                    <tr class="{{ auth()->id() == $letter->receiver_id && $letter->status == 'new' ? 'table-warning fw-bold' : '' }}">
+                        <td>{{ $loop->iteration + ($letters->currentPage() - 1) * $letters->perPage() }}</td>
 
-        {{ $letters->links() }}
+                        <td>
+                            @if(auth()->id() == $letter->receiver_id && $letter->status == 'new')
+                                <i class="bi bi-envelope-fill text-danger me-1"></i>
+                            @else
+                                <i class="bi bi-envelope-open text-success me-1"></i>
+                            @endif
+
+                            {{ $letter->subject }}
+                        </td>
+
+                        <td>{{ $letter->sender->name }}</td>
+                        <td>{{ $letter->receiver->name }}</td>
+
+                        <td>
+                            <x-status_badge status="{{ $letter->priority }}" />
+                        </td>
+
+                        <td>
+                            @if(auth()->id() == $letter->receiver_id)
+                                @if($letter->status == 'new')
+                                    <span class="badge bg-danger">خوانده نشده</span>
+                                @else
+                                    <span class="badge bg-success">خوانده شده</span>
+                                @endif
+                            @else
+                                <span class="badge bg-secondary">ارسالی</span>
+                            @endif
+                        </td>
+
+                        <td>{{ jdate($letter->created_at)->format('Y/m/d H:i') }}</td>
+
+                        <td>
+                            <a href="{{ route('admin.letters.show', $letter) }}"
+                               class="btn btn-sm btn-info text-white">
+                                <i class="bi bi-eye"></i>
+                                مشاهده
+                            </a>
+                        </td>
+                    </tr>
+                @empty
+                    <tr><td colspan="8" class="text-center">هیچ نامه‌ای یافت نشد.</td></tr>
+                @endforelse
+                </tbody>
+            </table>
+
+            {{ $letters->links() }}
+        </div>
     </div>
 </x-admin-layout>
