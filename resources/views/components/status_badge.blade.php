@@ -24,7 +24,7 @@
     $item = $map[$status] ?? ['text' => $status, 'class' => 'bg-secondary text-white'];
 @endphp
 
-<span class="badge {{ $item['class'] }} px-3 py-2 rounded-pill">
+<span class="badge {{ $item['class'] }}">
     {{ $item['text'] }}
 </span>
 <?php

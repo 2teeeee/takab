@@ -1,9 +1,65 @@
 <x-admin-layout title="لیست نامه‌ها" header="لیست نامه‌ها">
-    <div class="container py-4">
+    <div class="container py-4 px-0">
 
         <a href="{{ route('admin.letters.create') }}" class="btn btn-sm btn-primary mb-3">
             <i class="bi bi-plus-circle"></i> ایجاد نامه جدید
         </a>
+
+        <div class="card mb-3">
+            <div class="card-body">
+                <div class="d-flex flex-wrap gap-2">
+                    <a href="{{ route('admin.letters.index') }}"
+                       class="btn btn-sm {{ request('tab')=='' ? 'btn-primary':'btn-outline-primary' }}">
+                        همه
+                    </a>
+
+                    <a href="{{ route('admin.letters.index',['tab'=>'received']) }}"
+                       class="btn btn-sm {{ request('tab')=='received' ? 'btn-primary':'btn-outline-primary' }}">
+                        دریافتی
+                    </a>
+
+                    <a href="{{ route('admin.letters.index',['tab'=>'sent']) }}"
+                       class="btn btn-sm {{ request('tab')=='sent' ? 'btn-primary':'btn-outline-primary' }}">
+                        ارسالی
+                    </a>
+
+                    <a href="{{ route('admin.letters.index',['tab'=>'unread']) }}"
+                       class="btn btn-sm {{ request('tab')=='unread' ? 'btn-danger':'btn-outline-danger' }}">
+                        خوانده نشده
+                    </a>
+
+                    <a href="{{ route('admin.letters.index',['tab'=>'read']) }}"
+                       class="btn btn-sm {{ request('tab')=='read' ? 'btn-success':'btn-outline-success' }}">
+                        خوانده شده
+                    </a>
+
+                    <a href="{{ route('admin.letters.index',['tab'=>'referred']) }}"
+                       class="btn btn-sm {{ request('tab')=='referred' ? 'btn-warning':'btn-outline-warning' }}">
+                        ارجاع شده
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <form method="GET" action="{{ route('admin.letters.index') }}" class="mb-3">
+
+            <input type="hidden" name="tab" value="{{ request('tab') }}">
+
+            <div class="input-group">
+
+                <input type="text"
+                       name="search"
+                       class="form-control"
+                       value="{{ request('search') }}"
+                       placeholder="جستجو در موضوع، متن، فرستنده و گیرنده">
+
+                <button class="btn btn-primary">
+                    <i class="bi bi-search"></i>
+                </button>
+
+            </div>
+
+        </form>
 
         @if (session('success'))
             <div class="alert alert-success">{{ session('success') }}</div>
@@ -24,20 +80,44 @@
             </thead>
             <tbody>
             @forelse ($letters as $letter)
-                <tr>
+                <tr class="{{ auth()->id() == $letter->receiver_id && $letter->status == 'new' ? 'table-warning fw-bold' : '' }}">
                     <td>{{ $loop->iteration + ($letters->currentPage() - 1) * $letters->perPage() }}</td>
-                    <td>{{ $letter->subject }}</td>
+
+                    <td>
+                        @if(auth()->id() == $letter->receiver_id && $letter->status == 'new')
+                            <i class="bi bi-envelope-fill text-danger me-1"></i>
+                        @else
+                            <i class="bi bi-envelope-open text-success me-1"></i>
+                        @endif
+
+                        {{ $letter->subject }}
+                    </td>
+
                     <td>{{ $letter->sender->name }}</td>
                     <td>{{ $letter->receiver->name }}</td>
+
                     <td>
                         <x-status_badge status="{{ $letter->priority }}" />
                     </td>
+
                     <td>
-                        <x-status_badge status="{{ $letter->status }}" />
+                        @if(auth()->id() == $letter->receiver_id)
+                            @if($letter->status == 'new')
+                                <span class="badge bg-danger">خوانده نشده</span>
+                            @else
+                                <span class="badge bg-success">خوانده شده</span>
+                            @endif
+                        @else
+                            <span class="badge bg-secondary">ارسالی</span>
+                        @endif
                     </td>
+
                     <td>{{ jdate($letter->created_at)->format('Y/m/d H:i') }}</td>
+
                     <td>
-                        <a href="{{ route('admin.letters.show', $letter) }}" class="btn btn-sm btn-info text-white">
+                        <a href="{{ route('admin.letters.show', $letter) }}"
+                           class="btn btn-sm btn-info text-white">
+                            <i class="bi bi-eye"></i>
                             مشاهده
                         </a>
                     </td>

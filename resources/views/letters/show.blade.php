@@ -71,7 +71,7 @@
                        required>
             </div>
 
-            <button type="submit" class="btn btn-success" id="submitBtn">
+            <button type="submit" class="btn btn-sm btn-success" id="submitBtn">
         <span class="btn-text">
             <i class="bi bi-paperclip"></i>
             افزودن ضمیمه
@@ -108,7 +108,7 @@
                         <textarea name="note" id="note" rows="3" class="form-control"></textarea>
                     </div>
 
-                    <button type="submit" class="btn btn-primary">ارجاع</button>
+                    <button type="submit" class="btn btn-sm btn-primary">ارجاع</button>
                 </form>
             </div>
         </div>

@@ -17,23 +17,84 @@ use Symfony\Component\HttpFoundation\StreamedResponse;
 
 class LetterController extends Controller
 {
-    public function index(): View
+    public function index(Request $request): View
     {
         $user = auth()->user();
 
-        if ($user->roles()->where('name', 'admin')->exists()) {
-            // اگر ادمین است: همه نامه‌ها را ببیند
-            $letters = Letter::with(['sender', 'receiver'])->latest()->paginate(15);
-        } else {
-            // اگر کاربر عادی است: فقط نامه‌های خودش را ببیند
-            $letters = Letter::with(['sender', 'receiver'])
-                ->where(function ($query) use ($user) {
-                    $query->where('sender_id', $user->id)
-                        ->orWhere('receiver_id', $user->id);
-                })
-                ->latest()
-                ->paginate(15);
+        $letters = Letter::query()
+            ->with(['sender', 'receiver']);
+
+        // دسترسی
+        if (!$user->hasRole('admin')) {
+            $letters->where(function ($q) use ($user) {
+                $q->where('sender_id', $user->id)
+                    ->orWhere('receiver_id', $user->id);
+            });
         }
+
+        /*
+        |--------------------------------------------------------------------------
+        | Tabs
+        |--------------------------------------------------------------------------
+        */
+
+        switch ($request->get('tab')) {
+
+            case 'received':
+                $letters->where('receiver_id', $user->id);
+                break;
+
+            case 'sent':
+                $letters->where('sender_id', $user->id);
+                break;
+
+            case 'unread':
+                $letters->where('receiver_id', $user->id)
+                    ->where('status', 'new');
+                break;
+
+            case 'read':
+                $letters->where('receiver_id', $user->id)
+                    ->where('status', 'read');
+                break;
+
+            case 'referred':
+                $letters->where('status', 'referred');
+                break;
+
+            default:
+                // همه نامه ها
+                break;
+        }
+
+        /*
+        |--------------------------------------------------------------------------
+        | Search
+        |--------------------------------------------------------------------------
+        */
+
+        if ($request->filled('search')) {
+
+            $search = $request->search;
+
+            $letters->where(function ($q) use ($search) {
+
+                $q->where('subject', 'like', "%{$search}%")
+                    ->orWhere('body', 'like', "%{$search}%")
+                    ->orWhereHas('sender', function ($q) use ($search) {
+                        $q->where('name', 'like', "%{$search}%");
+                    })
+                    ->orWhereHas('receiver', function ($q) use ($search) {
+                        $q->where('name', 'like', "%{$search}%");
+                    });
+
+            });
+        }
+
+        $letters = $letters
+            ->latest()
+            ->paginate(15)
+            ->withQueryString();
 
         return view('letters.index', compact('letters'));
     }
