@@ -6,8 +6,8 @@
         <meta name="csrf-token" content="{{ csrf_token() }}">
 
         <title>@yield('title', 'تک آب صنعت ارم')</title>
-        <meta name="description" content="@yield('description', 'شرکت تک آب صنعت ارم تولید کننده دستگاه های تصویه آب و مخزنهای ذخیره سازی آب')">
-        <meta name="keywords" content="@yield('keywords', 'تک آب, صنعت ارم, تصویه آب, مخزن آب')">
+        <meta name="description" content="@yield('description', 'شرکت تک آب صنعت ارم تولید کننده دستگاه های تصفیه آب و مخزنهای ذخیره سازی آب')">
+        <meta name="keywords" content="@yield('keywords', 'تک آب, صنعت ارم, تصفیه آب, مخزن آب')">
 
         <link rel="stylesheet" href="{{asset("fonts/fontstyle.css")}}">
         @if(app()->getLocale() === 'fa' || app()->getLocale() === 'ar')
