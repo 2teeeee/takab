@@ -3,7 +3,7 @@
         <div class="col-md-4 border rounded-1 px-0">
             <h5 class="bg-main-light text-center p-2 rounded-top-1">{{ __('app.signin_tp_takab') }}</h5>
             <x-auth-session-status class="mb-4" :status="session('status')" />
-            <form method="POST" action="{{ route('login') }}" class="p-2">
+            <form method="POST" action="{{ route('authenticate') }}" class="p-2">
                 @csrf
                 <div class="input-group mb-3">
                     <span class="input-group-text" id="mobile-l">{{ __('app.mobile') }}</span>
