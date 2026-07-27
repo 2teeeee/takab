@@ -16,15 +16,43 @@
             background-color: #f8f9fa;
         }
 
-        .admin-sidebar {
-            width: 250px;
-            height: 100vh;
-            position: fixed;
-            top: 0;
-            right: 0;
-            background-color: #343a40;
-            color: #fff;
-            padding-top: 1rem;
+        .admin-sidebar{
+            width:250px;
+            position:fixed;
+            right:0;
+            top:0;
+            bottom:0;
+            background:#343a40;
+            display:flex;
+            flex-direction:column;
+        }
+
+        .sidebar-header{
+            flex:0 0 auto;
+            padding:15px 10px;
+            border-bottom:1px solid #495057;
+        }
+
+        .sidebar-menu{
+            flex:1;
+            overflow-y:auto;
+        }
+
+        .admin-sidebar::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        .admin-sidebar::-webkit-scrollbar-track {
+            background: #343a40;
+        }
+
+        .admin-sidebar::-webkit-scrollbar-thumb {
+            background: #6c757d;
+            border-radius: 5px;
+        }
+
+        .admin-sidebar::-webkit-scrollbar-thumb:hover {
+            background: #868e96;
         }
 
         .admin-sidebar a {
@@ -73,86 +101,93 @@
 
 {{-- Sidebar --}}
 <div class="admin-sidebar">
-    <h5 class="text-center text-light mb-3">مدیریت سایت</h5>
+    <div class="sidebar-header">
+        <h5 class="text-center text-light mb-3">
+            مدیریت سایت
+        </h5>
+    </div>
 
-    @if(auth()->user()->hasRole(['admin', 'manager', 'personel', 'wholesaler', 'seller', 'marketer']))
-    <a href="{{ route('admin.users.index') }}" class="{{ request()->routeIs('admin.users.*') ? 'active' : '' }}">
-        👤 کاربران
-    </a>
-    @endif
+    <div class="sidebar-menu">
 
-    @if(auth()->user()->hasRole(['admin', 'manager', 'personel']))
-    <a href="{{ route('admin.categories.index') }}" class="{{ request()->routeIs('admin.categories.*') ? 'active' : '' }}">
-        📂 دسته‌ها
-    </a>
-    @endif
-
-    @if(auth()->user()->hasRole(['admin', 'manager', 'personel']))
-    <a href="{{ route('admin.products.index') }}" class="{{ request()->routeIs('admin.products.*') ? 'active' : '' }}">
-        🛍 محصولات
-    </a>
-    @endif
-
-    @if(auth()->user()->hasRole(['admin', 'manager', 'personel']))
-    <a href="{{ route('admin.sliders.index') }}" class="{{ request()->routeIs('admin.sliders.*') ? 'active' : '' }}">
-        🛍 اسلایدر
-    </a>
-    @endif
-
-    @if(auth()->user()->hasRole(['admin', 'manager', 'personel']))
-    <a href="{{ route('admin.pages.index') }}" class="{{ request()->routeIs('admin.pages.*') ? 'active' : '' }}">
-        🛍 صفحات توضیحی
-    </a>
-    @endif
-
-    <hr class="border-secondary my-1">
-
-    @if(auth()->user()->hasRole(['admin', 'manager', 'personel', 'wholesaler', 'seller', 'marketer', 'nasab']))
-    <a href="{{ route('admin.letters.index') }}" class="{{ request()->routeIs('letters.*') ? 'active' : '' }}">
-        📬 اتوماسیون نامه‌ها
-    </a>
-
-    <hr class="border-secondary my-1">
-    @endif
-
-    @if(auth()->user()->hasRole(['admin', 'manager', 'personel','seller']))
-        <a href="{{ route('admin.orders.index') }}" class="{{ request()->routeIs('orders.*') ? 'active' : '' }}">
-            سفارش ها
+        @if(auth()->user()->hasRole(['admin', 'manager', 'personel', 'wholesaler', 'seller', 'marketer']))
+        <a href="{{ route('admin.users.index') }}" class="{{ request()->routeIs('admin.users.*') ? 'active' : '' }}">
+            👤 کاربران
         </a>
-    @endif
+        @endif
 
-    @if(auth()->user()->hasRole('wholesaler'))
-        <a href="{{ route('wholesaler.products') }}" class="{{ request()->routeIs('wholeseler.products.*') ? 'active' : '' }}">
-            درخواست خرید محصول
+        @if(auth()->user()->hasRole(['admin', 'manager', 'personel']))
+        <a href="{{ route('admin.categories.index') }}" class="{{ request()->routeIs('admin.categories.*') ? 'active' : '' }}">
+            📂 دسته‌ها
         </a>
-        <a href="{{ route('wholesaler.stores.index') }}" class="{{ request()->routeIs('wholeseler.stores.*') ? 'active' : '' }}">
-            فروش به فروشگاه
+        @endif
+
+        @if(auth()->user()->hasRole(['admin', 'manager', 'personel']))
+        <a href="{{ route('admin.products.index') }}" class="{{ request()->routeIs('admin.products.*') ? 'active' : '' }}">
+            🛍 محصولات
         </a>
-    @endif
+        @endif
 
-    @if(auth()->user()->hasRole('seller'))
-        <a href="{{ route('store.products') }}" class="{{ request()->routeIs('wholeseler.*') ? 'active' : '' }}">
-            خرید محصول
+        @if(auth()->user()->hasRole(['admin', 'manager', 'personel']))
+        <a href="{{ route('admin.sliders.index') }}" class="{{ request()->routeIs('admin.sliders.*') ? 'active' : '' }}">
+            🛍 اسلایدر
         </a>
-    @endif
+        @endif
 
-    @if(auth()->user()->hasRole(['admin', 'manager', 'personel']))
-    <a href="{{ route('admin.install_requests.index') }}" class="{{ request()->routeIs('install_requests.*') ? 'active' : '' }}">
-        ثبت درخواست سرویس
-    </a>
-    @endif
+        @if(auth()->user()->hasRole(['admin', 'manager', 'personel']))
+        <a href="{{ route('admin.pages.index') }}" class="{{ request()->routeIs('admin.pages.*') ? 'active' : '' }}">
+            🛍 صفحات توضیحی
+        </a>
+        @endif
 
-    @if(auth()->user()->hasRole(['admin', 'manager', 'personel']))
-    <a href="{{ route('admin.install_schedules.index') }}" class="{{ request()->routeIs('install_schedules.*') ? 'active' : '' }}">
-        زمانبندی سرویس
-    </a>
-    @endif
+        <hr class="border-secondary my-1">
 
-    @if(auth()->user()->hasRole(['admin', 'manager', 'personel']))
-    <a href="{{ route('admin.periodic_services.index') }}" class="{{ request()->routeIs('periodic_services.*') ? 'active' : '' }}">
-        دوره سرویس
-    </a>
-    @endif
+        @if(auth()->user()->hasRole(['admin', 'manager', 'personel', 'wholesaler', 'seller', 'marketer', 'nasab']))
+        <a href="{{ route('admin.letters.index') }}" class="{{ request()->routeIs('letters.*') ? 'active' : '' }}">
+            📬 اتوماسیون نامه‌ها
+        </a>
+
+        <hr class="border-secondary my-1">
+        @endif
+
+        @if(auth()->user()->hasRole(['admin', 'manager', 'personel','seller']))
+            <a href="{{ route('admin.orders.index') }}" class="{{ request()->routeIs('orders.*') ? 'active' : '' }}">
+                سفارش ها
+            </a>
+        @endif
+
+        @if(auth()->user()->hasRole('wholesaler'))
+            <a href="{{ route('wholesaler.products') }}" class="{{ request()->routeIs('wholesaler.products.*') ? 'active' : '' }}">
+                درخواست خرید محصول
+            </a>
+            <a href="{{ route('wholesaler.stores.index') }}" class="{{ request()->routeIs('wholesaler.stores.*') ? 'active' : '' }}">
+                فروش به فروشگاه
+            </a>
+        @endif
+
+        @if(auth()->user()->hasRole('seller'))
+            <a href="{{ route('store.products') }}" class="{{ request()->routeIs('wholesaler.*') ? 'active' : '' }}">
+                خرید محصول
+            </a>
+        @endif
+
+        @if(auth()->user()->hasRole(['admin', 'manager', 'personel']))
+        <a href="{{ route('admin.install_requests.index') }}" class="{{ request()->routeIs('install_requests.*') ? 'active' : '' }}">
+            ثبت درخواست سرویس
+        </a>
+        @endif
+
+        @if(auth()->user()->hasRole(['admin', 'manager', 'personel']))
+        <a href="{{ route('admin.install_schedules.index') }}" class="{{ request()->routeIs('install_schedules.*') ? 'active' : '' }}">
+            زمانبندی سرویس
+        </a>
+        @endif
+
+        @if(auth()->user()->hasRole(['admin', 'manager', 'personel']))
+        <a href="{{ route('admin.periodic_services.index') }}" class="{{ request()->routeIs('periodic_services.*') ? 'active' : '' }}">
+            دوره سرویس
+        </a>
+        @endif
+    </div>
 </div>
 
 <!-- Mobile Sidebar -->
