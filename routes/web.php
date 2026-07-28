@@ -44,10 +44,6 @@ Route::prefix('product')->group(function () {
 
 Route::get('/search', [SearchController::class, 'index'])->name('search');
 
-Route::get('/dashboard', function () {
-    return view('dashboard');
-})->middleware(['auth', 'verified'])->name('dashboard');
-
 Route::prefix('cart')->group(function () {
     Route::get('/', [CartController::class, 'index'])->name('cart.index');
     Route::get('/items', [CartController::class, 'show'])->name('cart.show');
@@ -66,16 +62,21 @@ Route::prefix('cart')->group(function () {
 Route::get('/pay/{order}', [ZarinpalController::class, 'pay'])->name('zarinpal.pay');
 Route::get('/callback/zarinpal', [ZarinpalController::class, 'callback'])->name('zarinpal.callback');
 
-Route::get('/register', [AuthController::class, 'create'])->name('register');
-Route::post('/register', [AuthController::class, 'register'])->name('register.create');
-Route::get('/login', [AuthController::class, 'login'])->name('login');
-Route::post('/login', [AuthController::class, 'authenticate'])->name('authenticate');
+
+Route::middleware('guest')->group(function () {
+    Route::get('/register', [AuthController::class, 'create'])->name('register');
+    Route::post('/register', [AuthController::class, 'register'])->name('register.create');
+    Route::get('/login', [AuthController::class, 'login'])->name('login');
+    Route::post('/login', [AuthController::class, 'authenticate'])->name('authenticate');
+
+    Route::prefix('hydrojoy')->name('hydrojoy.')->group(function () {
+        Route::get('/login', [\App\Http\Controllers\hydrojoy\AuthController::class, 'login'])->name('login');
+        Route::post('/login', [\App\Http\Controllers\hydrojoy\AuthController::class, 'authenticate'])->name('authenticate');
+    });
+});
 Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 
-Route::prefix('hydrojoy')->name('hydrojoy.')->group(function () {
-    Route::get('/login', [\App\Http\Controllers\hydrojoy\AuthController::class, 'login'])->name('login');
-    Route::post('/login', [\App\Http\Controllers\hydrojoy\AuthController::class, 'authenticate'])->name('authenticate');
-});
+
 
 Route::middleware(['auth'])->prefix('profile')->name('profile.')->group(function () {
     Route::get('/', [ProfileController::class, 'index'])->name('index'); // صفحه اصلی پروفایل
