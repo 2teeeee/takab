@@ -42,8 +42,13 @@
                     $lastReference = $references->first();
                 @endphp
 
+                <div class="border rounded p-3 bg-light">
+                    {!! nl2br(e($letter->body)) !!}
+                </div>
+
                 @if($lastReference && $lastReference->to_user_id == auth()->id())
 
+                    <hr/>
                     <div class="alert alert-warning">
 
                         <h6 class="mb-3">
@@ -54,13 +59,8 @@
                         {!! nl2br(e($lastReference->note)) !!}
 
                     </div>
-                    <hr/>
 
                 @endif
-
-                <div class="border rounded p-3 bg-light">
-                    {!! nl2br(e($letter->body)) !!}
-                </div>
 
                 @if ($letter->attachments->count())
                     <hr>
@@ -163,7 +163,7 @@
             <div class="card-header bg-light fw-bold">
                 تاریخچه ارجاعات
             </div>
-            <div class="card-body">
+            <div class="card-body table-responsive">
                 @if($references->count())
                     <table class="table table-bordered">
                         <thead class="table-light">
@@ -190,7 +190,7 @@
                                     {!! nl2br(e($ref->note ?? '-')) !!}
                                 </td>
 
-                                <td>{{ jdate($ref->created_at)->format('Y/m/d H:i') }}</td>
+                                <td>{{ jdate($ref->created_at->setTimezone('Asia/Tehran'))->format('Y/m/d H:i') }}</td>
 
                                 <td>
                                     @if($loop->first)

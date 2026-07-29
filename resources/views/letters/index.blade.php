@@ -153,7 +153,7 @@
                             @endif
                         </td>
 
-                        <td>{{ jdate($letter->created_at)->format('Y/m/d H:i') }}</td>
+                        <td>{{ jdate($letter->created_at->setTimezone('Asia/Tehran'))->format('Y/m/d H:i') }}</td>
 
                         <td>
                             <a href="{{ route('admin.letters.show', $letter) }}"
