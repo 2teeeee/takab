@@ -81,35 +81,75 @@
                 </thead>
                 <tbody>
                 @forelse ($letters as $letter)
-                    <tr class="{{ auth()->id() == $letter->receiver_id && $letter->status == 'new' ? 'table-warning fw-bold' : '' }}">
+
+                    @php
+                        $receiver = $letter->receiverItems->firstWhere('user_id', auth()->id());
+
+                        $isReceived = !is_null($receiver);
+
+                        $isUnread = $receiver && $receiver->status === 'new';
+
+                        $isRead = $receiver && $receiver->status === 'read';
+                    @endphp
+
+                    <tr class="{{ $isUnread ? 'table-warning fw-bold' : '' }}">
                         <td>{{ $loop->iteration + ($letters->currentPage() - 1) * $letters->perPage() }}</td>
 
                         <td>
-                            @if(auth()->id() == $letter->receiver_id && $letter->status == 'new')
+                            @if($isUnread)
                                 <i class="bi bi-envelope-fill text-danger me-1"></i>
-                            @else
+                            @elseif($isRead)
                                 <i class="bi bi-envelope-open text-success me-1"></i>
+                            @else
+                                <i class="bi bi-send text-secondary me-1"></i>
                             @endif
 
                             {{ $letter->subject }}
+
+                            @php
+                                $reference = $letter->references
+                                    ->where('to_user_id', auth()->id())
+                                    ->sortByDesc('created_at')
+                                    ->first();
+                            @endphp
+
+                            @if($reference)
+                                <div class="small text-primary mt-1">
+                                    <i class="bi bi-arrow-return-left"></i>
+                                    {{ $reference->note }}
+                                </div>
+                            @endif
                         </td>
 
                         <td>{{ $letter->sender->name }}</td>
-                        <td>{{ $letter->receiver->name }}</td>
+
+                        <td>
+                            @foreach($letter->receiverItems as $item)
+                                <span class="badge bg-secondary">
+                                    {{ $item->user->name }}
+                                </span>
+                            @endforeach
+                        </td>
 
                         <td>
                             <x-status_badge status="{{ $letter->priority }}" />
                         </td>
 
                         <td>
-                            @if(auth()->id() == $letter->receiver_id)
-                                @if($letter->status == 'new')
-                                    <span class="badge bg-danger">خوانده نشده</span>
+                            @if($isReceived)
+                                @if($isUnread)
+                                    <span class="badge bg-danger">
+                                        خوانده نشده
+                                    </span>
                                 @else
-                                    <span class="badge bg-success">خوانده شده</span>
+                                    <span class="badge bg-success">
+                                        خوانده شده
+                                    </span>
                                 @endif
                             @else
-                                <span class="badge bg-secondary">ارسالی</span>
+                                <span class="badge bg-secondary">
+                                    ارسالی
+                                </span>
                             @endif
                         </td>
 

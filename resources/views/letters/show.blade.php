@@ -14,7 +14,21 @@
             </div>
             <div class="card-body">
                 <p><strong>فرستنده:</strong> {{ $letter->sender->name }}</p>
-                <p><strong>گیرنده:</strong> {{ $letter->receiver->name }}</p>
+                <p>
+                    <strong>گیرندگان:</strong>
+
+                    @foreach($letter->receiverItems as $receiver)
+                        <span class="badge bg-secondary">
+                            {{ $receiver->user->name }}
+
+                            @if($receiver->status == 'new')
+                                <span class="badge bg-danger ms-1">خوانده نشده</span>
+                            @else
+                                <span class="badge bg-success ms-1">خوانده شده</span>
+                            @endif
+                        </span>
+                    @endforeach
+                </p>
                 <p><strong>اولویت:</strong>
                     <span class="badge
                         @if($letter->priority == 'high') bg-danger
@@ -24,7 +38,29 @@
                     </span>
                 </p>
                 <hr>
-                <p>{{ $letter->body }}</p>
+                @php
+                    $lastReference = $references->first();
+                @endphp
+
+                @if($lastReference && $lastReference->to_user_id == auth()->id())
+
+                    <div class="alert alert-warning">
+
+                        <h6 class="mb-3">
+                            <i class="bi bi-arrow-return-left"></i>
+                            توضیح ارجاع
+                        </h6>
+
+                        {!! nl2br(e($lastReference->note)) !!}
+
+                    </div>
+                    <hr/>
+
+                @endif
+
+                <div class="border rounded p-3 bg-light">
+                    {!! nl2br(e($letter->body)) !!}
+                </div>
 
                 @if ($letter->attachments->count())
                     <hr>
@@ -94,11 +130,20 @@
                     @csrf
                     <div class="mb-3">
                         <label for="to_user_id" class="form-label">ارجاع به</label>
-                        <select name="to_user_id" id="to_user_id" class="form-select" required>
+                        <select
+                                name="to_user_id"
+                                id="to_user_id"
+                                class="form-select"
+                                required>
+
                             <option value="">انتخاب کنید...</option>
+
                             @foreach($referableUsers as $user)
-                                <option value="{{ $user->id }}">{{ $user->name }}</option>
+                                <option value="{{ $user->id }}">
+                                    {{ $user->name }}
+                                </option>
                             @endforeach
+
                         </select>
                         @error('to_user_id') <small class="text-danger">{{ $message }}</small> @enderror
                     </div>
@@ -126,18 +171,35 @@
                             <th>#</th>
                             <th>از</th>
                             <th>به</th>
-                            <th>یادداشت</th>
-                            <th>تاریخ ارجاع</th>
+                            <th>متن ارجاع</th>
+                            <th>تاریخ</th>
+                            <th>وضعیت</th>
                         </tr>
                         </thead>
                         <tbody>
                         @foreach($references as $ref)
                             <tr>
+
                                 <td>{{ $loop->iteration }}</td>
+
                                 <td>{{ $ref->from->name }}</td>
+
                                 <td>{{ $ref->to->name }}</td>
-                                <td>{{ $ref->note ?? '-' }}</td>
+
+                                <td style="min-width:250px">
+                                    {!! nl2br(e($ref->note ?? '-')) !!}
+                                </td>
+
                                 <td>{{ jdate($ref->created_at)->format('Y/m/d H:i') }}</td>
+
+                                <td>
+                                    @if($loop->first)
+                                        <span class="badge bg-success">
+                                        آخرین ارجاع
+                                    </span>
+                                    @endif
+                                </td>
+
                             </tr>
                         @endforeach
                         </tbody>
@@ -161,5 +223,20 @@
             btn.querySelector('.loading-text').classList.remove('d-none');
         });
     </script>
+
+    @push('scripts')
+        <script>
+            $(function () {
+
+                $('#to_user_id').select2({
+                    theme: 'bootstrap-5',
+                    width: '100%',
+                    dir: 'rtl',
+                    placeholder: 'کاربر را انتخاب کنید'
+                });
+
+            });
+        </script>
+    @endpush
 
 </x-admin-layout>

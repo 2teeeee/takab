@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Letter extends Model
@@ -22,11 +23,6 @@ class Letter extends Model
         return $this->belongsTo(User::class, 'sender_id');
     }
 
-    public function receiver(): BelongsTo
-    {
-        return $this->belongsTo(User::class, 'receiver_id');
-    }
-
     public function attachments(): HasMany
     {
         return $this->hasMany(Attachment::class);
@@ -35,6 +31,21 @@ class Letter extends Model
     public function references(): HasMany
     {
         return $this->hasMany(LetterReference::class);
+    }
+
+    public function receivers(): BelongsToMany
+    {
+        return $this->belongsToMany(
+            User::class,
+            'letter_receivers'
+        )
+            ->withPivot(['status', 'read_at'])
+            ->withTimestamps();
+    }
+
+    public function receiverItems(): HasMany
+    {
+        return $this->hasMany(LetterReceiver::class);
     }
 
     public function getUrlAttribute(): string

@@ -68,9 +68,19 @@ class User extends Authenticatable
         return $this->hasMany(Letter::class, 'sender_id');
     }
 
-    public function receivedLetters(): HasMany
+    public function receivedLetters(): BelongsToMany
     {
-        return $this->hasMany(Letter::class, 'receiver_id');
+        return $this->belongsToMany(
+            Letter::class,
+            'letter_receivers'
+        )
+            ->withPivot(['status', 'read_at'])
+            ->withTimestamps();
+    }
+
+    public function letterReceivers(): HasMany
+    {
+        return $this->hasMany(LetterReceiver::class);
     }
 
     public function installRequests(): HasMany
