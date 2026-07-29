@@ -13,7 +13,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
-use PHPUnit\Event\Code\Throwable;
+use Throwable;
 use Symfony\Component\HttpFoundation\StreamedResponse;
 
 class LetterController extends Controller
@@ -72,7 +72,7 @@ class LetterController extends Controller
                 break;
 
             case 'referred':
-                $letters->where('status', 'referred');
+                $letters->whereHas('references');
                 break;
 
             default:
@@ -97,33 +97,29 @@ class LetterController extends Controller
                     ->orWhereHas('sender', function ($q) use ($search) {
                         $q->where('name', 'like', "%{$search}%");
                     })
-                    ->orWhereHas('receiver', function ($q) use ($search) {
+                    ->orWhereHas('receiverItems.user', function ($q) use ($search) {
                         $q->where('name', 'like', "%{$search}%");
                     });
 
             });
         }
 
-        if (!$user->hasRole('admin')) {
 
-            $letters->leftJoin('letter_receivers as lr', function ($join) use ($user) {
-                $join->on('letters.id', '=', 'lr.letter_id')
-                    ->where('lr.user_id', $user->id);
-            });
+        $letters->leftJoin('letter_receivers as lr', function ($join) use ($user) {
+            $join->on('letters.id', '=', 'lr.letter_id')
+                ->where('lr.user_id', $user->id);
+        });
 
-            $letters->select('letters.*')
-                ->orderByRaw("
-            CASE
-                WHEN lr.created_at IS NULL THEN 1
-                ELSE 0
-            END
-        ")
-                ->orderByDesc('lr.created_at')
-                ->orderByDesc('letters.created_at');
-        }
-        else{
-            $letters->latest();
-        }
+        $letters->select('letters.*')
+            ->orderByRaw("
+                CASE
+                    WHEN lr.created_at IS NULL THEN 1
+                    ELSE 0
+                END
+            ")
+            ->orderByDesc('lr.last_received_at')
+            ->orderByDesc('letters.created_at');
+
 
         $letters = $letters
             ->paginate(25)
@@ -171,6 +167,7 @@ class LetterController extends Controller
                 $letter->receiverItems()->create([
                     'user_id' => $receiverId,
                     'status' => 'new',
+                    'last_received_at'=>now(),
                 ]);
             }
 
@@ -238,9 +235,12 @@ TEXT;
 
         $isAdmin = $user->roles()->where('name', 'admin')->exists();
 
-        $isReceiver = $letter->receiverItems()
-            ->where('user_id', $user->id)
-            ->exists();
+
+        $receiver = $letter->receiverItems()
+            ->where('user_id',$user->id)
+            ->first();
+
+        $isReceiver = $receiver !== null;
 
         if (
             ! $isAdmin &&
@@ -249,10 +249,6 @@ TEXT;
         ) {
             abort(403, 'شما به این نامه دسترسی ندارید.');
         }
-
-        $receiver = $letter->receiverItems()
-            ->where('user_id',$user->id)
-            ->first();
 
         if($receiver && $receiver->status=='new'){
             $receiver->update([
@@ -291,17 +287,16 @@ TEXT;
                 'note' => $validated['note'] ?? null,
             ]);
 
-            $letter->receiverItems()->firstOrCreate(
+            $letter->receiverItems()->updateOrCreate(
                 [
                     'user_id' => $validated['to_user_id'],
                 ],
                 [
                     'status' => 'new',
+                    'read_at' => null,
+                    'last_received_at' => now(),
                 ]
             );
-
-            // به‌روزرسانی وضعیت نامه
-            $letter->update(['status' => 'referred']);
 
             $userRef = User::find($validated['to_user_id']);
 
@@ -371,12 +366,16 @@ TEXT;
     {
         $letter = $attachment->letter;
 
+        $isReceiver = $letter->receiverItems()
+            ->where('user_id', Auth::id())
+            ->exists();
+
         if (
             $letter->sender_id !== Auth::id() &&
-            $letter->receiver_id !== Auth::id() &&
+            ! $isReceiver &&
             ! Auth::user()->hasRole('admin')
         ) {
-            abort(403, 'شما اجازه حذف این ضمیمه را ندارید.');
+            abort(403);
         }
 
         if (Storage::disk('public')->exists($attachment->file_path)) {

@@ -14,6 +14,7 @@ class LetterReceiver extends Model
         'user_id',
         'status',
         'read_at',
+        'last_received_at',
     ];
 
     protected function casts(): array
