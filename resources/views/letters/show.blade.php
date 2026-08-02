@@ -53,7 +53,7 @@
 
                         <h6 class="mb-3">
                             <i class="bi bi-arrow-return-left"></i>
-                            توضیح ارجاع
+                            {{ $lastReference->from->name }}
                         </h6>
 
                         {!! nl2br(e($lastReference->note)) !!}
