@@ -20,25 +20,36 @@ class UserController extends Controller
 
         $usersQuery = User::query();
 
+        $isSearch = $request->filled('search');
+
         // محدودیت دسترسی
-        if (!$authUser->hasRole(['admin', 'manager', 'personel'])) {
+        if (
+            ! $authUser->hasRole(['admin', 'manager', 'personel']) &&
+            ! $isSearch
+        ) {
             $usersQuery->where('registered_by', $authUser->id);
         }
 
         // جستجو
-        if ($request->filled('search')) {
+        if ($isSearch) {
+
             $search = trim($request->search);
-            $usersQuery->where(function ($query) use ($search) {
-                $query->where('name', 'like', "%{$search}%")
-                    ->orWhere('mobile', 'like', "%{$search}%")
-                    ->orWhere('national_code', 'like', "%{$search}%");
-            });
+
+            $usersQuery
+                ->whereHas('roles', function ($q) {
+                    $q->where('name', 'user');
+                })
+                ->where(function ($query) use ($search) {
+                    $query->where('name', 'like', "%{$search}%")
+                        ->orWhere('mobile', 'like', "%{$search}%")
+                        ->orWhere('national_code', 'like', "%{$search}%");
+                });
         }
 
         $users = $usersQuery
             ->with('roles')
             ->latest()
-            ->paginate(10)
+            ->paginate(20)
             ->withQueryString();
 
         return view('users.index', compact('users'));
