@@ -26,7 +26,8 @@ class User extends Authenticatable
         'moaref_code',
         'moaref_id',
         'national_code',
-        'registered_by'
+        'registered_by',
+        'wholesaler_id'
     ];
 
     /**
@@ -142,15 +143,21 @@ class User extends Authenticatable
 
     public function generateMoarefCode(): string
     {
-        $prefix = 'C';
-
-        if ($this->hasRole('wholesaler')) {
+        if ($this->hasRole('admin')) {
+            $prefix = 'A';
+        } elseif ($this->hasRole('manager')) {
+            $prefix = 'M';
+        } elseif ($this->hasRole('personel')) {
+            $prefix = 'P';
+        } elseif ($this->hasRole('wholesaler')) {
             $prefix = 'W';
         } elseif ($this->hasRole('seller')) {
             $prefix = 'S';
         } elseif ($this->hasRole('marketer')) {
-            $prefix = 'M';
-        } elseif ($this->hasRole('customer')) {
+            $prefix = 'K';
+        } elseif ($this->hasRole('nasab')) {
+            $prefix = 'N';
+        } elseif ($this->hasRole('user')) {
             $prefix = 'C';
         }
 

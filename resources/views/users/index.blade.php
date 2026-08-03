@@ -39,6 +39,7 @@
             <thead>
             <tr>
                 <th>#</th>
+                <th>کد معرف</th>
                 <th>نام</th>
                 <th>موبایل</th>
                 <th>نقش‌ها</th>
@@ -49,6 +50,7 @@
             @forelse($users as $user)
                 <tr>
                     <td>{{ $loop->iteration + ($users->currentPage() - 1) * $users->perPage() }}</td>
+                    <td>{{ $user->moaref_code }}</td>
                     <td>{{ $user->name }}</td>
                     <td>{{ $user->mobile }}</td>
                     <td>{{ $user->roles->pluck('label')->join(', ') }}</td>

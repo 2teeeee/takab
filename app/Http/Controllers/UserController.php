@@ -64,32 +64,36 @@ class UserController extends Controller
 
     public function store(Request $request, NikSmsService $sms): RedirectResponse
     {
-        $data = $request->validate([
+        $validated = $request->validate([
             'name' => 'required|string|max:255',
             'mobile' => 'required|unique:users,mobile',
             'password' => 'required|string|min:6',
             'national_code' => 'required|string|min:10|max:10',
             'moaref_id' => 'nullable',
-            'roles' => 'nullable|array',
+            'roles' => 'required|array',
             'roles.*' => 'exists:roles,id',
         ]);
 
-        $data['password'] = Hash::make($data['password']);
-        $data['registered_by'] = Auth::id();
-
-        $user = User::create($data);
+        $user = User::create([
+            'name' => $validated['name'],
+            'mobile' => $validated['mobile'],
+            'password' => Hash::make($validated['password']),
+            'national_code' => $validated['national_code'],
+            'registered_by'=> Auth::id(),
+            'wholesaler_id' => Auth::user()->hasRole(['wholesaler']) ? Auth::id() : Auth::user()->wholesaler_id
+        ]);
 
         $user->save();
+
+        if (!empty($validated['roles'])) {
+            $user->roles()->sync($validated['roles']);
+        }
 
         $user->update([
             'moaref_code' => $user->generateMoarefCode(),
         ]);
 
         $sms->sendSingle($request->mobile, "به جمع تک آبی ها خوش آمدید."."\n"."کد معرف شما:".$user->moaref_code);
-
-        if (!empty($data['roles'])) {
-            $user->roles()->sync($data['roles']);
-        }
 
         return redirect()->route('admin.users.index')->with('success', 'کاربر با موفقیت ایجاد شد.');
     }
