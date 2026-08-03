@@ -161,6 +161,9 @@
             <a href="{{ route('wholesaler.products') }}" class="{{ request()->routeIs('wholesaler.products.*') ? 'active' : '' }}">
                 درخواست خرید محصول
             </a>
+        @endif
+
+        @if(auth()->user()->hasRole(['wholesaler', 'marketer']))
             <a href="{{ route('wholesaler.stores.index') }}" class="{{ request()->routeIs('wholesaler.stores.*') ? 'active' : '' }}">
                 فروش به فروشگاه
             </a>

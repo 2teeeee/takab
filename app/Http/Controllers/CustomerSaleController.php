@@ -52,6 +52,7 @@ class CustomerSaleController extends Controller
         $request->validate([
             'address' => ['required', 'string', 'max:1000'],
             'products' => ['required', 'array'],
+            'discount' => ['nullable','numeric','min:0'],
         ]);
 
         $selected = collect($request->products)
@@ -66,18 +67,20 @@ class CustomerSaleController extends Controller
         }
 
         DB::transaction(function() use($request,$customer){
+
+            $discount = (int) $request->discount;
+
             $order = Order::create([
                 'user_id'=>$customer->id,
                 'seller_id'=>Auth::id(),
                 'address'=>$request->address,
                 'status'=>'pending',
-                'discount'=>0,
+                'discount'=>$discount,
                 'total'=>0,
                 'final_total'=>0,
             ]);
 
             $total = 0;
-            $discount = 0;
 
             foreach($request->products as $productId=>$qty){
                 if($qty==0){
@@ -104,7 +107,6 @@ class CustomerSaleController extends Controller
 
                 $stock->decrement('quantity',$qty);
                 $total += $lineTotal;
-                $discount += $qty * 1000000;
             }
 
             $order->update([

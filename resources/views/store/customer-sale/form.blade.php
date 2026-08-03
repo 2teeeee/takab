@@ -38,9 +38,8 @@
                             <textarea
                                     name="address"
                                     rows="3"
-                                    class="form-control @error('address') is-invalid @enderror">
-                                {{ old('address', $customer->address) }}
-                            </textarea>
+                                    class="form-control @error('address') is-invalid @enderror"
+                            >{{ old('address', $customer->address) }}</textarea>
                             @error('address')
                             <div class="invalid-feedback">
                                 {{ $message }}
@@ -114,17 +113,52 @@
                         </tr>
                         <tr>
                             <th colspan="5" class="text-end">
-                                تخفیف
+                                کمیسیون
                             </th>
                             <th>
-                                <span id="discount">
+                                <span id="commission">
                                     0
                                 </span>
                             </th>
                         </tr>
+                        <tr>
+                            <th colspan="5" class="text-end">
+                                پاداش معرفی
+                            </th>
+                            <th>
+                                <span id="bonus">
+                                    0
+                                </span>
+                            </th>
+                        </tr>
+                        <tr>
+                            <th colspan="5" class="text-end">
+                                تخفیف قابل ارائه به مشتری
+                            </th>
+                            <th>
+                                <span id="discount_َavailable">
+                                    0
+                                </span>
+                            </th>
+                        </tr>
+                        <tr>
+                            <th colspan="5" class="text-end">
+                                تخفیف مشتری
+                            </th>
+                            <th>
+                                <input
+                                        type="number"
+                                        min="0"
+                                        step="1000"
+                                        name="discount"
+                                        id="discount"
+                                        value="{{ old('discount',0) }}"
+                                        class="form-control text-start">
+                            </th>
+                        </tr>
                         <tr class="table-success">
                             <th colspan="5" class="text-end">
-                                مبلغ نهایی
+                                مبلغ نهایی پرداخت
                             </th>
                             <th>
                                 <span id="final">
@@ -136,11 +170,13 @@
                     </table>
                 </div>
             </div>
-            <div class="mt-4 text-end">
-                <button class="btn btn-success btn-lg">
+
+            <div class="mt-2 d-flex justify-content-end gap-2">
+                <button class="btn btn-sm btn-success btn-lg">
                     ثبت سفارش
                 </button>
             </div>
+
         </form>
     </div>
 </x-admin-layout>
@@ -150,7 +186,11 @@
     document.addEventListener("DOMContentLoaded",function(){
         function calculate(){
             let total=0;
-            let discount=0;
+            let discount_available=0;
+            let commission=0;
+            let bonus=0;
+            let discount = parseInt(document.getElementById("discount").value) || 0;
+
             document.querySelectorAll(".quantity").forEach(function(input){
                 let qty=parseInt(input.value)||0;
                 let price=parseInt(input.dataset.price);
@@ -159,14 +199,22 @@
                     .querySelector(".line-total")
                     .innerHTML=rowTotal.toLocaleString();
                 total+=rowTotal;
-                discount+=qty*1000000;
+                discount_available+=qty*1000000;
+                commission+=qty*1000000;
+                bonus+=qty*1000000;
             });
 
             document.getElementById("total").innerHTML=
                 total.toLocaleString();
 
-            document.getElementById("discount").innerHTML=
-                discount.toLocaleString();
+            document.getElementById("discount_َavailable").innerHTML=
+                discount_available.toLocaleString();
+
+            document.getElementById("commission").innerHTML=
+                commission.toLocaleString();
+
+            document.getElementById("bonus").innerHTML=
+                bonus.toLocaleString();
 
             document.getElementById("final").innerHTML=
                 Math.max(total-discount,0).toLocaleString();
@@ -176,6 +224,9 @@
         document.querySelectorAll(".quantity").forEach(function(input){
             input.addEventListener("input",calculate);
         });
+
+        document.getElementById("discount")
+            .addEventListener("input", calculate);
 
         calculate();
     });

@@ -138,8 +138,9 @@
                     </table>
                 </div>
             </div>
-            <div class="mt-4 text-end">
-                <button class="btn btn-success btn-lg">
+
+            <div class=" mt-2 d-flex justify-content-end gap-2">
+                <button class="btn btn-sm btn-success btn-lg">
                     ثبت سفارش
                 </button>
             </div>

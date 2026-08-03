@@ -140,13 +140,18 @@ Route::middleware(['auth'])->prefix('admin')->name('admin.')->group(function () 
     });
 });
 
-Route::middleware(['auth'])->prefix('wholesaler')->name('wholesaler.')->middleware(['role:wholesaler'])->group(function () {
-    Route::get('/products', [WholesaleProductController::class, 'index'])->name('products');
-    Route::post('/products', [WholesaleProductController::class, 'store'])->name('products.store');
+Route::middleware(['auth'])->prefix('wholesaler')->name('wholesaler.')->group(function () {
 
-    Route::get('/stores/list', [StoreSaleController::class, 'index'])->name('stores.index');
-    Route::get('stores/{store}/sale', [StoreSaleController::class, 'create'])->name('stores.sale');
-    Route::post('stores/{store}/sale', [StoreSaleController::class, 'store'])->name('stores.sale.store');
+    Route::middleware(['role:wholesaler'])->group(function () {
+        Route::get('/products', [WholesaleProductController::class, 'index'])->name('products');
+        Route::post('/products', [WholesaleProductController::class, 'store'])->name('products.store');
+    });
+
+    Route::middleware(['role:wholesaler,marketer'])->group(function () {
+        Route::get('/stores/list', [StoreSaleController::class, 'index'])->name('stores.index');
+        Route::get('stores/{store}/sale', [StoreSaleController::class, 'create'])->name('stores.sale');
+        Route::post('stores/{store}/sale', [StoreSaleController::class, 'store'])->name('stores.sale.store');
+    });
 });
 
 Route::middleware(['auth','role:admin,seller'])->prefix('store')->name('store.')->group(function () {

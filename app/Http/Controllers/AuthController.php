@@ -27,15 +27,13 @@ class AuthController extends Controller
             'password' => ['required', 'confirmed'],
         ]);
 
-        $moarefCode = 'm'.rand(111111,999999);
         $user = User::create([
             'name' => $request->name,
             'mobile' => $request->mobile,
-            'password' => Hash::make($request->password),
-            'moaref_code' => $moarefCode
+            'password' => Hash::make($request->password)
         ]);
 
-        $sms->sendSingle($request->mobile, "به جمع تک آبی ها خوش آمدید."."\n"."کد معرف شما:".$moarefCode);
+        $sms->sendSingle($request->mobile, "به جمع تک آبی ها خوش آمدید.");
 
         event(new Registered($user));
 

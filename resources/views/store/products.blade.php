@@ -124,9 +124,11 @@
 
             </table>
 
-            <button class="btn btn-success btn-lg">
-                ثبت سفارش
-            </button>
+            <div class="d-flex justify-content-end gap-2">
+                <button class="btn btn-sm btn-success btn-lg">
+                    ثبت سفارش
+                </button>
+            </div>
 
         </form>
 

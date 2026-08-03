@@ -139,4 +139,21 @@ class User extends Authenticatable
         $role = Role::where('name', $roleName)->firstOrFail();
         $this->roles()->syncWithoutDetaching([$role->id]);
     }
+
+    public function generateMoarefCode(): string
+    {
+        $prefix = 'C';
+
+        if ($this->hasRole('wholesaler')) {
+            $prefix = 'W';
+        } elseif ($this->hasRole('seller')) {
+            $prefix = 'S';
+        } elseif ($this->hasRole('marketer')) {
+            $prefix = 'M';
+        } elseif ($this->hasRole('customer')) {
+            $prefix = 'C';
+        }
+
+        return $prefix . $this->id . rand(1111, 9999);
+    }
 }

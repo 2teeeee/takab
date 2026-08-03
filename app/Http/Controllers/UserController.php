@@ -64,13 +64,15 @@ class UserController extends Controller
         ]);
 
         $data['password'] = Hash::make($data['password']);
-        $data['moaref_code'] = rand(111111,999999);
         $data['registered_by'] = Auth::id();
 
         $user = User::create($data);
-        $user->moaref_code = $user->id.rand(111111,999999);
 
         $user->save();
+
+        $user->update([
+            'moaref_code' => $user->generateMoarefCode(),
+        ]);
 
         $sms->sendSingle($request->mobile, "به جمع تک آبی ها خوش آمدید."."\n"."کد معرف شما:".$user->moaref_code);
 
