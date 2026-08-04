@@ -132,13 +132,10 @@ class LetterController extends Controller
     {
         $user = auth()->user();
 
-        $usersQuery = User::query()
-            ->where('id', '!=', $user->id)
-            ->whereHas('roles', function ($q) {
-                $q->where('name', '!=', 'user');
-            });
-
-        $users = $usersQuery->get();
+        $users = $this->getAllowedReceivers($user)
+            ->with('roles')
+            ->orderBy('name')
+            ->get();
 
         return view('letters.create', compact('users'));
     }
@@ -153,6 +150,17 @@ class LetterController extends Controller
             'priority' => 'required|in:low,medium,high',
             'attachments.*' => 'nullable|file|max:2048',
         ]);
+
+        $allowedIds = $this->getAllowedReceivers(Auth::user())
+            ->pluck('id')
+            ->toArray();
+
+        foreach ($validated['receiver_ids'] as $receiverId) {
+
+            if (!in_array($receiverId, $allowedIds)) {
+                abort(403, 'شما اجازه ارسال نامه به این کاربر را ندارید.');
+            }
+        }
 
         try {
 
@@ -259,13 +267,10 @@ TEXT;
 
         $references = $letter->references()->with(['from', 'to'])->latest()->get();
 
-        $usersQuery = User::query()
-            ->where('id', '!=', $user->id)
-            ->whereHas('roles', function ($q) {
-                $q->where('name', '!=', 'user');
-            });
-
-        $referableUsers = $usersQuery->get();
+        $users = $this->getAllowedReceivers($user)
+            ->with('roles')
+            ->orderBy('name')
+            ->get();
 
         return view('letters.show', compact('letter', 'references', 'referableUsers'));
     }
@@ -278,6 +283,14 @@ TEXT;
             'to_user_id' => 'required|exists:users,id',
             'note' => 'nullable|string|max:1000',
         ]);
+
+        $allowedIds = $this->getAllowedReceivers(Auth::user())
+            ->pluck('id')
+            ->toArray();
+
+        if (!in_array($validated['to_user_id'], $allowedIds)) {
+            abort(403, 'شما اجازه ارسال نامه به این کاربر را ندارید.');
+        }
 
         try {
             LetterReference::create([
@@ -408,5 +421,82 @@ TEXT;
         ) {
             abort(403, 'شما اجازه مشاهده این نامه را ندارید.');
         }
+    }
+
+    protected function getAllowedReceivers(User $user)
+    {
+        return User::query()
+            ->where('id', '!=', $user->id)
+            ->where(function ($query) use ($user) {
+
+                // admin, manager, personel
+                if ($user->hasAnyRole(['admin', 'manager', 'personel'])) {
+
+                    $query->whereHas('roles', function ($q) {
+                        $q->where('name', '!=', 'user');
+                    });
+
+                    return;
+                }
+
+                // wholesaler
+                if ($user->hasRole('wholesaler')) {
+
+                    $query->where(function ($q) use ($user) {
+
+                        // مدیر و پرسنل
+                        $q->whereHas('roles', function ($r) {
+                            $r->whereIn('name', ['manager', 'personel']);
+                        });
+
+                        // فروشگاه های خودش
+                        $q->orWhere(function ($x) use ($user) {
+                            $x->where('wholesaler_id', $user->id)
+                                ->whereHas('roles', function ($r) {
+                                    $r->where('name', 'seller');
+                                });
+                        });
+
+                        // بازاریاب های خودش
+                        $q->orWhere(function ($x) use ($user) {
+                            $x->where('registered_by', $user->id)
+                                ->whereHas('roles', function ($r) {
+                                    $r->where('name', 'marketer');
+                                });
+                        });
+
+                    });
+
+                    return;
+                }
+
+                // seller
+                if ($user->hasRole('seller')) {
+
+                    $query->whereKey($user->wholesaler_id);
+
+                    return;
+                }
+
+                // marketer
+                if ($user->hasRole('marketer')) {
+
+                    $query->where(function ($q) use ($user) {
+
+                        // عمده فروش
+                        $q->whereKey($user->registered_by);
+
+                        // فروشگاه های خودش
+                        $q->orWhere(function ($x) use ($user) {
+                            $x->where('registered_by', $user->id)
+                                ->whereHas('roles', function ($r) {
+                                    $r->where('name', 'seller');
+                                });
+                        });
+
+                    });
+                }
+
+            });
     }
 }

@@ -127,9 +127,14 @@
                                     class="border-0 bg-transparent shadow-none text-sm text-darkgray nav-link"
                                     data-bs-toggle="dropdown" aria-expanded="false">
                                 <i class="bi bi-person icon-size-2x"></i>
-                                <div>
-                                    <span class="dropdown-toggle">
-                                    {{ Auth::user()->name }}
+                                <div class="text-start">
+                                    <div class="dropdown-toggle fw-semibold">
+                                        {{ Auth::user()->name }}
+                                    </div>
+
+                                    <small class="text-muted">
+                                        کد معرفی: {{ Auth::user()->moaref_code }}
+                                    </small>
                                 </div>
                             </button>
                             <ul class="dropdown-menu text-sm text-decoration-none pb-1">
@@ -245,9 +250,14 @@
                                 class="border-0 bg-transparent shadow-none text-sm text-darkgray nav-link"
                                 data-bs-toggle="dropdown" aria-expanded="false">
                             <i class="bi bi-person icon-size-2x"></i>
-                            <div>
-                                    <span class="dropdown-toggle">
-                                {{ Auth::user()->name }}
+                            <div class="text-start">
+                                <div class="dropdown-toggle fw-semibold">
+                                    {{ Auth::user()->name }}
+                                </div>
+
+                                <small class="text-muted">
+                                    کد: {{ Auth::user()->moaref_code }}
+                                </small>
                             </div>
                         </button>
                         <ul class="dropdown-menu text-sm text-decoration-none pb-1">
