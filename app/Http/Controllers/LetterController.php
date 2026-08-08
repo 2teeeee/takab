@@ -267,7 +267,7 @@ TEXT;
 
         $references = $letter->references()->with(['from', 'to'])->latest()->get();
 
-        $users = $this->getAllowedReceivers($user)
+        $referableUsers = $this->getAllowedReceivers($user)
             ->with('roles')
             ->orderBy('name')
             ->get();
