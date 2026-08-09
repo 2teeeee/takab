@@ -6,9 +6,11 @@ use App\Models\Category;
 use App\Models\Product;
 use App\Models\ProductImage;
 use App\Services\CartService;
+use App\Services\N8nService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 use Illuminate\View\View;
@@ -218,6 +220,60 @@ class ProductController extends Controller
 
         return response()->json([
             'url' => asset('storage/' . $path)
+        ]);
+    }
+
+    public function generateAiContent(
+        Request $request,
+        Product $product,
+        N8nService $n8nService
+    ): JsonResponse {
+        $request->validate([
+            'locale' => 'required|in:fa,en,ar',
+        ]);
+
+        $locale = $request->input('locale');
+
+        $translation = $product->translations()
+            ->where('locale', $locale)
+            ->first();
+
+        $payload = [
+            'product_id' => $product->id,
+            'locale' => $locale,
+
+            'product' => [
+                'category' => $product->category?->title,
+
+                'title' => $translation?->title,
+                'small_text' => $translation?->small_text,
+                'large_text' => $translation?->large_text,
+                'keywords' => $translation?->keywords,
+                'description' => $translation?->description,
+            ],
+        ];
+
+        $response = Http::timeout(60)
+            ->withHeaders([
+                'X-N8N-SECRET' => config('services.n8n.secret'),
+                'Accept' => 'application/json',
+            ])
+            ->post(
+                config('services.n8n.product_ai_webhook_url'),
+                $payload
+            );
+
+        if ($response->failed()) {
+            return response()->json([
+                'success' => false,
+                'message' => 'ارتباط با سرویس AI برقرار نشد.',
+                'error' => $response->body(),
+            ], 502);
+        }
+
+        return response()->json([
+            'success' => true,
+            'data' => $response->json(),
         ]);
     }
 }

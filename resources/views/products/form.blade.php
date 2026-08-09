@@ -47,6 +47,27 @@
                         </div>
 
                         <div class="mb-3">
+                            <button
+                                    type="button"
+                                    class="btn btn-outline-primary ai-generate-btn"
+                                    data-locale="{{ $locale }}"
+                                    data-url="{{ $product->exists
+                                        ? route('admin.products.ai.generate', $product)
+                                        : '' }}"
+                                    {{ !$product->exists ? 'disabled' : '' }}
+                            >
+                                🤖 تولید محتوای این زبان با AI
+                            </button>
+
+                            <span
+                                    class="ai-loading d-none ms-2"
+                                    data-loading="{{ $locale }}"
+                            >
+                                در حال تولید...
+                            </span>
+                        </div>
+
+                        <div class="mb-3">
                             <label class="form-label" for="small_text-{{ $locale }}">توضیح کوتاه</label>
                             <textarea name="small_text[{{ $locale }}]" id="small_text-{{ $locale }}"
                                       class="form-control"
@@ -178,6 +199,69 @@
                     uploadUrl: "{{ route('admin.products.uploadImage') }}?_token={{ csrf_token() }}"
                 }
             });
+        });
+
+        document.querySelectorAll('.ai-generate-btn').forEach(button => {
+
+            button.addEventListener('click', async function () {
+
+                const url = this.dataset.url;
+                const locale = this.dataset.locale;
+
+                if (!url) {
+                    return;
+                }
+
+                const loading = document.querySelector(
+                    `[data-loading="${locale}"]`
+                );
+
+                this.disabled = true;
+                loading.classList.remove('d-none');
+
+                try {
+
+                    const response = await fetch(url, {
+                        method: 'POST',
+
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'Accept': 'application/json',
+                            'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                        },
+
+                        body: JSON.stringify({
+                            locale: locale
+                        })
+                    });
+
+                    const result = await response.json();
+
+                    if (!response.ok) {
+                        throw new Error(
+                            result.message || 'خطایی رخ داد.'
+                        );
+                    }
+
+                    console.log('AI Result:', result);
+
+                    alert('درخواست با موفقیت به AI ارسال شد.');
+
+                } catch (error) {
+
+                    console.error(error);
+
+                    alert(
+                        error.message || 'ارتباط با AI برقرار نشد.'
+                    );
+
+                } finally {
+
+                    this.disabled = false;
+                    loading.classList.add('d-none');
+                }
+            });
+
         });
     </script>
 

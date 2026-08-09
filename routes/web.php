@@ -112,7 +112,10 @@ Route::middleware(['auth'])->prefix('admin')->name('admin.')->group(function () 
         Route::resource('users', UserController::class);
         Route::resource('users.product-user', InventoryController::class);
         Route::resource('categories', CategoryController::class);
+
         Route::resource('products', ProductController::class);
+        Route::post('/products/{product}/ai/generate', [ProductController::class, 'generateAiContent'])->name('products.ai.generate');
+
         Route::resource('sliders', SliderController::class);
         Route::resource('pages', PageController::class);
         Route::post('/products/upload-image', [ProductController::class, 'uploadImage'])->name('products.uploadImage');

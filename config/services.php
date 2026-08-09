@@ -39,4 +39,9 @@ return [
         'merchant_id' => env('ZARINPAL_MERCHANT_ID'),
     ],
 
+    'n8n' => [
+        'product_ai_webhook_url' => env('N8N_PRODUCT_AI_WEBHOOK_URL'),
+        'webhook_secret' => env('N8N_WEBHOOK_SECRET'),
+    ],
+
 ];
