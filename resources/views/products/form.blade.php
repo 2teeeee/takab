@@ -49,14 +49,11 @@
                         <div class="mb-3">
                             <button
                                     type="button"
-                                    class="btn btn-outline-primary ai-generate-btn"
-                                    data-locale="{{ $locale }}"
-                                    data-url="{{ $product->exists
-                                        ? route('admin.products.ai.generate', $product)
-                                        : '' }}"
+                                    class="btn btn-outline-primary"
+                                    onclick="generateAiContent(event, '{{ $locale }}')"
                                     {{ !$product->exists ? 'disabled' : '' }}
                             >
-                                🤖 تولید محتوای این زبان با AI
+                                🤖 تولید محتوای {{ $label }} با AI
                             </button>
 
                             <span
@@ -192,77 +189,142 @@
 
     <script src="https://cdn.ckeditor.com/ckeditor5/39.0.1/classic/ckeditor.js"></script>
     <script>
+        const editors = {};
+
         document.querySelectorAll('.editor').forEach(el => {
+
+            const locale = el.id.replace('large_text-', '');
+
             ClassicEditor.create(el, {
-                language: 'fa',
+                language: locale === 'fa' ? 'fa' : 'en',
+
                 ckfinder: {
                     uploadUrl: "{{ route('admin.products.uploadImage') }}?_token={{ csrf_token() }}"
                 }
-            });
+            })
+                .then(editor => {
+                    editors[locale] = editor;
+                })
+                .catch(error => {
+                    console.error(error);
+                });
+
         });
 
-        document.querySelectorAll('.ai-generate-btn').forEach(button => {
+        async function generateAiContent(event, locale) {
 
-            button.addEventListener('click', async function () {
+            const button = event.currentTarget;
 
-                const url = this.dataset.url;
-                const locale = this.dataset.locale;
+            button.disabled = true;
 
-                if (!url) {
-                    return;
-                }
+            const originalText = button.innerHTML;
 
-                const loading = document.querySelector(
-                    `[data-loading="${locale}"]`
-                );
+            button.innerHTML = '⏳ در حال تولید محتوا...';
 
-                this.disabled = true;
-                loading.classList.remove('d-none');
+            try {
 
-                try {
-
-                    const response = await fetch(url, {
+                const response = await fetch(
+                    "{{ route('admin.products.ai.generate', $product) }}",
+                    {
                         method: 'POST',
 
                         headers: {
                             'Content-Type': 'application/json',
                             'Accept': 'application/json',
-                            'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                            'X-CSRF-TOKEN': "{{ csrf_token() }}"
                         },
 
                         body: JSON.stringify({
                             locale: locale
                         })
-                    });
-
-                    const result = await response.json();
-
-                    if (!response.ok) {
-                        throw new Error(
-                            result.message || 'خطایی رخ داد.'
-                        );
                     }
+                );
 
-                    console.log('AI Result:', result);
+                const data = await response.json();
 
-                    alert('درخواست با موفقیت به AI ارسال شد.');
+                console.log('AI Response:', data);
 
-                } catch (error) {
-
-                    console.error(error);
-
-                    alert(
-                        error.message || 'ارتباط با AI برقرار نشد.'
+                if (!response.ok || !data.success) {
+                    throw new Error(
+                        data.message || 'خطا در دریافت محتوای AI'
                     );
-
-                } finally {
-
-                    this.disabled = false;
-                    loading.classList.add('d-none');
                 }
-            });
 
-        });
+                const content = data.data.content;
+
+                // عنوان
+                const titleInput = document.getElementById(
+                    `title-${locale}`
+                );
+
+                if (titleInput) {
+                    titleInput.value = content.title || '';
+                }
+
+                // توضیح کوتاه
+                const smallTextInput = document.getElementById(
+                    `small_text-${locale}`
+                );
+
+                if (smallTextInput) {
+                    smallTextInput.value = content.small_text || '';
+                }
+
+                // توضیحات کامل - CKEditor
+                if (editors[locale]) {
+                    editors[locale].setData(
+                        content.large_text || ''
+                    );
+                }
+
+                // کلمات کلیدی
+                const keywordsInput = document.getElementById(
+                    `keywords-${locale}`
+                );
+
+                if (keywordsInput) {
+                    keywordsInput.value = content.keywords || '';
+                }
+
+                // SEO Description
+                const descriptionInput = document.getElementById(
+                    `description-${locale}`
+                );
+
+                if (descriptionInput) {
+                    descriptionInput.value = content.description || '';
+                }
+
+                alert(
+                    `محتوای ${getLocaleName(locale)} با موفقیت تولید شد.`
+                );
+
+            } catch (error) {
+
+                console.error('AI Content Error:', error);
+
+                alert(
+                    error.message || 'خطایی در تولید محتوا رخ داد.'
+                );
+
+            } finally {
+
+                button.disabled = false;
+
+                button.innerHTML = originalText;
+            }
+        }
+
+        function getLocaleName(locale) {
+
+            const names = {
+                fa: 'فارسی',
+                en: 'انگلیسی',
+                ar: 'عربی'
+            };
+
+            return names[locale] || locale;
+        }
     </script>
 
 </x-admin-layout>

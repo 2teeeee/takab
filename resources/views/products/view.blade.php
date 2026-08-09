@@ -23,7 +23,7 @@
                     <h5 class="border-bottom pb-2">{{$product->translation->title}}</h5>
                     <div class="row">
                         <div class="col-md-7 text-small">
-                            {{$product->translation->small_text}}
+                            {!! $product->translation->small_text !!}
                         </div>
                         <div class="col-md-5 text-center">
                             <div class="py-2 @if($product->main_price != $product->sell_price) border-bottom @endif">
