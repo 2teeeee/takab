@@ -132,9 +132,11 @@
                                         {{ Auth::user()->name }}
                                     </div>
 
-                                    <small class="text-muted">
-                                        کد معرفی: {{ Auth::user()->moaref_code }}
-                                    </small>
+                                    @if(Auth::user()->moaref_code)
+                                        <small class="text-muted d-block" style="font-size:11px;">
+                                            کد معرفی:{{ Auth::user()->moaref_code }}
+                                        </small>
+                                    @endif
                                 </div>
                             </button>
                             <ul class="dropdown-menu text-sm text-decoration-none pb-1">
@@ -255,9 +257,11 @@
                                     {{ Auth::user()->name }}
                                 </div>
 
-                                <small class="text-muted">
-                                    کد: {{ Auth::user()->moaref_code }}
+                                @if(Auth::user()->moaref_code)
+                                <small class="text-muted d-block" style="font-size:11px;">
+                                    کد:{{ Auth::user()->moaref_code }}
                                 </small>
+                                @endif
                             </div>
                         </button>
                         <ul class="dropdown-menu text-sm text-decoration-none pb-1">
