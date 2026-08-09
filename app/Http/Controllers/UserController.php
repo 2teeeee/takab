@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\LetterReference;
+use App\Models\Order;
 use App\Models\Role;
 use App\Models\User;
 use App\Services\Sms\NikSmsService;
@@ -11,6 +13,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\View\View;
+use Throwable;
 
 class UserController extends Controller
 {
@@ -131,8 +134,135 @@ class UserController extends Controller
 
     public function destroy(User $user): RedirectResponse
     {
-        $user->delete();
-        return redirect()->route('users.index')->with('success', 'کاربر حذف شد.');
+        // فقط admin اجازه حذف دارد
+        if (!Auth::user()->hasRole('admin')) {
+            abort(403, 'شما اجازه حذف کاربر را ندارید.');
+        }
+
+        // جلوگیری از حذف خود کاربر
+        if ($user->id === Auth::id()) {
+            return back()->with('error', 'شما نمی‌توانید حساب کاربری خودتان را حذف کنید.');
+        }
+
+        /*
+        |--------------------------------------------------------------------------
+        | بررسی وابستگی‌های کاربر
+        |--------------------------------------------------------------------------
+        */
+
+        $dependencies = [];
+
+        // سفارش‌هایی که کاربر به عنوان مشتری دارد
+        if ($user->orders()->exists()) {
+            $dependencies[] = 'سفارش‌های ثبت شده';
+        }
+
+        // محصولاتی که در موجودی کاربر هستند
+        if ($user->inventories()->exists()) {
+            $dependencies[] = 'موجودی محصولات';
+        }
+
+        // نامه‌هایی که کاربر ارسال کرده
+        if ($user->sentLetters()->exists()) {
+            $dependencies[] = 'نامه‌های ارسال شده';
+        }
+
+        // نامه‌هایی که کاربر دریافت کرده
+        if ($user->letterReceivers()->exists()) {
+            $dependencies[] = 'نامه‌های دریافتی';
+        }
+
+        // ارجاع‌هایی که از طرف این کاربر ثبت شده
+        if (LetterReference::where('from_user_id', $user->id)->exists()) {
+            $dependencies[] = 'ارجاع‌های ثبت شده';
+        }
+
+        // ارجاع‌هایی که به این کاربر شده
+        if (LetterReference::where('to_user_id', $user->id)->exists()) {
+            $dependencies[] = 'ارجاع‌های دریافتی';
+        }
+
+        // درخواست‌های نصب
+        if ($user->installRequests()->exists()) {
+            $dependencies[] = 'درخواست‌های نصب';
+        }
+
+        // برنامه‌های نصب
+        if ($user->schedules()->exists()) {
+            $dependencies[] = 'برنامه‌های نصب';
+        }
+
+        /*
+        |--------------------------------------------------------------------------
+        | registered_by
+        |--------------------------------------------------------------------------
+        */
+
+        if (User::where('registered_by', $user->id)->exists()) {
+            $dependencies[] = 'کاربرانی توسط این شخص ثبت شده‌اند';
+        }
+
+        /*
+        |--------------------------------------------------------------------------
+        | moaref_id
+        |--------------------------------------------------------------------------
+        */
+
+        if (User::where('moaref_id', $user->id)->exists()) {
+            $dependencies[] = 'کاربرانی توسط این شخص معرفی شده‌اند';
+        }
+
+        /*
+        |--------------------------------------------------------------------------
+        | wholesaler_id
+        |--------------------------------------------------------------------------
+        */
+
+        if (User::where('wholesaler_id', $user->id)->exists()) {
+            $dependencies[] = 'کاربران یا فروشگاه‌های وابسته به این عمده‌فروش وجود دارند';
+        }
+
+        /*
+        |--------------------------------------------------------------------------
+        | جلوگیری از حذف
+        |--------------------------------------------------------------------------
+        */
+
+        if (!empty($dependencies)) {
+
+            $message = 'این کاربر به دلیل داشتن اطلاعات وابسته قابل حذف نیست: '
+                . implode('، ', $dependencies);
+
+            return back()->with('error', $message);
+        }
+
+        /*
+        |--------------------------------------------------------------------------
+        | حذف امن
+        |--------------------------------------------------------------------------
+        */
+
+        try {
+
+            // چون کاربر هیچ وابستگی ندارد،
+            // ابتدا رابطه نقش‌ها را پاک می‌کنیم.
+            $user->roles()->detach();
+
+            $user->delete();
+
+            return redirect()
+                ->route('admin.users.index')
+                ->with('success', 'کاربر با موفقیت حذف شد.');
+
+        } catch (Throwable $e) {
+
+            report($e);
+
+            return back()->with(
+                'error',
+                'حذف کاربر انجام نشد. اطلاعات کاربر وابستگی دارد یا خطایی در سیستم رخ داده است.'
+            );
+        }
     }
 
     static function getRoles(): Collection

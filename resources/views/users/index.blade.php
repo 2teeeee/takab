@@ -3,8 +3,18 @@
 
         <a href="{{ route('admin.users.create') }}" class="btn btn-sm btn-primary mb-3">افزودن کاربر جدید</a>
 
+        @if(session('error'))
+            <div class="alert alert-danger">
+                <i class="bi bi-exclamation-triangle"></i>
+                {{ session('error') }}
+            </div>
+        @endif
+
         @if(session('success'))
-            <div class="alert alert-success">{{ session('success') }}</div>
+            <div class="alert alert-success">
+                <i class="bi bi-check-circle"></i>
+                {{ session('success') }}
+            </div>
         @endif
 
         <form method="GET"
@@ -59,7 +69,7 @@
                         @if(auth()->user()->hasRole(['admin','manager','personel','seller']))
                         <a href="{{ route('store.customers.sale',$user) }}" class="btn btn-sm btn-success">فروش کالا</a>
                         @endif
-                        @if(auth()->user()->hasRole(['admin','manager','personel']))
+                        @if(auth()->user()->hasRole(['admin']))
                         <form action="{{ route('admin.users.destroy', $user) }}" method="POST" class="d-inline">
                             @csrf
                             @method('DELETE')
