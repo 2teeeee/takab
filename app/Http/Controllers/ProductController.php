@@ -253,7 +253,8 @@ class ProductController extends Controller
             ],
         ];
 
-        $response = Http::timeout(60)
+        $response = Http::connectTimeout(10)
+            ->timeout(60)
             ->withHeaders([
                 'X-N8N-SECRET' => config('services.n8n.secret'),
                 'Accept' => 'application/json',
@@ -264,10 +265,14 @@ class ProductController extends Controller
             );
 
         if ($response->failed()) {
+
+            report(new \RuntimeException(
+                'n8n AI request failed: ' . $response->status()
+            ));
+
             return response()->json([
                 'success' => false,
-                'message' => 'ارتباط با سرویس AI برقرار نشد.',
-                'error' => $response->body(),
+                'message' => 'سرویس تولید محتوا در دسترس نیست. لطفاً دوباره تلاش کنید.',
             ], 502);
         }
 

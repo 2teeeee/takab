@@ -3,6 +3,8 @@
     <div class="container py-4">
         <h4>{{ $product->exists ? 'ویرایش محصول' : 'افزودن محصول جدید' }}</h4>
 
+        <div id="ai-status" class="alert d-none" role="alert"></div>
+
         <form method="POST"
               action="{{ $product->exists ? route('admin.products.update', $product) : route('admin.products.store') }}"
               enctype="multipart/form-data">
@@ -49,11 +51,18 @@
                         <div class="mb-3">
                             <button
                                     type="button"
-                                    class="btn btn-outline-primary"
+                                    class="btn btn-outline-primary ai-generate-btn"
                                     onclick="generateAiContent(event, '{{ $locale }}')"
-                                    {{ !$product->exists ? 'disabled' : '' }}
                             >
-                                🤖 تولید محتوای {{ $label }} با AI
+                                <span class="ai-btn-text">
+                                    🤖 تولید محتوای {{ $label }} با AI
+                                </span>
+
+                                <span
+                                        class="spinner-border spinner-border-sm d-none ai-spinner"
+                                        role="status"
+                                        aria-hidden="true">
+                                </span>
                             </button>
 
                             <span
@@ -215,16 +224,25 @@
 
             const button = event.currentTarget;
 
+            const text = button.querySelector('.ai-btn-text');
+            const spinner = button.querySelector('.ai-spinner');
+
+            hideAiStatus();
+
             button.disabled = true;
 
-            const originalText = button.innerHTML;
+            if (text) {
+                text.textContent = 'در حال تولید...';
+            }
 
-            button.innerHTML = '⏳ در حال تولید محتوا...';
+            if (spinner) {
+                spinner.classList.remove('d-none');
+            }
 
             try {
 
                 const response = await fetch(
-                    "{{ route('admin.products.ai.generate', $product) }}",
+                    "{{ route('admin.products.ai-content', $product) }}",
                     {
                         method: 'POST',
 
@@ -245,73 +263,121 @@
                 console.log('AI Response:', data);
 
                 if (!response.ok || !data.success) {
+
                     throw new Error(
-                        data.message || 'خطا در دریافت محتوای AI'
+                        data.message ||
+                        'تولید محتوا با خطا مواجه شد.'
                     );
                 }
 
                 const content = data.data.content;
 
-                // عنوان
-                const titleInput = document.getElementById(
-                    `title-${locale}`
-                );
+                /*
+                |--------------------------------------------------------------------------
+                | Title
+                |--------------------------------------------------------------------------
+                */
+
+                const titleInput =
+                    document.getElementById(`title-${locale}`);
 
                 if (titleInput) {
                     titleInput.value = content.title || '';
                 }
 
-                // توضیح کوتاه
-                const smallTextInput = document.getElementById(
-                    `small_text-${locale}`
-                );
+
+                /*
+                |--------------------------------------------------------------------------
+                | Small Text
+                |--------------------------------------------------------------------------
+                */
+
+                const smallTextInput =
+                    document.getElementById(`small_text-${locale}`);
 
                 if (smallTextInput) {
-                    smallTextInput.value = content.small_text || '';
+                    smallTextInput.value =
+                        content.small_text || '';
                 }
 
-                // توضیحات کامل - CKEditor
+
+                /*
+                |--------------------------------------------------------------------------
+                | Large Text / CKEditor
+                |--------------------------------------------------------------------------
+                */
+
                 if (editors[locale]) {
+
                     editors[locale].setData(
                         content.large_text || ''
                     );
                 }
 
-                // کلمات کلیدی
-                const keywordsInput = document.getElementById(
-                    `keywords-${locale}`
-                );
+
+                /*
+                |--------------------------------------------------------------------------
+                | Keywords
+                |--------------------------------------------------------------------------
+                */
+
+                const keywordsInput =
+                    document.getElementById(`keywords-${locale}`);
 
                 if (keywordsInput) {
-                    keywordsInput.value = content.keywords || '';
+                    keywordsInput.value =
+                        content.keywords || '';
                 }
 
-                // SEO Description
-                const descriptionInput = document.getElementById(
-                    `description-${locale}`
-                );
+
+                /*
+                |--------------------------------------------------------------------------
+                | SEO Description
+                |--------------------------------------------------------------------------
+                */
+
+                const descriptionInput =
+                    document.getElementById(`description-${locale}`);
 
                 if (descriptionInput) {
-                    descriptionInput.value = content.description || '';
+                    descriptionInput.value =
+                        content.description || '';
                 }
 
-                alert(
-                    `محتوای ${getLocaleName(locale)} با موفقیت تولید شد.`
+
+                /*
+                |--------------------------------------------------------------------------
+                | Success
+                |--------------------------------------------------------------------------
+                */
+
+                showAiStatus(
+                    `محتوای ${getLocaleName(locale)} با موفقیت تولید شد. لطفاً نتیجه را بررسی و سپس محصول را ذخیره کنید.`,
+                    'success'
                 );
 
             } catch (error) {
 
                 console.error('AI Content Error:', error);
 
-                alert(
-                    error.message || 'خطایی در تولید محتوا رخ داد.'
+                showAiStatus(
+                    error.message ||
+                    'خطایی در ارتباط با سرویس AI رخ داد.',
+                    'danger'
                 );
 
             } finally {
 
                 button.disabled = false;
 
-                button.innerHTML = originalText;
+                if (text) {
+                    text.textContent =
+                        `🤖 تولید محتوای ${getLocaleName(locale)} با AI`;
+                }
+
+                if (spinner) {
+                    spinner.classList.add('d-none');
+                }
             }
         }
 
@@ -324,6 +390,30 @@
             };
 
             return names[locale] || locale;
+        }
+
+        function showAiStatus(message, type = 'success') {
+
+            const status = document.getElementById('ai-status');
+
+            if (!status) {
+                return;
+            }
+
+            status.className = `alert alert-${type}`;
+            status.textContent = message;
+            status.classList.remove('d-none');
+        }
+
+        function hideAiStatus() {
+
+            const status = document.getElementById('ai-status');
+
+            if (!status) {
+                return;
+            }
+
+            status.classList.add('d-none');
         }
     </script>
 
