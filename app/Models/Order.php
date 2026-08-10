@@ -20,7 +20,8 @@ class Order extends Model
         'seller_id',
         'seller_role',
         'discount',
-        'final_total'
+        'final_total',
+        'from_user_id'
     ];
 
     public function user(): BelongsTo

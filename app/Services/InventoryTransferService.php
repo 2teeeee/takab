@@ -11,13 +11,12 @@ use RuntimeException;
 class InventoryTransferService
 {
     /**
-     * انتقال موجودی
+     * Create an inventory transfer order.
      *
-     * @param int $fromUserId
-     * @param int $toUserId
-     * @param array $products [product_id => quantity]
-     * @param int $discountPerItem
-     * @param string $address
+     * During order creation:
+     * - The sender's inventory is decreased.
+     * - The receiver's inventory is not increased yet.
+     * - The order is created with pending status.
      */
     public function transfer(
         int $fromUserId,
@@ -36,12 +35,13 @@ class InventoryTransferService
         ) {
 
             $order = Order::create([
-                'user_id'     => $toUserId,
-                'status'      => 'pending',
-                'address'     => $address,
-                'total'       => 0,
-                'discount'    => 0,
-                'final_total' => 0,
+                'user_id'       => $toUserId,
+                'from_user_id'  => $fromUserId,
+                'status'        => 'pending',
+                'address'       => $address,
+                'total'         => 0,
+                'discount'      => 0,
+                'final_total'   => 0,
             ]);
 
             $total = 0;
@@ -64,12 +64,17 @@ class InventoryTransferService
                     ->first();
 
                 if (!$inventory) {
-                    throw new RuntimeException("موجودی کالا یافت نشد.");
+                    throw new RuntimeException(
+                        __('inventory.inventory_not_found')
+                    );
                 }
 
                 if ($inventory->quantity < $quantity) {
                     throw new RuntimeException(
-                        "{$product->translate()->title} فقط {$inventory->quantity} عدد موجود است."
+                        __('inventory.insufficient_inventory', [
+                            'product'  => $product->translate()->title,
+                            'quantity' => $inventory->quantity,
+                        ])
                     );
                 }
 
@@ -83,31 +88,136 @@ class InventoryTransferService
                     'total'      => $rowTotal,
                 ]);
 
+                /*
+                 * Only the sender's inventory is decreased.
+                 *
+                 * The receiver's inventory will be increased
+                 * after the order is approved.
+                 */
                 ProductUser::decrease(
                     $fromUserId,
                     $productId,
                     $quantity
                 );
 
-                ProductUser::increase(
-                    $toUserId,
-                    $productId,
-                    $quantity
-                );
-
                 $total += $rowTotal;
-
                 $discount += $quantity * $discountPerItem;
             }
 
-            if ($order->items()->count() == 0) {
-                throw new RuntimeException('هیچ محصولی انتخاب نشده است.');
+            if ($order->items()->count() === 0) {
+                throw new RuntimeException(
+                    __('inventory.no_products_selected')
+                );
             }
 
             $order->update([
                 'total'       => $total,
                 'discount'    => $discount,
                 'final_total' => max(0, $total - $discount),
+            ]);
+
+            return $order;
+        });
+    }
+
+
+    /**
+     * Approve the order and transfer inventory to the receiver.
+     */
+    public function approve(Order $order): Order
+    {
+        return DB::transaction(function () use ($order) {
+
+            $order = Order::query()
+                ->lockForUpdate()
+                ->findOrFail($order->id);
+
+            /*
+             * Only pending orders can be approved.
+             *
+             * This prevents inventory from being increased again
+             * if approve() is executed more than once.
+             */
+            if ($order->status !== 'pending') {
+                throw new RuntimeException(
+                    __('inventory.order_already_processed')
+                );
+            }
+
+            /*
+             * The sender must be known so that the inventory
+             * transfer can be tracked correctly.
+             */
+            if (!$order->from_user_id) {
+                throw new RuntimeException(
+                    __('inventory.from_user_not_defined')
+                );
+            }
+
+            $fromUserId = $order->from_user_id;
+            $toUserId = $order->user_id;
+
+            foreach ($order->items as $item) {
+
+                ProductUser::increase(
+                    $toUserId,
+                    $item->product_id,
+                    $item->quantity
+                );
+            }
+
+            $order->update([
+                'status' => 'success',
+            ]);
+
+            return $order;
+        });
+    }
+
+
+    /**
+     * Reject the order and return the inventory to the sender.
+     */
+    public function reject(Order $order): Order
+    {
+        return DB::transaction(function () use ($order) {
+
+            $order = Order::query()
+                ->with('items')
+                ->lockForUpdate()
+                ->findOrFail($order->id);
+
+            /*
+             * Only pending orders can be rejected.
+             *
+             * This prevents the inventory from being returned
+             * more than once if reject() is executed again.
+             */
+            if ($order->status !== 'pending') {
+                throw new RuntimeException(
+                    __('inventory.order_already_processed')
+                );
+            }
+
+            if (!$order->from_user_id) {
+                throw new RuntimeException(
+                    __('inventory.from_user_not_defined')
+                );
+            }
+
+            $fromUserId = $order->from_user_id;
+
+            foreach ($order->items as $item) {
+
+                ProductUser::increase(
+                    $fromUserId,
+                    $item->product_id,
+                    $item->quantity
+                );
+            }
+
+            $order->update([
+                'status' => 'rejected',
             ]);
 
             return $order;
