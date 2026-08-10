@@ -100,6 +100,7 @@ class StoreSaleController extends Controller
             $order = Order::create([
                 'user_id'=>$store->id,
                 'seller_id'=>Auth::id(),
+                'from_user_id'=>Auth::id(),
                 'address'=>$request->address,
                 'status'=>'pending',
                 'discount'=>0,

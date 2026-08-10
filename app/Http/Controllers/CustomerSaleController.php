@@ -73,6 +73,7 @@ class CustomerSaleController extends Controller
             $order = Order::create([
                 'user_id'=>$customer->id,
                 'seller_id'=>Auth::id(),
+                'from_user_id'=>Auth::id(),
                 'address'=>$request->address,
                 'status'=>'pending',
                 'discount'=>$discount,
