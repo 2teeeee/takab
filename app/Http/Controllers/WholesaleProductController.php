@@ -43,13 +43,13 @@ class WholesaleProductController extends Controller
         return view('wholesaler.products', compact('products'));
     }
 
-    public function store(Request $request): RedirectResponse
+    public function store(Request $request, InventoryTransferService $inventoryTransferService): RedirectResponse
     {
         $request->validate([
             'products' => 'required|array',
         ]);
 
-        app(InventoryTransferService::class)->transfer(
+        $inventoryTransferService->transfer(
             fromUserId: config('shop.company_user_id'),
             toUserId: auth()->id(),
             products: $request->products,
@@ -71,6 +71,6 @@ class WholesaleProductController extends Controller
         return ProductUser::where([
             'user_id' => $this->inventoryOwnerId(),
             'product_id' => $product->id,
-        ])->value('quantity') ?? 50;
+        ])->value('quantity') ?? 0;
     }
 }

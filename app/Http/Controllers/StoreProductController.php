@@ -42,13 +42,13 @@ class StoreProductController extends Controller
         ));
     }
 
-    public function store(Request $request): RedirectResponse
+    public function store(Request $request, InventoryTransferService $inventoryTransferService): RedirectResponse
     {
         $request->validate([
             'products' => 'required|array',
         ]);
 
-        app(InventoryTransferService::class)->transfer(
+        $inventoryTransferService->transfer(
             fromUserId: auth()->user()->registered_by,
             toUserId: auth()->id(),
             products: $request->products,

@@ -5,6 +5,7 @@ namespace App\Services;
 use App\Models\Order;
 use App\Models\Product;
 use App\Models\ProductUser;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use RuntimeException;
 
@@ -22,22 +23,27 @@ class InventoryTransferService
         int $fromUserId,
         int $toUserId,
         array $products,
+        string $status = 'pending',
         int $discountPerItem = 0,
-        string $address = '-'
+        string $address = '-',
+        int $discount = 0,
     ): Order {
 
         return DB::transaction(function () use (
             $fromUserId,
             $toUserId,
+            $status,
             $products,
             $discountPerItem,
-            $address
+            $address,
+            $discount
         ) {
 
             $order = Order::create([
                 'user_id'       => $toUserId,
                 'from_user_id'  => $fromUserId,
-                'status'        => 'pending',
+                'seller_id'=>Auth::id(),
+                'status'        => $status,
                 'address'       => $address,
                 'total'         => 0,
                 'discount'      => 0,
@@ -45,7 +51,7 @@ class InventoryTransferService
             ]);
 
             $total = 0;
-            $discount = 0;
+            $discountCalc = 0;
 
             foreach ($products as $productId => $quantity) {
 
@@ -100,8 +106,16 @@ class InventoryTransferService
                     $quantity
                 );
 
+                if($status == 'success') {
+                    ProductUser::increase(
+                        $toUserId,
+                        $productId,
+                        $quantity
+                    );
+                }
+
                 $total += $rowTotal;
-                $discount += $quantity * $discountPerItem;
+                $discountCalc += $quantity * $discountPerItem;
             }
 
             if ($order->items()->count() === 0) {
@@ -110,10 +124,12 @@ class InventoryTransferService
                 );
             }
 
+            $discountFinal = ($discount > 0) ? $discount : $discountCalc;
+
             $order->update([
                 'total'       => $total,
-                'discount'    => $discount,
-                'final_total' => max(0, $total - $discount),
+                'discount'    => $discountFinal,
+                'final_total' => max(0, $total - $discountFinal),
             ]);
 
             return $order;
@@ -154,7 +170,6 @@ class InventoryTransferService
                 );
             }
 
-            $fromUserId = $order->from_user_id;
             $toUserId = $order->user_id;
 
             foreach ($order->items as $item) {

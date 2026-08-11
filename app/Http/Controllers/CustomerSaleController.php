@@ -6,6 +6,7 @@ use App\Models\Order;
 use App\Models\Product;
 use App\Models\ProductUser;
 use App\Models\User;
+use App\Services\InventoryTransferService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -46,7 +47,8 @@ class CustomerSaleController extends Controller
 
     public function store(
         Request $request,
-        User $customer
+        User $customer,
+        InventoryTransferService $inventoryTransferService
     ): RedirectResponse
     {
         $request->validate([
@@ -66,56 +68,16 @@ class CustomerSaleController extends Controller
                 ->withInput();
         }
 
-        DB::transaction(function() use($request,$customer){
+        $discount = (int) $request->discount;
 
-            $discount = (int) $request->discount;
-
-            $order = Order::create([
-                'user_id'=>$customer->id,
-                'seller_id'=>Auth::id(),
-                'from_user_id'=>Auth::id(),
-                'address'=>$request->address,
-                'status'=>'pending',
-                'discount'=>$discount,
-                'total'=>0,
-                'final_total'=>0,
-            ]);
-
-            $total = 0;
-
-            foreach($request->products as $productId=>$qty){
-                if($qty==0){
-                    continue;
-                }
-
-                $stock = ProductUser::where([
-                    'user_id'=>auth()->id(),
-                    'product_id'=>$productId,
-                ])->firstOrFail();
-
-                if($qty>$stock->quantity){
-                    abort(400,'موجودی کافی نیست');
-                }
-
-                $price = Product::find($productId)->sell_price;
-                $lineTotal = $price*$qty;
-                $order->items()->create([
-                    'product_id'=>$productId,
-                    'quantity'=>$qty,
-                    'price'=>$price,
-                    'total'=>$lineTotal,
-                ]);
-
-                $stock->decrement('quantity',$qty);
-                $total += $lineTotal;
-            }
-
-            $order->update([
-                'total'=>$total,
-                'discount'=>$discount,
-                'final_total'=>max(0,$total-$discount),
-            ]);
-        });
+        $inventoryTransferService->transfer(
+            fromUserId: auth()->id(),
+            toUserId: $customer->id,
+            products: $request->products,
+            status: 'success',
+            address: $request->address,
+            discount: $discount
+        );
 
         return redirect()
             ->route('admin.orders.index')
