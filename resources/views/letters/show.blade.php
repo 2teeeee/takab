@@ -11,6 +11,7 @@
         <div class="card shadow-sm mb-4">
             <div class="card-header bg-light fw-bold">
                 موضوع: {{ $letter->subject }}
+
             </div>
             <div class="card-body">
                 <p><strong>فرستنده:</strong> {{ $letter->sender->name }}</p>
@@ -36,6 +37,10 @@
                         @else bg-success @endif">
                         {{ ucfirst($letter->priority) }}
                     </span>
+                </p>
+                <p>
+                    <strong>تاریخ و ساعت ثبت نامه:</strong>
+                    <span>{{ jdate($letter->created_at->setTimezone('Asia/Tehran'))->format('Y/m/d H:i') }}</span>
                 </p>
                 <hr>
                 @php
