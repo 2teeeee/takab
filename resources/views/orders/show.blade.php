@@ -347,6 +347,13 @@
 
                     </div>
 
+                    <div class="border-top mt-2 pt-2">
+                        <strong>توضیحات تغییر وضعیت سفارش</strong>
+                        <p>
+                            {{$order->status_note ? $order->status_note : '-'}}
+                        </p>
+                    </div>
+
                 @else
 
                     <form action="{{ route('admin.orders.updateStatus', $order) }}"
@@ -410,6 +417,28 @@
 
                         </div>
 
+                        <div class="col-md-8">
+
+                            <label class="form-label">
+                                توضیح تغییر وضعیت
+                                <span class="text-muted small">(اختیاری)</span>
+                            </label>
+
+                            <textarea
+                                    name="status_note"
+                                    rows="3"
+                                    class="form-control @error('status_note') is-invalid @enderror"
+                                    placeholder="در صورت نیاز دلیل تغییر وضعیت را وارد کنید..."
+                            >{{ old('status_note', $order->status_note) }}</textarea>
+
+                            @error('status_note')
+                            <div class="invalid-feedback">
+                                {{ $message }}
+                            </div>
+                            @enderror
+
+                        </div>
+
                         <div class="col-md-4">
 
                             <button type="submit"
@@ -450,23 +479,18 @@
                     <table class="table table-striped table-hover mb-0">
 
                         <thead>
-
                         <tr>
-
                             <th>#</th>
                             <th>محصول</th>
                             <th>تعداد</th>
                             <th>قیمت واحد</th>
                             <th>جمع</th>
-
                         </tr>
-
                         </thead>
 
                         <tbody>
 
                         @forelse($order->items as $item)
-
                             <tr>
 
                                 <td>
@@ -474,50 +498,33 @@
                                 </td>
 
                                 <td>
-
                                     {{ optional($item->product->translation)->title
                                         ?? 'محصول حذف شده' }}
-
                                 </td>
 
                                 <td>
-
                                     {{ number_format($item->quantity) }}
-
                                 </td>
 
                                 <td>
-
                                     {{ number_format($item->price) }}
                                     تومان
-
                                 </td>
 
                                 <td>
-
                                     {{ number_format(
                                         $item->price * $item->quantity
                                     ) }}
-
                                     تومان
-
                                 </td>
-
                             </tr>
-
                         @empty
-
                             <tr>
-
                                 <td colspan="5"
                                     class="text-center text-muted py-4">
-
                                     آیتمی برای این سفارش ثبت نشده است.
-
                                 </td>
-
                             </tr>
-
                         @endforelse
 
                         </tbody>
@@ -525,70 +532,43 @@
                         <tfoot>
 
                         <tr>
-
                             <th colspan="4"
                                 class="text-end">
-
                                 مبلغ کل
-
                             </th>
-
                             <th>
-
                                 {{ number_format($order->total ?? 0) }}
                                 تومان
-
                             </th>
-
                         </tr>
 
                         <tr>
-
                             <th colspan="4"
                                 class="text-end text-danger">
-
                                 تخفیف
-
                             </th>
-
                             <th class="text-danger">
-
                                 {{ number_format($order->discount ?? 0) }}
                                 تومان
-
                             </th>
-
                         </tr>
 
                         <tr class="table-success">
-
                             <th colspan="4"
                                 class="text-end">
-
                                 مبلغ نهایی
-
                             </th>
 
                             <th>
-
                                 {{ number_format($order->final_total ?? 0) }}
                                 تومان
-
                             </th>
-
                         </tr>
-
                         </tfoot>
-
                     </table>
-
                 </div>
-
             </div>
-
         </div>
-
     </div>
-
 </x-admin-layout>
-```
+

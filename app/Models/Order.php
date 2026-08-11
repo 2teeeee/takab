@@ -12,6 +12,7 @@ class Order extends Model
         'user_id',
         'address',
         'status',
+        'status_note',
         'total',
         'reference_id',
         'authority',

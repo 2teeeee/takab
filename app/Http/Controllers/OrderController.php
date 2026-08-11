@@ -2,13 +2,14 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Letter;
 use App\Models\Order;
 use App\Services\InventoryTransferService;
+use App\Services\Sms\NikSmsService;
 use Illuminate\Contracts\View\View;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use RuntimeException;
 
 class OrderController extends Controller
 {
@@ -55,13 +56,20 @@ class OrderController extends Controller
         return view('orders.show', compact('order'));
     }
 
-    public function updateStatus(Request $request, Order $order): RedirectResponse
-    {
+    public function updateStatus(
+        Request $request,
+        Order $order,
+        NikSmsService $nikSmsService
+    ): RedirectResponse {
         $request->validate([
-            'status' => 'required|string',
+            'status' => ['required', 'string'],
+            'status_note' => ['nullable', 'string', 'max:2000'],
         ]);
 
         $newStatus = $request->status;
+        $statusNote = $request->status_note;
+
+        $oldStatus = $order->status;
 
         /*
         |--------------------------------------------------------------------------
@@ -94,6 +102,24 @@ class OrderController extends Controller
                 } else {
                     $service->reject($order);
                 }
+
+                /*
+                 * Save status note
+                 */
+                $order->update([
+                    'status_note' => $statusNote,
+                ]);
+
+                /*
+                 * Create automation letter
+                 */
+                $this->createStatusChangeLetter(
+                    $order,
+                    $oldStatus,
+                    $newStatus,
+                    $statusNote,
+                    $nikSmsService
+                );
 
                 return back()->with(
                     'success',
@@ -135,11 +161,99 @@ class OrderController extends Controller
 
         $order->update([
             'status' => $newStatus,
+            'status_note' => $statusNote,
         ]);
+
+        /*
+         * Create automation letter
+         */
+        $this->createStatusChangeLetter(
+            $order,
+            $oldStatus,
+            $newStatus,
+            $statusNote
+        );
 
         return back()->with(
             'success',
             __('orders.status_updated')
+        );
+    }
+
+    protected function createStatusChangeLetter(
+        Order $order,
+        string $oldStatus,
+        string $newStatus,
+        ?string $note,
+        NikSmsService $sms
+    ): void {
+        $order->loadMissing([
+            'user'
+        ]);
+
+        $statusLabels = [
+            'pending'    => __('order.status.pending'),
+            'paid'       => __('order.status.paid'),
+            'processing' => __('order.status.processing'),
+            'shipping'   => __('order.status.shipping'),
+            'delivered'  => __('order.status.delivered'),
+            'canceled'   => __('order.status.canceled'),
+            'success'    => __('order.status.success'),
+            'rejected'   => __('order.status.rejected'),
+        ];
+
+        $oldStatusLabel = $statusLabels[$oldStatus] ?? $oldStatus;
+        $newStatusLabel = $statusLabels[$newStatus] ?? $newStatus;
+
+        $actor = Auth::user();
+
+        $buyerName = $order->user?->name ?? '—';
+
+        $message = <<<TEXT
+وضعیت سفارش شماره #{$order->id} تغییر کرد.
+
+خریدار:
+{$buyerName}
+
+وضعیت قبلی:
+{$oldStatusLabel}
+
+وضعیت جدید:
+{$newStatusLabel}
+
+توضیح تغییر:
+{$note}
+
+مبلغ نهایی:
+{$order->final_total} تومان
+
+TEXT;
+
+        $letter = Letter::create([
+            'sender_id' => $actor->id,
+            'subject'   => "تغییر وضعیت سفارش #{$order->id}",
+            'body'      => $message,
+            'priority'  => 'medium',
+        ]);
+
+        $letter->receiverItems()->create([
+            'user_id' => $order->user_id,
+            'status' => 'new',
+            'last_received_at' => now(),
+        ]);
+
+        $message = <<<TEXT
+یک نامه جدید برای شما ثبت شده است.
+
+موضوع:
+{$letter->subject}
+
+{$letter->url}
+TEXT;
+
+        $sms->sendSingle(
+            $order->user_id,
+            $message
         );
     }
 }
