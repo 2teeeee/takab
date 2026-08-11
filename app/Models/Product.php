@@ -72,4 +72,9 @@ class Product extends Model
             ->withPivot('quantity')
             ->withTimestamps();
     }
+
+    public function productUsers(): HasMany
+    {
+        return $this->hasMany(ProductUser::class);
+    }
 }

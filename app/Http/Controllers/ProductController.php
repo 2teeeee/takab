@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Category;
 use App\Models\Product;
 use App\Models\ProductImage;
+use App\Models\ProductUser;
 use App\Services\CartService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
@@ -19,7 +20,17 @@ class ProductController extends Controller
 {
     public function index(): View
     {
-        $products = Product::with('category')->whereNotNull('category_id')->orderBy('id','desc')->paginate(10);
+        $companyUserId = config('shop.company_user_id');
+
+        $products = Product::with([
+            'category',
+            'productUsers' => function ($query) use ($companyUserId) {
+                $query->where('user_id', $companyUserId);
+            },
+        ])
+            ->whereNotNull('category_id')
+            ->orderByDesc('id')
+            ->paginate(20);
 
         return view('products.index', compact('products'));
     }
@@ -219,5 +230,29 @@ class ProductController extends Controller
         return response()->json([
             'url' => asset('storage/' . $path)
         ]);
+    }
+
+    public function updateStock(Request $request, Product $product): RedirectResponse
+    {
+        $validated = $request->validate([
+            'quantity' => ['required', 'integer', 'min:0'],
+        ]);
+
+        $companyUserId = config('shop.company_user_id');
+
+        ProductUser::updateOrCreate(
+            [
+                'user_id' => $companyUserId,
+                'product_id' => $product->id,
+            ],
+            [
+                'quantity' => $validated['quantity'],
+            ]
+        );
+
+        return back()->with(
+            'success',
+            'موجودی محصول با موفقیت به‌روزرسانی شد.'
+        );
     }
 }
