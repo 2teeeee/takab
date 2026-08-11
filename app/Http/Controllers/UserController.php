@@ -30,7 +30,12 @@ class UserController extends Controller
             ! $authUser->hasRole(['admin', 'manager', 'personel']) &&
             ! $isSearch
         ) {
-            $usersQuery->where('registered_by', $authUser->id);
+            if($authUser->hasRole('wholesaler')) {
+                $usersQuery->where('wholesaler_id', $authUser->id);
+            }
+            else{
+                $usersQuery->where('registered_by', $authUser->id);
+            }
         }
 
         // جستجو
