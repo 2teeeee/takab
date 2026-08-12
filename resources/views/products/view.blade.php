@@ -47,7 +47,7 @@
                                         </div>
                                     @else
                                         <button class="btn btn-outline-success" onclick="updateCart({{ $product->id }}, 1)">
-                                            {{ __('addToBasket') }}
+                                            {{ __('app.addToBasket') }}
                                         </button>
                                     @endif
                                 </div>

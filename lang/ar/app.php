@@ -54,4 +54,12 @@ return [
     'reason' => 'السبب',
     'unspecifiedError' => 'خطأ غير معروف',
     'returnToShoppingCart' => 'العودة إلى السلة',
+    'referralCode' => 'رمز الإحالة',
+    'referralCodePlaceholder' => 'أدخل رمز الإحالة الخاص بك',
+    'referralCodeHelp' => 'عند إدخال رمز إحالة صالح، ستحصل على خصم قدره 1,000,000 تومان.',
+    'discount' => 'الخصم',
+    'finalTotal' => 'المبلغ النهائي',
+    'checkReferralCode' => 'التحقق من رمز الإحالة',
+    'checking' => 'جارٍ التحقق...',
+    'connectionError' => 'حدث خطأ في الاتصال بالخادم.',
 ];

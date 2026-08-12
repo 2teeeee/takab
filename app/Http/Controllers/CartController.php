@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Order;
 use App\Models\Product;
+use App\Models\User;
 use App\Services\CartService;
 use Illuminate\Contracts\View\View;
 use Illuminate\Http\JsonResponse;
@@ -121,19 +122,76 @@ class CartController extends Controller
         return view('cart.address', compact('cart'));
     }
 
-    public function pay(Request $request): string
+    public function pay(Request $request): RedirectResponse
     {
         $request->validate([
-            'address' => 'required',
+            'address' => ['required', 'string', 'max:1000'],
+            'phone' => ['required', 'string', 'max:20'],
+            'postal_code' => ['required', 'string', 'max:20'],
+            'referral_code' => ['nullable', 'string', 'max:50'],
         ]);
 
         $cart = $this->cartService->getCart();
+        $cart->load('items');
+
+        if ($cart->items->isEmpty()) {
+            return back()->with('error', __('cart.empty'));
+        }
+
+        $total = $cart->items->sum('total');
+
+        $discount = 0;
+        $referrer = null;
+
+        /*
+         * Validate referral code
+         */
+        if ($request->filled('referral_code')) {
+
+            $referrer = User::where(
+                'moaref_code',
+                trim($request->referral_code)
+            )->first();
+
+            if (!$referrer) {
+                return back()
+                    ->withErrors([
+                        'referral_code' => __('order.invalid_referral_code'),
+                    ])
+                    ->withInput();
+            }
+
+            /*
+             * Customer cannot use their own referral code.
+             */
+            if ($referrer->id === auth()->id()) {
+                return back()
+                    ->withErrors([
+                        'referral_code' => __('order.self_referral_not_allowed'),
+                    ])
+                    ->withInput();
+            }
+
+            /*
+             * Fixed referral discount.
+             */
+            $discount = 1_000_000;
+        }
+
+        $finalTotal = max(0, $total - $discount);
 
         $order = Order::create([
-            'user_id' => auth()->id(),
-            'address' => $request->address,
-            'status' => 'pending',
-            'total' => $cart->items->sum('total'),
+            'user_id'      => auth()->id(),
+            'address'      => $request->address,
+            'status'       => 'pending',
+
+            'total'        => $total,
+            'discount'     => $discount,
+            'final_total'  => $finalTotal,
+
+            'moaref_id'    => $referrer?->id,
+
+            'postal_code'  => $request->postal_code,
         ]);
 
         foreach ($cart->items as $item) {
@@ -145,12 +203,47 @@ class CartController extends Controller
             ]);
         }
 
-        return redirect()->route('zarinpal.pay',['order'=> $order]);
+        return redirect()->route('zarinpal.pay', [
+            'order' => $order,
+        ]);
     }
 
     private function calculateCartTotal(): int
     {
         $cart = app(CartService::class)->getCart();
         return $cart->items->sum('total');
+    }
+
+    public function checkReferral(Request $request): JsonResponse
+    {
+        $request->validate([
+            'referral_code' => ['required', 'string', 'max:50'],
+        ]);
+
+        $referrer = User::where(
+            'moaref_code',
+            trim($request->referral_code)
+        )->first();
+
+        if (!$referrer) {
+            return response()->json([
+                'success' => false,
+                'message' => __('order.invalid_referral_code'),
+            ], 422);
+        }
+
+        if ($referrer->id === auth()->id()) {
+            return response()->json([
+                'success' => false,
+                'message' => __('order.self_referral_not_allowed'),
+            ], 422);
+        }
+
+        return response()->json([
+            'success' => true,
+            'message' => __('order.referral_code_applied'),
+            'discount' => 1_000_000,
+            'referrer_name' => $referrer->name,
+        ]);
     }
 }

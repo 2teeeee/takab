@@ -54,4 +54,12 @@ return [
     'reason' => 'Reason',
     'unspecifiedError' => 'Unspecified error',
     'returnToShoppingCart' => 'Return to shopping cart',
+    'referralCode' => 'Referral Code',
+    'referralCodePlaceholder' => 'Enter your referral code',
+    'referralCodeHelp' => 'If you enter a valid referral code, you will receive a 1,000,000 Toman discount.',
+    'discount' => 'Discount',
+    'finalTotal' => 'Final Total',
+    'checkReferralCode' => 'Check Referral Code',
+    'checking' => 'Checking...',
+    'connectionError' => 'Connection error.',
 ];
