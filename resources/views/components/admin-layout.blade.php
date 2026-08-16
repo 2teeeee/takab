@@ -209,7 +209,7 @@
     </div>
 
     <div class="offcanvas-body">
-        @if(auth()->user()->hasRole(['admin', 'manager', 'personel', 'wholeseler', 'seller', 'marketer']))
+        @if(auth()->user()->hasRole(['admin', 'manager', 'personel', 'wholesaler', 'seller', 'marketer']))
             <a href="{{ route('admin.users.index') }}" class="text-light d-block mb-2 text-decoration-none">👤 کاربران</a>
         @endif
         @if(auth()->user()->hasRole(['admin', 'manager', 'personel']))
@@ -237,7 +237,7 @@
         @if(auth()->user()->hasRole(['admin', 'manager', 'personel']))
             <a href="{{ route('admin.periodic_services.index') }}" class="text-light d-block mb-2 text-decoration-none">دوره سرویس</a>
         @endif
-        @if(auth()->user()->hasRole(['wholeseler']))
+        @if(auth()->user()->hasRole(['wholesaler']))
                 <a href="{{ route('wholesaler.products') }}" class="text-light d-block mb-2 text-decoration-none">درخواست خرید محصول</a>
                 <a href="{{ route('wholesaler.stores.index') }}" class="text-light d-block mb-2 text-decoration-none">فروش به فروشگاه</a>
             @endif
