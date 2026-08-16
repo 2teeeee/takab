@@ -4,16 +4,21 @@ namespace App\Http\Controllers;
 
 use App\Models\Order;
 use App\Services\CartService;
+use App\Services\CommissionService;
 use App\Services\ZarinpalService;
 use Illuminate\Http\Request;
 
 class ZarinpalController extends Controller
 {
     protected CartService $cartService;
+    protected CommissionService $commissionService;
 
-    public function __construct(CartService $cartService)
-    {
+    public function __construct(
+        CartService $cartService,
+        CommissionService $commissionService
+    ) {
         $this->cartService = $cartService;
+        $this->commissionService = $commissionService;
     }
 
     public function pay(Order $order, ZarinpalService $zarinpal)
@@ -55,6 +60,8 @@ class ZarinpalController extends Controller
             $order->status = 'paid';
             $order->reference_id = $result['ref_id'];
             $order->save();
+
+            $this->commissionService->createForOrder($order);
 
             $this->cartService->clear();
 

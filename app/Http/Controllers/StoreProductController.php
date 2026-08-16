@@ -51,8 +51,7 @@ class StoreProductController extends Controller
         $inventoryTransferService->transfer(
             fromUserId: auth()->user()->registered_by,
             toUserId: auth()->id(),
-            products: $request->products,
-            discountPerItem: 2_000_000
+            products: $request->products
         );
 
         return redirect()

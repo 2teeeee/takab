@@ -4,6 +4,7 @@ use App\Http\Controllers\AssemblyController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\CartController;
 use App\Http\Controllers\CategoryController;
+use App\Http\Controllers\CommissionController;
 use App\Http\Controllers\CustomerSaleController;
 use App\Http\Controllers\InstallRequestController;
 use App\Http\Controllers\InstallScheduleController;
@@ -44,18 +45,19 @@ Route::prefix('product')->group(function () {
 
 Route::get('/search', [SearchController::class, 'index'])->name('search');
 
-Route::prefix('cart')->group(function () {
-    Route::get('/', [CartController::class, 'index'])->name('cart.index');
-    Route::get('/items', [CartController::class, 'show'])->name('cart.show');
-    Route::post('/increase/{product}', [CartController::class, 'increase'])->name('cart.increase');
-    Route::post('/decrease/{product}', [CartController::class, 'decrease'])->name('cart.decrease');
-    Route::post('/add/{product}', [CartController::class, 'add'])->name('cart.add');
-    Route::post('/remove/{product}', [CartController::class, 'remove'])->name('cart.remove');
-    Route::delete('/clear', [CartController::class, 'clear'])->name('cart.clear');
+Route::prefix('cart')->name('cart.')->group(function () {
+    Route::get('/', [CartController::class, 'index'])->name('index');
+    Route::get('/items', [CartController::class, 'show'])->name('show');
+    Route::post('/increase/{product}', [CartController::class, 'increase'])->name('increase');
+    Route::post('/decrease/{product}', [CartController::class, 'decrease'])->name('decrease');
+    Route::post('/add/{product}', [CartController::class, 'add'])->name('add');
+    Route::post('/remove/{product}', [CartController::class, 'remove'])->name('remove');
+    Route::delete('/clear', [CartController::class, 'clear'])->name('clear');
+    Route::post('/check-referral', [CartController::class, 'checkReferral'])->name('checkReferral');
 
     Route::middleware('auth')->group(function () {
-        Route::get('/address', [CartController::class, 'address'])->name('cart.address');
-        Route::post('/pay', [CartController::class, 'pay'])->name('cart.pay');
+        Route::get('/address', [CartController::class, 'address'])->name('address');
+        Route::post('/pay', [CartController::class, 'pay'])->name('pay');
     });
 });
 
@@ -75,8 +77,6 @@ Route::middleware('guest')->group(function () {
     });
 });
 Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
-
-
 
 Route::middleware(['auth'])->prefix('profile')->name('profile.')->group(function () {
     Route::get('/', [ProfileController::class, 'index'])->name('index'); // صفحه اصلی پروفایل
@@ -115,6 +115,8 @@ Route::middleware(['auth'])->prefix('admin')->name('admin.')->group(function () 
 
         Route::resource('products', ProductController::class);
         Route::patch('/products/{product}/stock', [ProductController::class, 'updateStock'])->name('products.stock.update');
+        Route::get('/commissions', [CommissionController::class, 'index'])->name('commissions.index');
+
 
         Route::resource('sliders', SliderController::class);
         Route::resource('pages', PageController::class);

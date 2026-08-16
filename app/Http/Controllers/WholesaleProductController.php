@@ -52,8 +52,7 @@ class WholesaleProductController extends Controller
         $inventoryTransferService->transfer(
             fromUserId: config('shop.company_user_id'),
             toUserId: auth()->id(),
-            products: $request->products,
-            discountPerItem: 1_000_000
+            products: $request->products
         );
 
         return redirect()

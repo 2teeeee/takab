@@ -157,6 +157,12 @@
             </a>
         @endif
 
+        @if(auth()->user()->hasRole(['admin', 'manager']))
+            <a href="{{ route('admin.commissions.index') }}" class="{{ request()->routeIs('commissions.*') ? 'active' : '' }}">
+                کمیسیون ها
+            </a>
+        @endif
+
         @if(auth()->user()->hasRole('wholesaler'))
             <a href="{{ route('wholesaler.products') }}" class="{{ request()->routeIs('wholesaler.products.*') ? 'active' : '' }}">
                 درخواست خرید محصول
@@ -220,6 +226,9 @@
 
         @if(auth()->user()->hasRole(['admin', 'manager', 'personel']))
             <a href="{{ route('admin.orders.index') }}" class="text-light d-block mb-2 text-decoration-none">سفارش‌ها</a>
+        @endif
+        @if(auth()->user()->hasRole(['admin', 'manager']))
+            <a href="{{ route('admin.commissions.index') }}" class="text-light d-block mb-2 text-decoration-none">کمیسیون ها</a>
         @endif
         @if(auth()->user()->hasRole(['admin', 'manager', 'personel']))
             <a href="{{ route('admin.install_requests.index') }}" class="text-light d-block mb-2 text-decoration-none">درخواست سرویس</a>

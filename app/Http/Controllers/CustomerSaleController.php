@@ -2,19 +2,25 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Order;
-use App\Models\Product;
 use App\Models\ProductUser;
 use App\Models\User;
+use App\Services\CommissionService;
 use App\Services\InventoryTransferService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\DB;
 use Illuminate\View\View;
 
 class CustomerSaleController extends Controller
 {
+
+    protected CommissionService $commissionService;
+
+    public function __construct(
+        CommissionService $commissionService
+    ) {
+        $this->commissionService = $commissionService;
+    }
+
     public function create(User $customer): View
     {
         $locale = app()->getLocale();
@@ -49,16 +55,29 @@ class CustomerSaleController extends Controller
         Request $request,
         User $customer,
         InventoryTransferService $inventoryTransferService
-    ): RedirectResponse
-    {
+    ): RedirectResponse {
+
         $request->validate([
             'address' => ['required', 'string', 'max:1000'],
             'products' => ['required', 'array'],
-            'discount' => ['nullable','numeric','min:0'],
+            'discount' => ['nullable', 'numeric', 'min:0'],
         ]);
 
+        $store = auth()->user();
+
+        /*
+         * The store's registered_by is its wholesaler.
+         */
+        $wholesalerId = $store->registered_by;
+
+        /*
+         * In this sales flow, the store is also considered
+         * the referrer.
+         */
+        $referrerId = $store->id;
+
         $selected = collect($request->products)
-            ->filter(fn ($q) => $q > 0);
+            ->filter(fn ($q) => (int) $q > 0);
 
         if ($selected->isEmpty()) {
             return back()
@@ -70,8 +89,8 @@ class CustomerSaleController extends Controller
 
         $discount = (int) $request->discount;
 
-        $inventoryTransferService->transfer(
-            fromUserId: auth()->id(),
+        $order = $inventoryTransferService->transfer(
+            fromUserId: $store->id,
             toUserId: $customer->id,
             products: $request->products,
             status: 'success',
@@ -79,8 +98,20 @@ class CustomerSaleController extends Controller
             discount: $discount
         );
 
+        /*
+         * Store seller, wholesaler and referrer information
+         * directly on the order.
+         */
+        $order->update([
+            'seller_id'     => $store->id,
+            'wholesaler_id' => $wholesalerId,
+            'moaref_id'     => $referrerId,
+        ]);
+
+        $this->commissionService->createForOrder($order);
+
         return redirect()
             ->route('admin.orders.index')
-            ->with('success','سفارش ثبت شد.');
+            ->with('success', 'سفارش با موفقیت ثبت شد.');
     }
 }

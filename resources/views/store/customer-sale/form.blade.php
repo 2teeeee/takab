@@ -113,26 +113,6 @@
                         </tr>
                         <tr>
                             <th colspan="5" class="text-end">
-                                کمیسیون
-                            </th>
-                            <th>
-                                <span id="commission">
-                                    0
-                                </span>
-                            </th>
-                        </tr>
-                        <tr>
-                            <th colspan="5" class="text-end">
-                                پاداش معرفی
-                            </th>
-                            <th>
-                                <span id="bonus">
-                                    0
-                                </span>
-                            </th>
-                        </tr>
-                        <tr>
-                            <th colspan="5" class="text-end">
                                 تخفیف قابل ارائه به مشتری
                             </th>
                             <th>
@@ -187,8 +167,6 @@
         function calculate(){
             let total=0;
             let discount_available=0;
-            let commission=0;
-            let bonus=0;
             let discount = parseInt(document.getElementById("discount").value) || 0;
 
             document.querySelectorAll(".quantity").forEach(function(input){
@@ -200,8 +178,6 @@
                     .innerHTML=rowTotal.toLocaleString();
                 total+=rowTotal;
                 discount_available+=qty*1000000;
-                commission+=qty*1000000;
-                bonus+=qty*1000000;
             });
 
             document.getElementById("total").innerHTML=
@@ -209,12 +185,6 @@
 
             document.getElementById("discount_َavailable").innerHTML=
                 discount_available.toLocaleString();
-
-            document.getElementById("commission").innerHTML=
-                commission.toLocaleString();
-
-            document.getElementById("bonus").innerHTML=
-                bonus.toLocaleString();
 
             document.getElementById("final").innerHTML=
                 Math.max(total-discount,0).toLocaleString();

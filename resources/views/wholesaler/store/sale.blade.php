@@ -114,16 +114,6 @@
                                 </span>
                             </th>
                         </tr>
-                        <tr>
-                            <th colspan="5" class="text-end">
-                                تخفیف
-                            </th>
-                            <th>
-                                <span id="discount">
-                                    0
-                                </span>
-                            </th>
-                        </tr>
                         <tr class="table-success">
                             <th colspan="5" class="text-end">
                                 مبلغ نهایی

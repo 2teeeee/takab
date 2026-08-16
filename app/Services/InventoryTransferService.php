@@ -16,8 +16,11 @@ class InventoryTransferService
      *
      * During order creation:
      * - The sender's inventory is decreased.
-     * - The receiver's inventory is not increased yet.
-     * - The order is created with pending status.
+     * - The receiver's inventory is not increased.
+     * - The order is created with the given status.
+     *
+     * The receiver's inventory is increased only when
+     * the order is explicitly approved.
      */
     public function transfer(
         int $fromUserId,
@@ -39,10 +42,19 @@ class InventoryTransferService
             $discount
         ) {
 
+            /*
+             * Only pending and success are valid initial states.
+             */
+            if (!in_array($status, ['pending', 'success'], true)) {
+                throw new RuntimeException(
+                    __('inventory.invalid_status')
+                );
+            }
+
             $order = Order::create([
                 'user_id'       => $toUserId,
                 'from_user_id'  => $fromUserId,
-                'seller_id'=>Auth::id(),
+                'seller_id'     => Auth::id(),
                 'status'        => $status,
                 'address'       => $address,
                 'total'         => 0,
@@ -63,6 +75,10 @@ class InventoryTransferService
 
                 $product = Product::findOrFail($productId);
 
+                /*
+                 * Lock the sender's inventory to prevent
+                 * concurrent transfers from using the same stock.
+                 */
                 $inventory = ProductUser::query()
                     ->where('user_id', $fromUserId)
                     ->where('product_id', $productId)
@@ -78,7 +94,7 @@ class InventoryTransferService
                 if ($inventory->quantity < $quantity) {
                     throw new RuntimeException(
                         __('inventory.insufficient_inventory', [
-                            'product'  => $product->translate()->title,
+                            'product'  => $product->translation->title,
                             'quantity' => $inventory->quantity,
                         ])
                     );
@@ -95,24 +111,15 @@ class InventoryTransferService
                 ]);
 
                 /*
-                 * Only the sender's inventory is decreased.
+                 * Reserve the stock by decreasing the sender's inventory.
                  *
-                 * The receiver's inventory will be increased
-                 * after the order is approved.
+                 * The receiver's inventory is NOT increased here.
                  */
                 ProductUser::decrease(
                     $fromUserId,
                     $productId,
                     $quantity
                 );
-
-                if($status == 'success') {
-                    ProductUser::increase(
-                        $toUserId,
-                        $productId,
-                        $quantity
-                    );
-                }
 
                 $total += $rowTotal;
                 $discountCalc += $quantity * $discountPerItem;
@@ -124,7 +131,9 @@ class InventoryTransferService
                 );
             }
 
-            $discountFinal = ($discount > 0) ? $discount : $discountCalc;
+            $discountFinal = $discount > 0
+                ? $discount
+                : $discountCalc;
 
             $order->update([
                 'total'       => $total,
@@ -139,20 +148,23 @@ class InventoryTransferService
 
     /**
      * Approve the order and transfer inventory to the receiver.
+     *
+     * The receiver's inventory is increased only once.
      */
     public function approve(Order $order): Order
     {
         return DB::transaction(function () use ($order) {
 
             $order = Order::query()
+                ->with('items')
                 ->lockForUpdate()
                 ->findOrFail($order->id);
 
             /*
              * Only pending orders can be approved.
              *
-             * This prevents inventory from being increased again
-             * if approve() is executed more than once.
+             * This prevents the receiver's inventory
+             * from being increased more than once.
              */
             if ($order->status !== 'pending') {
                 throw new RuntimeException(
@@ -160,10 +172,6 @@ class InventoryTransferService
                 );
             }
 
-            /*
-             * The sender must be known so that the inventory
-             * transfer can be tracked correctly.
-             */
             if (!$order->from_user_id) {
                 throw new RuntimeException(
                     __('inventory.from_user_not_defined')
@@ -189,9 +197,8 @@ class InventoryTransferService
         });
     }
 
-
     /**
-     * Reject the order and return the inventory to the sender.
+     * Reject the order and return the reserved inventory to the sender.
      */
     public function reject(Order $order): Order
     {
@@ -205,8 +212,8 @@ class InventoryTransferService
             /*
              * Only pending orders can be rejected.
              *
-             * This prevents the inventory from being returned
-             * more than once if reject() is executed again.
+             * This prevents the sender's inventory
+             * from being restored more than once.
              */
             if ($order->status !== 'pending') {
                 throw new RuntimeException(

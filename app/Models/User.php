@@ -2,7 +2,6 @@
 
 namespace App\Models;
 
-// use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -104,6 +103,19 @@ class User extends Authenticatable
         return $this->belongsToMany(Product::class, 'product_user')
             ->withPivot('quantity')
             ->withTimestamps();
+    }
+
+    public function commissions(): HasMany
+    {
+        return $this->hasMany(ReferralCommission::class);
+    }
+
+    public function paidCommissions(): HasMany
+    {
+        return $this->hasMany(
+            ReferralCommission::class,
+            'paid_by'
+        );
     }
 
     public function scopeRole($query, string|array $roles)

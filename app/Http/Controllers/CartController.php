@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Order;
 use App\Models\Product;
+use App\Models\ProductUser;
 use App\Models\User;
 use App\Services\CartService;
 use Illuminate\Contracts\View\View;
@@ -144,8 +145,11 @@ class CartController extends Controller
         $referrer = null;
 
         /*
-         * Validate referral code
-         */
+        |--------------------------------------------------------------------------
+        | Validate referral code
+        |--------------------------------------------------------------------------
+        */
+
         if ($request->filled('referral_code')) {
 
             $referrer = User::where(
@@ -161,9 +165,6 @@ class CartController extends Controller
                     ->withInput();
             }
 
-            /*
-             * Customer cannot use their own referral code.
-             */
             if ($referrer->id === auth()->id()) {
                 return back()
                     ->withErrors([
@@ -172,29 +173,74 @@ class CartController extends Controller
                     ->withInput();
             }
 
-            /*
-             * Fixed referral discount.
-             */
             $discount = 1_000_000;
+        }
+
+        /*
+        |--------------------------------------------------------------------------
+        | Find seller and wholesaler
+        |--------------------------------------------------------------------------
+        */
+
+        $sellerId = null;
+        $wholesalerId = null;
+
+        if ($referrer) {
+
+            // Find the latest order associated with this referrer
+            $lastOrder = Order::query()
+                ->where('moaref_id', $referrer->id)
+                ->whereNotNull('seller_id')
+                ->latest('id')
+                ->first();
+
+            if ($lastOrder) {
+                $sellerId = $lastOrder->seller_id;
+
+                // The wholesaler of the store
+                $seller = User::find($sellerId);
+
+                $wholesalerId = $seller?->wholesaler_id;
+            }
+        }
+
+        /*
+        |--------------------------------------------------------------------------
+        | Fallback to company/store account
+        |--------------------------------------------------------------------------
+        */
+
+        if (!$sellerId) {
+            $sellerId = config('shop.company_user_id');
         }
 
         $finalTotal = max(0, $total - $discount);
 
+        /*
+        |--------------------------------------------------------------------------
+        | Create order
+        |--------------------------------------------------------------------------
+        */
+
         $order = Order::create([
-            'user_id'      => auth()->id(),
-            'address'      => $request->address,
-            'status'       => 'pending',
+            'user_id'       => auth()->id(),
 
-            'total'        => $total,
-            'discount'     => $discount,
-            'final_total'  => $finalTotal,
+            'seller_id'     => $sellerId,
+            'wholesaler_id' => $wholesalerId,
+            'moaref_id'     => $referrer?->id,
 
-            'moaref_id'    => $referrer?->id,
+            'address'       => $request->address,
+            'postal_code'   => $request->postal_code,
 
-            'postal_code'  => $request->postal_code,
+            'status'        => 'pending',
+
+            'total'         => $total,
+            'discount'      => $discount,
+            'final_total'   => $finalTotal,
         ]);
 
         foreach ($cart->items as $item) {
+
             $order->items()->create([
                 'product_id' => $item->product_id,
                 'quantity'   => $item->quantity,

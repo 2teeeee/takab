@@ -96,18 +96,6 @@
 
                 </tr>
 
-                <tr>
-
-                    <th colspan="5" class="text-end text-danger">
-                        پورسانت
-                    </th>
-
-                    <th class="text-danger" id="discount">
-                        0
-                    </th>
-
-                </tr>
-
                 <tr class="table-success">
 
                     <th colspan="5" class="text-end">
@@ -144,7 +132,7 @@
 
     document.addEventListener('DOMContentLoaded', function () {
 
-        const discountPerProduct = 1000000;
+        const discountPerProduct = 0;
 
         function calculate() {
 
