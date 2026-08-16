@@ -62,4 +62,11 @@ return [
     'checkReferralCode' => 'التحقق من رمز الإحالة',
     'checking' => 'جارٍ التحقق...',
     'connectionError' => 'حدث خطأ في الاتصال بالخادم.',
+    'fix_errors' => 'يرجى تصحيح الأخطاء التالية.',
+    'namePlaceholder' => 'الاسم الكامل',
+    'mobilePlaceholder' => 'مثال: 09123456789',
+    'passwordPlaceholder' => 'أدخل كلمة المرور',
+    'confirmPasswordPlaceholder' => 'أعد إدخال كلمة المرور',
+    'showPassword' => 'إظهار كلمة المرور',
+    'already_registered' => 'لديك حساب بالفعل؟',
 ];

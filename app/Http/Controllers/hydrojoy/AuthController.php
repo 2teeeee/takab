@@ -21,18 +21,29 @@ class AuthController extends Controller
     public function authenticate(Request $request): RedirectResponse
     {
         $credentials = $request->validate([
-            'national_code' => ['required'],
-            'password' => ['required'],
+            'national_code' => ['required', 'string'],
+            'password' => ['required', 'string'],
+        ], [
+            'national_code.required' => __('auth.national_code_required'),
+            'password.required'      => __('auth.password_required'),
         ]);
 
-        if (Auth::attempt($credentials)) {
+        if (Auth::attempt(
+            [
+                'national_code' => $credentials['national_code'],
+                'password'      => $credentials['password'],
+            ],
+            $request->boolean('remember')
+        )) {
             $request->session()->regenerate();
 
             return redirect()->route('main.index');
         }
 
-        return back()->withErrors([
-            'national_code' => 'کاربری با این مشخصات وجود ندارد.',
-        ])->onlyInput('national_code');
+        return back()
+            ->withErrors([
+                'national_code' => __('auth.invalid_credentials'),
+            ])
+            ->onlyInput('national_code');
     }
 }

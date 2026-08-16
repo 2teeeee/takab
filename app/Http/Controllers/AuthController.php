@@ -21,25 +21,38 @@ class AuthController extends Controller
 
     public function register(Request $request, NikSmsService $sms): RedirectResponse
     {
-        $request->validate([
+        $validated = $request->validate([
             'name' => ['required', 'string', 'max:255'],
-            'mobile' => ['required', 'string', 'max:11', 'unique:'.User::class],
-            'password' => ['required', 'confirmed'],
+            'mobile' => [
+                'required',
+                'string',
+                'max:11',
+                'unique:users,mobile',
+            ],
+            'password' => [
+                'required',
+                'string',
+                'min:6',
+                'confirmed',
+            ],
         ]);
 
         $user = User::create([
-            'name' => $request->name,
-            'mobile' => $request->mobile,
-            'password' => Hash::make($request->password)
+            'name' => $validated['name'],
+            'mobile' => $validated['mobile'],
+            'password' => Hash::make($validated['password']),
         ]);
 
-        $sms->sendSingle($request->mobile, "به جمع تک آبی ها خوش آمدید.");
+        $sms->sendSingle(
+            $validated['mobile'],
+            'به جمع تک آبی ها خوش آمدید.'
+        );
 
         event(new Registered($user));
 
         Auth::login($user);
 
-        return redirect(route('main.index', absolute: false));
+        return redirect()->route('main.index');
     }
 
     public function login(): Response
@@ -54,18 +67,24 @@ class AuthController extends Controller
     public function authenticate(Request $request): RedirectResponse
     {
         $credentials = $request->validate([
-            'mobile' => ['required'],
-            'password' => ['required'],
+            'mobile' => ['required', 'string'],
+            'password' => ['required', 'string'],
+        ], [
+            'mobile.required' => __('auth.mobile_required'),
+            'password.required' => __('auth.password_required'),
         ]);
 
         if (Auth::attempt($credentials, $request->boolean('remember'))) {
             $request->session()->regenerate();
-            return redirect(route('admin.index', absolute: false));
+
+            return redirect()->route('admin.index');
         }
 
-        return back()->withErrors([
-            'mobile' => 'کاربری با این مشخصات وجود ندارد.',
-        ])->onlyInput('mobile');
+        return back()
+            ->withErrors([
+                'mobile' => __('auth.invalid_credentials'),
+            ])
+            ->onlyInput('mobile');
     }
 
     public function logout(Request $request): RedirectResponse

@@ -62,4 +62,11 @@ return [
     'checkReferralCode' => 'Check Referral Code',
     'checking' => 'Checking...',
     'connectionError' => 'Connection error.',
+    'fix_errors' => 'Please fix the following errors.',
+    'namePlaceholder' => 'Full name',
+    'mobilePlaceholder' => 'e.g. 09123456789',
+    'passwordPlaceholder' => 'Enter your password',
+    'confirmPasswordPlaceholder' => 'Confirm your password',
+    'showPassword' => 'Show password',
+    'already_registered' => 'Already registered?',
 ];
