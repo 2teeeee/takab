@@ -9,7 +9,7 @@
                 <div class="card border-0 shadow-sm rounded-4 overflow-hidden">
 
                     {{-- Header --}}
-                    <div class="text-center px-4 py-4">
+                    <div class="bg-main-light text-center px-4 py-4">
 
                         <div class="mb-3">
 
