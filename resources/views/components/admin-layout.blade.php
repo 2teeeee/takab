@@ -167,11 +167,19 @@
             <a href="{{ route('wholesaler.products') }}" class="{{ request()->routeIs('wholesaler.products.*') ? 'active' : '' }}">
                 درخواست خرید محصول
             </a>
+
+            <a href="{{ route('wholesaler.orders.purchases') }}" class="{{ request()->routeIs('wholesaler.orders.*') ? 'active' : '' }}">
+                لیست خریدهای عمده فروش
+            </a>
         @endif
 
         @if(auth()->user()->hasRole(['wholesaler', 'marketer']))
             <a href="{{ route('wholesaler.stores.index') }}" class="{{ request()->routeIs('wholesaler.stores.*') ? 'active' : '' }}">
                 فروش به فروشگاه
+            </a>
+
+            <a href="{{ route('wholesaler.sales.index') }}" class="{{ request()->routeIs('wholesaler.sales.*') ? 'active' : '' }}">
+                لیست فروش های عمده فروش
             </a>
         @endif
 
@@ -179,6 +187,17 @@
             <a href="{{ route('store.products') }}" class="{{ request()->routeIs('wholesaler.*') ? 'active' : '' }}">
                 خرید محصول
             </a>
+
+            <a href="{{ route('store.orders.purchases') }}" class="{{ request()->routeIs('store.orders.*') ? 'active' : '' }}">
+                لیست خریدهای فروشگاه
+            </a>
+
+            <a href="{{ route('store.sales.index') }}" class="{{ request()->routeIs('store.sales.*') ? 'active' : '' }}">
+                لیست فروش های فروشگاه
+            </a>
+        @endif
+
+        @if(auth()->user()->hasRole(['wholesaler', 'seller']))
         @endif
 
         @if(auth()->user()->hasRole(['admin', 'manager', 'personel']))
@@ -238,9 +257,11 @@
             <a href="{{ route('admin.periodic_services.index') }}" class="text-light d-block mb-2 text-decoration-none">دوره سرویس</a>
         @endif
         @if(auth()->user()->hasRole(['wholesaler']))
-                <a href="{{ route('wholesaler.products') }}" class="text-light d-block mb-2 text-decoration-none">درخواست خرید محصول</a>
-                <a href="{{ route('wholesaler.stores.index') }}" class="text-light d-block mb-2 text-decoration-none">فروش به فروشگاه</a>
-            @endif
+            <a href="{{ route('wholesaler.products') }}" class="text-light d-block mb-2 text-decoration-none">درخواست خرید محصول</a>
+            <a href="{{ route('wholesaler.stores.index') }}" class="text-light d-block mb-2 text-decoration-none">فروش به فروشگاه</a>
+            <a href="{{ route('wholesaler.orders.purchases') }}" class="text-light d-block mb-2 text-decoration-none">لیست خریدهای عمده فروش</a>
+            <a href="{{ route('wholesaler.sales.index') }}" class="text-light d-block mb-2 text-decoration-none">لیست فروش های عمده فروش</a>
+        @endif
         <hr class="border-secondary">
 
         <a href="{{ route('main.index') }}" class="text-light d-block mb-2 text-decoration-none">🏠 داشبورد</a>

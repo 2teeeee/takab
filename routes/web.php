@@ -24,6 +24,7 @@ use App\Http\Controllers\StoreSaleController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\UserInstallRequestController;
 use App\Http\Controllers\WholesaleProductController;
+use App\Http\Controllers\WholesalerSaleController;
 use App\Http\Controllers\ZarinpalController;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Session;
@@ -150,6 +151,8 @@ Route::middleware(['auth'])->prefix('wholesaler')->name('wholesaler.')->group(fu
     Route::middleware(['role:wholesaler'])->group(function () {
         Route::get('/products', [WholesaleProductController::class, 'index'])->name('products');
         Route::post('/products', [WholesaleProductController::class, 'store'])->name('products.store');
+        Route::get('/orders/purchases', [OrderController::class, 'purchases'])->name('orders.purchases');
+        Route::get('/sales', [ WholesalerSaleController::class, 'index'])->name('sales.index');
     });
 
     Route::middleware(['role:wholesaler,marketer'])->group(function () {
@@ -162,6 +165,8 @@ Route::middleware(['auth'])->prefix('wholesaler')->name('wholesaler.')->group(fu
 Route::middleware(['auth','role:admin,seller'])->prefix('store')->name('store.')->group(function () {
     Route::get('/products', [StoreProductController::class, 'index'])->name('products');
     Route::post('/products', [StoreProductController::class, 'store'])->name('products.store');
+    Route::get('/orders/purchases', [OrderController::class, 'purchases'])->name('orders.purchases');
+    Route::get('/sales', [StoreSaleController::class, 'sales'])->name('sales.index');
 
     Route::get('customers/{customer}/sale', [CustomerSaleController::class, 'create'])->name('customers.sale');
     Route::post('customers/{customer}/sale', [CustomerSaleController::class, 'store'])->name('customers.sale.store');

@@ -256,4 +256,64 @@ TEXT;
             $message
         );
     }
+
+    public function purchases(Request $request): View
+    {
+        $user = auth()->user();
+
+        $query = Order::query()
+            ->with([
+                'user',
+                'fromUser',
+                'wholesaler',
+                'seller',
+                'items.product.translation',
+            ])
+            ->where('user_id', $user->id)
+            ->whereNotNull('from_user_id');
+
+        /*
+        |--------------------------------------------------------------------------
+        | Search
+        |--------------------------------------------------------------------------
+        */
+
+        if ($request->filled('search')) {
+
+            $search = trim($request->search);
+
+            $query->where(function ($q) use ($search) {
+
+                $q->where('id', $search)
+
+                    ->orWhereHas('fromUser', function ($q) use ($search) {
+                        $q->where('name', 'LIKE', "%{$search}%")
+                            ->orWhere('mobile', 'LIKE', "%{$search}%");
+                    })
+
+                    ->orWhereHas('wholesaler', function ($q) use ($search) {
+                        $q->where('name', 'LIKE', "%{$search}%")
+                            ->orWhere('mobile', 'LIKE', "%{$search}%");
+                    });
+
+            });
+        }
+
+        /*
+        |--------------------------------------------------------------------------
+        | Status filter
+        |--------------------------------------------------------------------------
+        */
+
+        if ($request->filled('status')) {
+            $query->where('status', $request->status);
+        }
+
+        $orders = $query
+            ->latest()
+            ->paginate(15)
+            ->withQueryString();
+
+        return view('orders.purchases', compact('orders'));
+    }
 }

@@ -110,4 +110,51 @@ class StoreSaleController extends Controller
             ->route('wholesaler.stores.index')
             ->with('success','سفارش ثبت شد.');
     }
+
+    public function sales(Request $request): View
+    {
+        $storeId = auth()->id();
+
+        $query = Order::with([
+            'user',
+            'items.product.translation',
+        ])
+            ->where('seller_id', $storeId)
+            ->where('seller_role', 'store')
+            ->latest();
+
+        // جستجو
+        if ($request->filled('search')) {
+
+            $search = trim($request->search);
+
+            $query->where(function ($q) use ($search) {
+
+                $q->where('id', $search)
+
+                    ->orWhereHas('user', function ($userQuery) use ($search) {
+
+                        $userQuery
+                            ->where('name', 'LIKE', "%{$search}%")
+                            ->orWhere('mobile', 'LIKE', "%{$search}%");
+
+                    });
+
+            });
+        }
+
+        // وضعیت
+        if ($request->filled('status')) {
+            $query->where('status', $request->status);
+        }
+
+        $orders = $query
+            ->paginate(15)
+            ->withQueryString();
+
+        return view(
+            'store.sales.index',
+            compact('orders')
+        );
+    }
 }
