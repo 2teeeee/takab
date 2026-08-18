@@ -146,9 +146,7 @@
 
                                 <td>
 
-                                    <span class="badge bg-{{ $order->status_color }}">
-                                        {{ __('orders.status.' . $order->status) }}
-                                    </span>
+                                    <x-status_badge status="{{ $order->status }}" />
 
                                 </td>
 

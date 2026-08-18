@@ -93,7 +93,6 @@ class CustomerSaleController extends Controller
             fromUserId: $store->id,
             toUserId: $customer->id,
             products: $request->products,
-            status: 'success',
             address: $request->address,
             discount: $discount
         );
@@ -105,8 +104,11 @@ class CustomerSaleController extends Controller
         $order->update([
             'seller_id'     => $store->id,
             'wholesaler_id' => $wholesalerId,
+            'seller_role'   => 'store',
             'moaref_id'     => $referrerId,
         ]);
+
+        $inventoryTransferService->approve($order);
 
         $this->commissionService->createForOrder($order);
 

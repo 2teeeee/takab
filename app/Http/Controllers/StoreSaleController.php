@@ -98,13 +98,21 @@ class StoreSaleController extends Controller
                 ->withInput();
         }
 
-        $inventoryTransferService->transfer(
+        $wholesalerId = $store->registered_by;
+
+        $order = $inventoryTransferService->transfer(
             fromUserId: auth()->id(),
             toUserId: $store->id,
             products: $request->products,
-            status: 'success',
             address: $request->address
         );
+
+        $order->update([
+            'wholesaler_id' => $wholesalerId,
+            'seller_role' => 'wholesaler'
+        ]);
+
+        $inventoryTransferService->approve($order);
 
         return redirect()
             ->route('wholesaler.stores.index')

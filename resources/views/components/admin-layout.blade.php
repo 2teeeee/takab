@@ -413,8 +413,7 @@
         @if($user->hasRole([
             'admin',
             'manager',
-            'personel',
-            'seller'
+            'personel'
         ]))
 
             <a
@@ -729,8 +728,7 @@
         @if($user->hasRole([
             'admin',
             'manager',
-            'personel',
-            'seller'
+            'personel'
         ]))
 
             <a

@@ -49,7 +49,7 @@ class WholesaleProductController extends Controller
             'products' => 'required|array',
         ]);
 
-        $inventoryTransferService->transfer(
+        $order = $inventoryTransferService->transfer(
             fromUserId: config('shop.company_user_id'),
             toUserId: auth()->id(),
             products: $request->products

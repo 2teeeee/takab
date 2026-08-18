@@ -48,11 +48,16 @@ class StoreProductController extends Controller
             'products' => 'required|array',
         ]);
 
-        $inventoryTransferService->transfer(
+        $order = $inventoryTransferService->transfer(
             fromUserId: auth()->user()->registered_by,
             toUserId: auth()->id(),
             products: $request->products
         );
+
+        $order->update([
+            'wholesaler_id' => auth()->user()->registered_by,
+            'seller_role' => 'wholesaler'
+        ]);
 
         return redirect()
             ->route('store.products')

@@ -16,7 +16,7 @@ class WholesalerSaleController extends Controller
             'user',
             'items.product.translation',
         ])
-            ->where('seller_id', $wholesalerId)
+            ->where('wholesaler_id', $wholesalerId)
             ->where('seller_role', 'wholesaler')
             ->latest();
 
