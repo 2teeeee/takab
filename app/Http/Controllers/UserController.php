@@ -8,9 +8,11 @@ use App\Models\Role;
 use App\Models\User;
 use App\Services\Sms\NikSmsService;
 use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Database\QueryException;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\View\View;
 use Throwable;
@@ -73,37 +75,109 @@ class UserController extends Controller
     public function store(Request $request, NikSmsService $sms): RedirectResponse
     {
         $validated = $request->validate([
-            'name' => 'required|string|max:255',
-            'mobile' => 'required|unique:users,mobile',
-            'password' => 'required|string|min:6',
-            'national_code' => 'required|string|min:10|max:10',
-            'moaref_id' => 'nullable',
-            'roles' => 'required|array',
-            'roles.*' => 'exists:roles,id',
+            'name' => ['required', 'string', 'max:255'],
+
+            'mobile' => [
+                'required',
+                'string',
+                'max:11',
+                'unique:users,mobile',
+            ],
+
+            'password' => [
+                'required',
+                'string',
+                'min:6',
+            ],
+
+            'national_code' => [
+                'required',
+                'string',
+                'digits:10',
+                'unique:users,national_code',
+            ],
+
+            'moaref_id' => [
+                'nullable',
+                'exists:users,id',
+            ],
+
+            'roles' => [
+                'required',
+                'array',
+                'min:1',
+            ],
+
+            'roles.*' => [
+                'exists:roles,id',
+            ],
         ]);
 
-        $user = User::create([
-            'name' => $validated['name'],
-            'mobile' => $validated['mobile'],
-            'password' => Hash::make($validated['password']),
-            'national_code' => $validated['national_code'],
-            'registered_by'=> Auth::id(),
-            'wholesaler_id' => Auth::user()->hasRole(['wholesaler']) ? Auth::id() : Auth::user()->wholesaler_id
-        ]);
+        try {
 
-        $user->save();
+            $user = DB::transaction(function () use ($validated) {
 
-        if (!empty($validated['roles'])) {
-            $user->roles()->sync($validated['roles']);
+                $authUser = Auth::user();
+
+                $user = User::create([
+                    'name' => $validated['name'],
+                    'mobile' => $validated['mobile'],
+                    'password' => Hash::make($validated['password']),
+                    'national_code' => $validated['national_code'],
+
+                    'registered_by' => $authUser->id,
+
+                    'wholesaler_id' => $authUser->hasRole('wholesaler')
+                        ? $authUser->id
+                        : $authUser->wholesaler_id,
+
+                    'moaref_id' => $validated['moaref_id'] ?? null,
+                ]);
+
+                $user->roles()->sync($validated['roles']);
+
+                $user->update([
+                    'moaref_code' => $user->generateMoarefCode(),
+                ]);
+
+                return $user;
+            });
+
+        } catch (QueryException $e) {
+
+            /*
+             * Unique constraint violation
+             *
+             * این قسمت مهم است:
+             * حتی اگر دو درخواست همزمان ارسال شوند،
+             * دیتابیس اجازه ساخت رکورد تکراری نمی‌دهد.
+             */
+            if ($e->getCode() === '23000') {
+
+                return back()
+                    ->withErrors([
+                        'mobile' => 'شماره موبایل یا کد ملی قبلاً در سیستم ثبت شده است.',
+                    ])
+                    ->withInput();
+            }
+
+            throw $e;
         }
 
-        $user->update([
-            'moaref_code' => $user->generateMoarefCode(),
-        ]);
+        /*
+         * SMS را بعد از موفقیت کامل Transaction ارسال می‌کنیم.
+         */
+        $sms->sendSingle(
+            $user->mobile,
+            "به جمع تک آبی ها خوش آمدید."
+            . "\n"
+            . "کد معرف شما: "
+            . $user->moaref_code
+        );
 
-        $sms->sendSingle($request->mobile, "به جمع تک آبی ها خوش آمدید."."\n"."کد معرف شما:".$user->moaref_code);
-
-        return redirect()->route('admin.users.index')->with('success', 'کاربر با موفقیت ایجاد شد.');
+        return redirect()
+            ->route('admin.users.index')
+            ->with('success', 'کاربر با موفقیت ایجاد شد.');
     }
 
     public function edit(User $user): View

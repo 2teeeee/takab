@@ -101,7 +101,7 @@
             <a href="{{ route('admin.users.index') }}" class="btn btn-outline-secondary px-4">
                 <i class="bi bi-arrow-right"></i> بازگشت
             </a>
-            <button type="submit" class="btn btn-success px-4">
+            <button type="submit" id="submit-user" class="btn btn-success px-4">
                 <i class="bi bi-check2-circle"></i> ذخیره
             </button>
         </div>
