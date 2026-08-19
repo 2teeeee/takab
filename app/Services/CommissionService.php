@@ -4,11 +4,17 @@ namespace App\Services;
 
 use App\Models\Order;
 use App\Models\ReferralCommission;
+use App\Services\Sms\NikSmsService;
 use Illuminate\Support\Facades\DB;
 use RuntimeException;
 
 class CommissionService
 {
+    public function __construct(
+        protected NikSmsService $sms
+    ) {
+    }
+
     /**
      * Create all commissions related to an order.
      *
@@ -215,5 +221,65 @@ class CommissionService
             'paid_by'   => $isPaid ? auth()->id() : null,
             'note'      => $note,
         ]);
+    }
+
+    /**
+     * Send SMS to users who received commission from the order.
+     */
+    public function sendCommissionSms(Order $order): void
+    {
+        $commissions = ReferralCommission::query()
+            ->with('user')
+            ->where('order_id', $order->id)
+            ->where('type', '!=', 'customer_discount')
+            ->get();
+
+        foreach ($commissions as $commission) {
+
+            if (!$commission->user) {
+                continue;
+            }
+
+            if (!$commission->user->mobile) {
+                continue;
+            }
+
+            $message = $this->commissionMessage(
+                $commission,
+                $order
+            );
+
+            $this->sms->sendSingle(
+                $commission->user->mobile,
+                $message
+            );
+        }
+    }
+
+
+    /**
+     * Generate SMS message based on commission type.
+     */
+    protected function commissionMessage(
+        ReferralCommission $commission,
+        Order $order
+    ): string {
+
+        $amount = number_format($commission->amount);
+
+        return match ($commission->type) {
+
+            'wholesaler' =>
+            "همکار گرامی، مبلغ {$amount} تومان کمیسیون شما بابت سفارش شماره {$order->id} ثبت شد.",
+
+            'store' =>
+            "فروشگاه گرامی، مبلغ {$amount} تومان کمیسیون فروش شما بابت سفارش شماره {$order->id} ثبت شد.",
+
+            'referral' =>
+            "معرف گرامی، مبلغ {$amount} تومان کمیسیون معرفی شما بابت سفارش شماره {$order->id} ثبت شد.",
+
+            default =>
+            "کمیسیون مبلغ {$amount} تومان بابت سفارش شماره {$order->id} برای شما ثبت شد.",
+        };
     }
 }

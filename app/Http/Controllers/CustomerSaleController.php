@@ -71,8 +71,7 @@ class CustomerSaleController extends Controller
         $wholesalerId = $store->registered_by;
 
         /*
-         * In this sales flow, the store is also considered
-         * the referrer.
+         * In this sales flow, the store is also the referrer.
          */
         $referrerId = $store->id;
 
@@ -97,10 +96,6 @@ class CustomerSaleController extends Controller
             discount: $discount
         );
 
-        /*
-         * Store seller, wholesaler and referrer information
-         * directly on the order.
-         */
         $order->update([
             'seller_id'     => $store->id,
             'wholesaler_id' => $wholesalerId,
@@ -110,7 +105,15 @@ class CustomerSaleController extends Controller
 
         $inventoryTransferService->approve($order);
 
+        /*
+         * Create commissions.
+         */
         $this->commissionService->createForOrder($order);
+
+        /*
+         * Send commission SMS notifications.
+         */
+        $this->commissionService->sendCommissionSms($order);
 
         return redirect()
             ->route('admin.orders.index')

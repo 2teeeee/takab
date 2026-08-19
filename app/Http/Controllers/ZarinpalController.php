@@ -63,6 +63,11 @@ class ZarinpalController extends Controller
 
             $this->commissionService->createForOrder($order);
 
+            /*
+             * Send commission SMS notifications.
+             */
+            $this->commissionService->sendCommissionSms($order);
+
             $this->cartService->clear();
 
             return view('payment.success', ['order' => $order, 'ref_id' => $result['ref_id']]);
