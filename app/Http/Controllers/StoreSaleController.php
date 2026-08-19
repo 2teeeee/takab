@@ -49,19 +49,51 @@ class StoreSaleController extends Controller
     public function create(User $store): View
     {
         $locale = app()->getLocale();
+        $user = auth()->user();
+
+        /*
+         * تعیین عمده فروش
+         *
+         * عمده فروش:
+         * خودش صاحب موجودی است.
+         *
+         * بازاریاب:
+         * موجودی را از عمده فروش خودش دریافت می‌کند.
+         */
+        $wholesalerId = match (true) {
+
+            $user->hasRole('wholesaler') => $user->id,
+
+            $user->hasRole('marketer') => $user->wholesaler_id,
+
+            default => null,
+        };
+
+        if (!$wholesalerId) {
+            abort(403, 'عمده فروش برای این کاربر مشخص نشده است.');
+        }
 
         $products = ProductUser::query()
-            ->where('product_user.user_id',auth()->id())
-            ->where('product_user.quantity','>',0)
-            ->join('products','products.id','=','product_user.product_id')
-            ->join('product_translations as t',function($join) use($locale){
-                $join->on('t.product_id','=','products.id')
-                    ->where('t.locale',$locale);
+            ->where('product_user.user_id', $wholesalerId)
+            ->where('product_user.quantity', '>', 0)
+
+            ->join(
+                'products',
+                'products.id',
+                '=',
+                'product_user.product_id'
+            )
+
+            ->join('product_translations as t', function ($join) use ($locale) {
+                $join->on('t.product_id', '=', 'products.id')
+                    ->where('t.locale', $locale);
             })
-            ->join('product_images as image',function($join){
-                $join->on('image.product_id','=','products.id')
-                    ->where('image.is_main',1);
+
+            ->join('product_images as image', function ($join) {
+                $join->on('image.product_id', '=', 'products.id')
+                    ->where('image.is_main', 1);
             })
+
             ->select([
                 'products.id',
                 't.title',
@@ -69,10 +101,12 @@ class StoreSaleController extends Controller
                 'image.small_image_name',
                 'product_user.quantity as stock',
             ])
+
             ->get();
 
         return view(
-            'wholesaler.store.sale',compact('store','products')
+            'wholesaler.store.sale',
+            compact('store', 'products')
         );
     }
 
@@ -80,15 +114,15 @@ class StoreSaleController extends Controller
         Request $request,
         User $store,
         InventoryTransferService $inventoryTransferService
-    ): RedirectResponse
-    {
+    ): RedirectResponse {
+
         $request->validate([
             'address' => ['required', 'string', 'max:1000'],
             'products' => ['required', 'array'],
         ]);
 
         $selected = collect($request->products)
-            ->filter(fn ($q) => $q > 0);
+            ->filter(fn ($q) => (int) $q > 0);
 
         if ($selected->isEmpty()) {
             return back()
@@ -98,25 +132,43 @@ class StoreSaleController extends Controller
                 ->withInput();
         }
 
-        $wholesalerId = $store->registered_by;
+        $user = auth()->user();
+
+        if ($user->hasRole('wholesaler')) {
+            $wholesalerId = $user->id;
+        } elseif ($user->hasRole('marketer')) {
+            $wholesalerId = $user->wholesaler_id;
+            if (!$wholesalerId) {
+                return back()
+                    ->withErrors([
+                        'products' => 'عمده فروش مربوط به بازاریاب مشخص نشده است.'
+                    ])
+                    ->withInput();
+            }
+        } else {
+            abort(403);
+        }
 
         $order = $inventoryTransferService->transfer(
-            fromUserId: auth()->id(),
+            fromUserId: $wholesalerId,
             toUserId: $store->id,
             products: $request->products,
-            address: $request->address
+            address: $request->address,
         );
 
         $order->update([
             'wholesaler_id' => $wholesalerId,
-            'seller_role' => 'wholesaler'
+            'seller_id' => $user->id,
+            'seller_role' => 'wholesaler',
         ]);
 
-        $inventoryTransferService->approve($order);
+        if ($user->hasRole('wholesaler')) {
+            $inventoryTransferService->approve($order);
+        }
 
         return redirect()
             ->route('wholesaler.stores.index')
-            ->with('success','سفارش ثبت شد.');
+            ->with('success', 'سفارش ثبت شد.');
     }
 
     public function sales(Request $request): View
