@@ -172,7 +172,7 @@ class CommissionService
             return;
         }
 
-        $amount = $this->calculateCommissionAmount($order);
+        $amount = $order->discount;
 
         if ($amount <= 0) {
             return;
@@ -234,52 +234,67 @@ class CommissionService
             ->where('type', '!=', 'customer_discount')
             ->get();
 
-        foreach ($commissions as $commission) {
+        /*
+         * Group commissions by user.
+         * If one user has multiple commissions,
+         * only one SMS will be sent.
+         */
+        $commissions
+            ->filter(fn ($commission) =>
+                $commission->user &&
+                !empty($commission->user->mobile)
+            )
+            ->groupBy('user_id')
+            ->each(function ($userCommissions) use ($order) {
 
-            if (!$commission->user) {
-                continue;
-            }
+                $user = $userCommissions->first()->user;
 
-            if (!$commission->user->mobile) {
-                continue;
-            }
+                $message = $this->commissionMessage(
+                    $userCommissions,
+                    $order
+                );
 
-            $message = $this->commissionMessage(
-                $commission,
-                $order
-            );
-
-            $this->sms->sendSingle(
-                $commission->user->mobile,
-                $message
-            );
-        }
+                $this->sms->sendSingle(
+                    $user->mobile,
+                    $message
+                );
+            });
     }
 
-
-    /**
-     * Generate SMS message based on commission type.
-     */
     protected function commissionMessage(
-        ReferralCommission $commission,
+        $commissions,
         Order $order
     ): string {
 
-        $amount = number_format($commission->amount);
+        $lines = [];
+        $total = 0;
 
-        return match ($commission->type) {
+        foreach ($commissions as $commission) {
 
-            'wholesaler' =>
-            "همکار گرامی، مبلغ {$amount} تومان کمیسیون شما بابت سفارش شماره {$order->id} ثبت شد.",
+            $amount = (int) $commission->amount;
+            $total += $amount;
 
-            'store' =>
-            "فروشگاه گرامی، مبلغ {$amount} تومان کمیسیون فروش شما بابت سفارش شماره {$order->id} ثبت شد.",
+            $label = match ($commission->type) {
 
-            'referral' =>
-            "معرف گرامی، مبلغ {$amount} تومان کمیسیون معرفی شما بابت سفارش شماره {$order->id} ثبت شد.",
+                'wholesaler' => 'کمیسیون عمده‌فروشی',
 
-            default =>
-            "کمیسیون مبلغ {$amount} تومان بابت سفارش شماره {$order->id} برای شما ثبت شد.",
-        };
+                'store' => 'کمیسیون فروشگاه',
+
+                'referral' => 'کمیسیون معرفی',
+
+                default => 'کمیسیون',
+            };
+
+            $lines[] = "{$label}: "
+                . number_format($amount)
+                . " تومان";
+        }
+
+        $totalFormatted = number_format($total);
+
+        return "کاربر گرامی،\n"
+            . "کمیسیون‌های شما بابت سفارش شماره {$order->id} ثبت شد.\n"
+            . implode("\n", $lines)
+            . "\nمجموع: {$totalFormatted} تومان";
     }
 }
