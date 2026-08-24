@@ -69,4 +69,33 @@ return [
     'confirmPasswordPlaceholder' => 'Confirm your password',
     'showPassword' => 'Show password',
     'already_registered' => 'Already registered?',
+    'installers_list' => 'Installers List',
+    'add_installer' => 'Add New Installer',
+
+    'clear_search' => 'Clear Search',
+
+    'search_installer_placeholder' =>
+        'Search by name, mobile or national code...',
+
+    'national_code' => 'National Code',
+    'status' => 'Status',
+    'experience' => 'Experience',
+    'actions' => 'Actions',
+
+    'approved' => 'Approved',
+    'rejected' => 'Rejected',
+    'pending' => 'Pending Review',
+    'unknown' => 'Unknown',
+
+    'years' => 'years',
+    'not_set' => 'Not set',
+
+    'edit' => 'Edit',
+    'view' => 'View',
+
+    'confirm_delete_installer' =>
+        'Are you sure you want to delete this installer?',
+
+    'no_installers_found' =>
+        'No installers found.',
 ];

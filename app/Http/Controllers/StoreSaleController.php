@@ -19,8 +19,7 @@ class StoreSaleController extends Controller
     {
         $authUser = Auth::user();
 
-        $storesQuery = User::query()
-            ->role('seller'); // فقط فروشگاه‌ها
+         // فقط فروشگاه‌ها
 
         if (!$authUser->hasRole(['admin', 'manager', 'personel'])) {
             $storesQuery->where('registered_by', $authUser->id);

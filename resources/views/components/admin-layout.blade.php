@@ -392,7 +392,7 @@
             'wholesaler',
             'seller',
             'marketer',
-            'nasab'
+            'installer'
         ]))
 
             <a
@@ -551,11 +551,19 @@
              Services
         ====================================================== --}}
 
-        @if($isStaff)
+        @if($isStaff || $isWholesaler)
 
             <div class="sidebar-section-title">
                 خدمات
             </div>
+
+            <a
+                    href="{{ route('admin.installers.index') }}"
+                    class="{{ request()->routeIs('admin.installers.*') ? 'active' : '' }}"
+            >
+                <i class="bi bi-tools"></i>
+                <span>نصاب ها</span>
+            </a>
 
             <a
                     href="{{ route('admin.install_requests.index') }}"
@@ -707,7 +715,7 @@
             'wholesaler',
             'seller',
             'marketer',
-            'nasab'
+            'installer'
         ]))
 
             <hr class="border-secondary">
@@ -841,13 +849,21 @@
 
         {{-- Services --}}
 
-        @if($isStaff)
+        @if($isStaff || $isWholesaler)
 
             <hr class="border-secondary">
 
             <div class="text-secondary small px-2 mb-2">
                 خدمات
             </div>
+
+            <a
+                    href="{{ route('admin.installers.index') }}"
+                    class="mobile-menu-link {{ request()->routeIs('admin.installers.*') ? 'active' : '' }}"
+            >
+                <i class="bi bi-tools"></i>
+                <span>نصاب ها</span>
+            </a>
 
             <a
                     href="{{ route('admin.install_requests.index') }}"

@@ -6,6 +6,7 @@ use App\Http\Controllers\CartController;
 use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\CommissionController;
 use App\Http\Controllers\CustomerSaleController;
+use App\Http\Controllers\InstallerController;
 use App\Http\Controllers\InstallRequestController;
 use App\Http\Controllers\InstallScheduleController;
 use App\Http\Controllers\InventoryController;
@@ -307,7 +308,7 @@ Route::middleware('auth')
     ->group(function () {
 
         Route::middleware([
-            'role:admin,manager,nasab,wholesaler,marketer,seller,personel'
+            'role:admin,manager,installer,wholesaler,marketer,seller,personel'
         ])->group(function () {
 
 
@@ -426,6 +427,29 @@ Route::middleware('auth')
 
                 });
 
+
+            /*
+            |--------------------------------------------------------------------------
+            | Installers
+            |--------------------------------------------------------------------------
+            */
+
+            Route::resource(
+                'installers',
+                InstallerController::class
+            )->parameters([
+                'installers' => 'user',
+            ]);
+
+            Route::patch(
+                '/installers/{user}/approve',
+                [InstallerController::class, 'approve']
+            )->name('installers.approve');
+
+            Route::patch(
+                '/installers/{user}/reject',
+                [InstallerController::class, 'reject']
+            )->name('installers.reject');
 
             /*
             |--------------------------------------------------------------------------

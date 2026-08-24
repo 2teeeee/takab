@@ -69,4 +69,33 @@ return [
     'confirmPasswordPlaceholder' => 'أعد إدخال كلمة المرور',
     'showPassword' => 'إظهار كلمة المرور',
     'already_registered' => 'لديك حساب بالفعل؟',
+    'installers_list' => 'قائمة الفنيين',
+    'add_installer' => 'إضافة فني جديد',
+
+    'clear_search' => 'مسح البحث',
+
+    'search_installer_placeholder' =>
+        'البحث حسب الاسم أو رقم الهاتف أو الرقم الوطني...',
+
+    'national_code' => 'الرقم الوطني',
+    'status' => 'الحالة',
+    'experience' => 'الخبرة',
+    'actions' => 'الإجراءات',
+
+    'approved' => 'تمت الموافقة',
+    'rejected' => 'مرفوض',
+    'pending' => 'قيد المراجعة',
+    'unknown' => 'غير معروف',
+
+    'years' => 'سنوات',
+    'not_set' => 'غير محدد',
+
+    'edit' => 'تعديل',
+    'view' => 'عرض',
+
+    'confirm_delete_installer' =>
+        'هل أنت متأكد من حذف هذا الفني؟',
+
+    'no_installers_found' =>
+        'لم يتم العثور على فنيين.',
 ];

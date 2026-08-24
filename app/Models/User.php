@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 
@@ -118,6 +119,21 @@ class User extends Authenticatable
         );
     }
 
+    public function installer(): HasOne
+    {
+        return $this->hasOne(Installer::class);
+    }
+
+    public function installers(): BelongsToMany
+    {
+        return $this->belongsToMany(
+            Installer::class,
+            'installer_wholesaler',
+            'wholesaler_id',
+            'installer_id'
+        )->withTimestamps();
+    }
+
     public function scopeRole($query, string|array $roles)
     {
         $roles = is_array($roles) ? $roles : [$roles];
@@ -167,7 +183,7 @@ class User extends Authenticatable
             $prefix = 'S';
         } elseif ($this->hasRole('marketer')) {
             $prefix = 'K';
-        } elseif ($this->hasRole('nasab')) {
+        } elseif ($this->hasRole('installer')) {
             $prefix = 'N';
         } elseif ($this->hasRole('user')) {
             $prefix = 'C';

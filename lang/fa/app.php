@@ -77,4 +77,33 @@ return [
     'confirmPasswordPlaceholder' => 'رمز عبور را دوباره وارد کنید',
     'showPassword' => 'نمایش رمز عبور',
     'already_registered' => 'قبلاً ثبت‌نام کرده‌اید؟',
+    'installers_list' => 'لیست نصاب‌ها',
+    'add_installer' => 'افزودن نصاب جدید',
+
+    'clear_search' => 'حذف جستجو',
+
+    'search_installer_placeholder' =>
+        'جستجو بر اساس نام، موبایل یا کد ملی...',
+
+    'national_code' => 'کد ملی',
+    'status' => 'وضعیت',
+    'experience' => 'سابقه',
+    'actions' => 'عملیات',
+
+    'approved' => 'تأیید شده',
+    'rejected' => 'رد شده',
+    'pending' => 'در انتظار بررسی',
+    'unknown' => 'نامشخص',
+
+    'years' => 'سال',
+    'not_set' => 'ثبت نشده',
+
+    'edit' => 'ویرایش',
+    'view' => 'مشاهده',
+
+    'confirm_delete_installer' =>
+        'آیا از حذف این نصاب اطمینان دارید؟',
+
+    'no_installers_found' =>
+        'هیچ نصابی یافت نشد.',
 ];
