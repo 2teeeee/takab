@@ -10,10 +10,10 @@ use Illuminate\Database\Eloquent\Relations\HasOne;
 
 class InstallRequest extends Model
 {
-    use HasFactory;
-
     protected $fillable = [
         'user_id',
+        'order_id',
+        'wholesaler_id',
         'device_model',
         'serial_number',
         'address',
@@ -25,24 +25,23 @@ class InstallRequest extends Model
         'installation_date' => 'datetime',
     ];
 
-    // --- روابط ---
-    public function user(): BelongsTo
+    public function user()
     {
         return $this->belongsTo(User::class);
     }
 
-    public function schedule(): HasOne
+    public function order()
     {
-        return $this->hasOne(InstallSchedule::class);
+        return $this->belongsTo(Order::class);
     }
 
-    public function schedules(): HasMany
+    public function wholesaler()
     {
-        return $this->hasMany(InstallSchedule::class, 'install_request_id');
+        return $this->belongsTo(User::class, 'wholesaler_id');
     }
 
-    public function periodicService(): HasOne
+    public function schedules()
     {
-        return $this->hasOne(PeriodicService::class);
+        return $this->hasMany(InstallSchedule::class);
     }
 }

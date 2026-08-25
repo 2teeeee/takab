@@ -161,6 +161,16 @@
                                     {{ __('app.view') }}
                                 </a>
 
+                                @if($status === 'approved')
+                                <a
+                                        href="{{ route('admin.installers.wholesalers', $user) }}"
+                                        class="btn btn-sm btn-info"
+                                >
+                                    <i class="bi bi-link-45deg"></i>
+                                    {{ __('installers.actions.wholesalers') }}
+                                </a>
+                                @endif
+
                             </div>
 
                         </td>

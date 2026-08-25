@@ -8,8 +8,6 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class InstallSchedule extends Model
 {
-    use HasFactory;
-
     protected $fillable = [
         'installer_id',
         'install_request_id',
@@ -21,14 +19,16 @@ class InstallSchedule extends Model
         'scheduled_date' => 'date',
     ];
 
-    // --- روابط ---
-    public function installer(): BelongsTo
+    public function installer()
     {
-        return $this->belongsTo(User::class, 'installer_id');
+        return $this->belongsTo(Installer::class);
     }
 
-    public function installRequest(): BelongsTo
+    public function installRequest()
     {
-        return $this->belongsTo(InstallRequest::class);
+        return $this->belongsTo(
+            InstallRequest::class,
+            'install_request_id'
+        );
     }
 }

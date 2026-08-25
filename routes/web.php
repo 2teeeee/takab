@@ -451,11 +451,31 @@ Route::middleware('auth')
                 [InstallerController::class, 'reject']
             )->name('installers.reject');
 
+            Route::get(
+                '/installers/{user}/wholesalers',
+                [InstallerController::class, 'wholesalers']
+            )->name('installers.wholesalers');
+
+            Route::put(
+                '/installers/{user}/wholesalers',
+                [InstallerController::class, 'syncWholesalers']
+            )->name('installers.wholesalers.sync');
+
             /*
             |--------------------------------------------------------------------------
             | Installation
             |--------------------------------------------------------------------------
             */
+
+            Route::get(
+                '/install_requests/create/{order}',
+                [InstallRequestController::class, 'createFromOrder']
+            )->name('install_requests.create_from_order');
+
+            Route::post(
+                '/install_requests/create/{order}',
+                [InstallRequestController::class, 'storeFromOrder']
+            )->name('install_requests.store_from_order');
 
             Route::resource(
                 'install_requests',

@@ -81,6 +81,15 @@
                                    class="btn btn-sm btn-outline-primary">
                                     مشاهده
                                 </a>
+
+                                @if(($order->status === 'completed' || $order->status === 'success') &&
+                                    $order->user->hasRole(['user']))
+                                    <a href="{{ route('admin.install_requests.create_from_order', $order) }}"
+                                       class="btn btn-sm btn-info">
+                                        <i class="bi bi-tools"></i>
+                                        ثبت نصب / سرویس
+                                    </a>
+                                @endif
                             </td>
                         </tr>
 

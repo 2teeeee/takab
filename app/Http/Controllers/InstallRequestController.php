@@ -2,11 +2,15 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Installer;
 use App\Models\InstallRequest;
+use App\Models\InstallSchedule;
+use App\Models\Order;
 use App\Models\User;
 use Illuminate\Contracts\View\View;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 class InstallRequestController extends Controller
 {
@@ -71,5 +75,117 @@ class InstallRequestController extends Controller
     {
         $installRequest->delete();
         return back()->with('success', 'درخواست حذف شد.');
+    }
+
+    public function createFromOrder(Order $order): View
+    {
+        $order->load('wholesaler', 'user');
+
+        abort_unless(
+            $order->wholesaler_id,
+            422,
+            'این سفارش عمده‌فروش ندارد.'
+        );
+
+        $installers = Installer::query()
+            ->where('status', 'approved')
+            ->whereHas('wholesalers', function ($query) use ($order) {
+                $query->where(
+                    'users.id',
+                    $order->wholesaler_id
+                );
+            })
+            ->with('user')
+            ->get();
+
+        return view(
+            'install_requests.create_for_order',
+            compact(
+                'order',
+                'installers'
+            )
+        );
+    }
+
+    public function storeFromOrder(
+        Request $request,
+        Order $order
+    ): RedirectResponse {
+
+        $validated = $request->validate([
+            'installer_id' => [
+                'required',
+                'exists:installers,id',
+            ],
+
+            'device_model' => [
+                'required',
+                'string',
+                'max:255',
+            ],
+
+            'serial_number' => [
+                'nullable',
+                'string',
+                'max:255',
+            ],
+
+            'address' => [
+                'required',
+                'string',
+                'max:2000',
+            ],
+
+            'scheduled_date' => [
+                'required',
+                'date',
+            ],
+        ]);
+
+        /*
+         * Make sure the selected installer belongs
+         * to the wholesaler of this order.
+         */
+
+        $installer = Installer::query()
+            ->where('id', $validated['installer_id'])
+            ->where('status', 'approved')
+            ->whereHas('wholesalers', function ($query) use ($order) {
+                $query->where(
+                    'users.id',
+                    $order->wholesaler_id
+                );
+            })
+            ->firstOrFail();
+        DB::transaction(function () use (
+            $validated,
+            $order,
+            $installer
+        ) {
+
+            $installRequest = InstallRequest::create([
+                'user_id' => $order->user_id,
+                'order_id' => $order->id,
+                'wholesaler_id' => $order->wholesaler_id,
+                'device_model' => $validated['device_model'],
+                'serial_number' => $validated['serial_number'] ?? null,
+                'address' => $validated['address'],
+                'status' => 'scheduled',
+            ]);
+
+            InstallSchedule::create([
+                'installer_id' => $installer->id,
+                'install_request_id' => $installRequest->id,
+                'scheduled_date' => $validated['scheduled_date'],
+                'status' => 'waiting',
+            ]);
+        });
+
+        return redirect()
+            ->route('admin.orders.show', $order)
+            ->with(
+                'success',
+                'درخواست نصب با موفقیت ثبت و به نصاب اختصاص داده شد.'
+            );
     }
 }

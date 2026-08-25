@@ -46,6 +46,13 @@ class Order extends Model
         return $this->belongsTo(User::class, 'wholesaler_id');
     }
 
+    public function installRequests(): HasMany
+    {
+        return $this->hasMany(
+            InstallRequest::class
+        );
+    }
+
     public function seller(): BelongsTo
     {
         return $this->belongsTo(User::class, 'seller_id');

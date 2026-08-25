@@ -303,8 +303,6 @@ class InstallerController extends Controller
 
         $installer->update([
             'status' => 'approved',
-            'approved_by' => Auth::id(),
-            'approved_at' => now(),
         ]);
 
         return back()->with(
@@ -380,6 +378,52 @@ class InstallerController extends Controller
             ->with(
                 'success',
                 'نصاب با موفقیت حذف شد.'
+            );
+    }
+
+    public function wholesalers(User $user): View
+    {
+        $wholesalers = User::query()
+            ->role('wholesaler')
+            ->orderBy('name')
+            ->get();
+
+        $user->installer->load('wholesalers');
+
+        return view(
+            'installers.wholesalers',
+            compact('user', 'wholesalers')
+        );
+    }
+
+    public function syncWholesalers(
+        Request $request,
+        User $user
+    ): RedirectResponse {
+        $validated = $request->validate([
+            'wholesalers' => ['nullable', 'array'],
+            'wholesalers.*' => [
+                'integer',
+                'exists:users,id',
+            ],
+        ]);
+
+        $wholesalerIds = User::query()
+            ->role('wholesaler')
+            ->whereIn(
+                'id',
+                $validated['wholesalers'] ?? []
+            )
+            ->pluck('id')
+            ->toArray();
+
+        $user->installer->wholesalers()->sync($wholesalerIds);
+
+        return redirect()
+            ->route('admin.installers.wholesalers', $user)
+            ->with(
+                'success',
+                'ارتباط نصاب با عمده‌فروش‌ها با موفقیت به‌روزرسانی شد.'
             );
     }
 }
