@@ -46,9 +46,6 @@ class UserController extends Controller
             $search = trim($request->search);
 
             $usersQuery
-                ->whereHas('roles', function ($q) {
-                    $q->where('name', 'user');
-                })
                 ->where(function ($query) use ($search) {
                     $query->where('name', 'like', "%{$search}%")
                         ->orWhere('mobile', 'like', "%{$search}%")
