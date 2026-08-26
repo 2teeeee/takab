@@ -116,7 +116,7 @@ class CustomerSaleController extends Controller
         $this->commissionService->sendCommissionSms($order);
 
         return redirect()
-            ->route('admin.orders.index')
+            ->route('store.sales.index')
             ->with('success', 'سفارش با موفقیت ثبت شد.');
     }
 }
