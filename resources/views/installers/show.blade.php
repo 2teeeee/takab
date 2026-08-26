@@ -244,6 +244,33 @@
 
                     </div>
 
+                    @if($user->installer?->status === 'rejected')
+
+                        <div class="alert alert-danger">
+
+                            <h6 class="fw-bold">
+                                <i class="bi bi-x-circle"></i>
+                                دلیل رد نصاب
+                            </h6>
+
+                            <hr>
+
+                            <p class="mb-2">
+                                {{ $user->installer->status_note }}
+                            </p>
+
+                            @if($user->installer->approved_at)
+
+                                <small class="text-muted">
+                                    بررسی شده در:
+                                    {{ $user->installer->approved_at->format('Y/m/d H:i') }}
+                                </small>
+
+                            @endif
+
+                        </div>
+
+                    @endif
 
                     {{-- آدرس --}}
                     <div class="col-12 mb-3">
@@ -361,7 +388,7 @@
         <div class="d-flex justify-content-between mt-4">
 
             <a href="{{ route('admin.installers.index') }}"
-               class="btn btn-secondary">
+               class="btn btn-sm btn-secondary">
 
                 <i class="bi bi-arrow-right"></i>
                 بازگشت
@@ -372,7 +399,7 @@
             <div class="d-flex gap-2">
 
                 <a href="{{ route('admin.installers.edit', $user) }}"
-                   class="btn btn-primary">
+                   class="btn btn-sm btn-primary">
 
                     <i class="bi bi-pencil"></i>
                     ویرایش
@@ -388,7 +415,7 @@
                         @method('PATCH')
 
                         <button type="submit"
-                                class="btn btn-success">
+                                class="btn btn-sm btn-success">
 
                             <i class="bi bi-check-circle"></i>
                             تأیید نصاب
@@ -396,6 +423,16 @@
                         </button>
 
                     </form>
+
+                    <button
+                            type="button"
+                            class="btn btn-sm btn-danger"
+                            data-bs-toggle="modal"
+                            data-bs-target="#rejectInstallerModal"
+                    >
+                        <i class="bi bi-x-circle"></i>
+                        رد نصاب
+                    </button>
 
                 @endif
 
@@ -405,4 +442,119 @@
 
     </div>
 
-</x-admin-layout><?php
+    @if($user->installer->status === 'pending')
+
+        <div
+                class="modal fade"
+                id="rejectInstallerModal"
+                tabindex="-1"
+                aria-labelledby="rejectInstallerModalLabel"
+                aria-hidden="true"
+        >
+            <div class="modal-dialog">
+
+                <div class="modal-content">
+
+                    <form
+                            method="POST"
+                            action="{{ route(
+                    'admin.installers.reject',
+                    $user
+                ) }}"
+                    >
+
+                        @csrf
+                        @method('PATCH')
+
+                        <div class="modal-header">
+
+                            <h5
+                                    class="modal-title"
+                                    id="rejectInstallerModalLabel"
+                            >
+                                رد نصاب
+                            </h5>
+
+                            <button
+                                    type="button"
+                                    class="btn-close"
+                                    data-bs-dismiss="modal"
+                                    aria-label="Close"
+                            ></button>
+
+                        </div>
+
+
+                        <div class="modal-body">
+
+                            <div class="alert alert-warning">
+
+                                <i class="bi bi-exclamation-triangle"></i>
+
+                                آیا مطمئن هستید که می‌خواهید این نصاب را رد کنید؟
+
+                            </div>
+
+
+                            <div class="mb-3">
+
+                                <label
+                                        for="status_note"
+                                        class="form-label"
+                                >
+                                    دلیل رد نصاب
+                                </label>
+
+                                <textarea
+                                        name="status_note"
+                                        id="status_note"
+                                        rows="5"
+                                        class="form-control @error('status_note') is-invalid @enderror"
+                                        placeholder="دلیل رد نصاب را وارد کنید..."
+                                        required
+                                >{{ old('status_note') }}</textarea>
+
+
+                                @error('status_note')
+
+                                <div class="invalid-feedback">
+                                    {{ $message }}
+                                </div>
+
+                                @enderror
+
+                            </div>
+
+                        </div>
+
+
+                        <div class="modal-footer">
+
+                            <button
+                                    type="button"
+                                    class="btn btn-sm btn-secondary"
+                                    data-bs-dismiss="modal"
+                            >
+                                انصراف
+                            </button>
+
+                            <button
+                                    type="submit"
+                                    class="btn btn-sm btn-danger"
+                            >
+                                <i class="bi bi-x-circle"></i>
+                                ثبت رد نصاب
+                            </button>
+
+                        </div>
+
+                    </form>
+
+                </div>
+
+            </div>
+        </div>
+
+    @endif
+
+</x-admin-layout>
