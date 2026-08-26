@@ -62,9 +62,9 @@
                                             value="{{ $wholesaler->id }}"
                                             id="wholesaler-{{ $wholesaler->id }}"
                                             @checked(
-                                                $user->installer->wholesalers->contains(
-                                                    'id',
-                                                    $wholesaler->id
+                                                in_array(
+                                                    $wholesaler->id,
+                                                    $selectedWholesalerIds
                                                 )
                                             )
                                     >
@@ -75,6 +75,15 @@
                                     >
                                         <strong>
                                             {{ $wholesaler->name }}
+
+                                            @if($user->registered_by == $wholesaler->id)
+
+                                                <span class="badge bg-success ms-2">
+                                                    معرف نصاب
+                                                </span>
+
+                                            @endif
+
                                         </strong>
 
                                         <div class="small text-muted">

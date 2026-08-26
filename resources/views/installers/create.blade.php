@@ -2,12 +2,22 @@
 
     <div class="container py-4">
 
+        @if(auth()->user()->hasRole(['admin', 'manager', 'personel']))
         {{-- بازگشت به لیست --}}
         <a href="{{ route('admin.installers.index') }}"
            class="btn btn-sm btn-secondary mb-3">
             <i class="bi bi-chevron-double-right"></i>
             بازگشت به لیست نصاب‌ها
         </a>
+        @endif
+
+            {{-- Success message --}}
+            @if(session('success'))
+                <div class="alert alert-success">
+                    <i class="bi bi-check-circle"></i>
+                    {{ session('success') }}
+                </div>
+            @endif
 
         <form action="{{ route('admin.installers.store') }}"
               method="POST"
@@ -240,14 +250,6 @@
 
             {{-- دکمه‌ها --}}
             <div class="d-flex justify-content-between mt-3">
-
-                <a href="{{ route('admin.installers.index') }}"
-                   class="btn btn-secondary">
-
-                    <i class="bi bi-arrow-right"></i>
-                    بازگشت
-
-                </a>
 
                 <button type="submit"
                         class="btn btn-success">

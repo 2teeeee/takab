@@ -294,7 +294,6 @@ class CommissionService
 
         return "کاربر گرامی،\n"
             . "کمیسیون‌های شما بابت سفارش شماره {$order->id} ثبت شد.\n"
-            . implode("\n", $lines)
-            . "\nمجموع: {$totalFormatted} تومان";
+            . "\nمبلغ: {$totalFormatted} تومان";
     }
 }

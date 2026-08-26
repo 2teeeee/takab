@@ -270,13 +270,12 @@
 
                                 @foreach($installers as $installer)
 
-                                    <option value="{{ $installer->id }}"
-                                            @selected(old('installer_id') == $installer->id)>
-
+                                    <option
+                                            value="{{ $installer->id }}"
+                                            @selected($installer->id == $defaultInstallerId)
+                                    >
                                         {{ $installer->user->name }}
-
-                                        -
-                                        {{ $installer->user->mobile }}
+                                        - {{ $installer->user->mobile }}
 
                                     </option>
 

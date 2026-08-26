@@ -289,6 +289,7 @@
     $isWholesaler = $user?->hasRole('wholesaler');
     $isSeller = $user?->hasRole('seller');
     $isMarketer = $user?->hasRole('marketer');
+    $isInstaller = $user?->hasRole('installer');
 @endphp
 
 
@@ -486,6 +487,14 @@
                 <span>فروش‌های عمده‌فروش</span>
             </a>
 
+            <a
+                    href="{{ route('admin.installers.create') }}"
+                    class="{{ request()->routeIs('admin.installers.*') ? 'active' : '' }}"
+            >
+                <i class="bi bi-person-plus"></i>
+                <span>معرفی نصاب</span>
+            </a>
+
         @endif
 
 
@@ -551,7 +560,7 @@
              Services
         ====================================================== --}}
 
-        @if($isStaff || $isWholesaler)
+        @if($isStaff)
 
             <div class="sidebar-section-title">
                 خدمات
@@ -566,8 +575,8 @@
             </a>
 
             <a
-                    href="{{ route('admin.install_requests.index') }}"
-                    class="{{ request()->routeIs('admin.install_requests.*') ? 'active' : '' }}"
+                    href="{{ route('admin.service_requests.index') }}"
+                    class="{{ request()->routeIs('admin.service_requests.*') ? 'active' : '' }}"
             >
                 <i class="bi bi-tools"></i>
                 <span>درخواست سرویس</span>
@@ -587,6 +596,24 @@
             >
                 <i class="bi bi-arrow-repeat"></i>
                 <span>دوره سرویس</span>
+            </a>
+
+        @endif
+
+        @if($isInstaller)
+
+            <hr class="border-secondary my-1">
+
+            <div class="px-3 py-2 text-secondary small">
+                مدیریت خدمات
+            </div>
+
+            <a href="{{ route('installer.orders.index') }}"
+               class="{{ request()->routeIs('installer.orders.*') ? 'active' : '' }}">
+
+                <i class="bi bi-tools"></i>
+                درخواست‌های سرویس من
+
             </a>
 
         @endif
@@ -807,6 +834,14 @@
                 <span>فروش‌های عمده‌فروش</span>
             </a>
 
+            <a
+                    href="{{ route('admin.installers.create') }}"
+                    class="mobile-menu-link {{ request()->routeIs('admin.installers.*') ? 'active' : '' }}"
+            >
+                <i class="bi bi-person-plus"></i>
+                <span>معرفی نصاب</span>
+            </a>
+
         @endif
 
 
@@ -849,7 +884,7 @@
 
         {{-- Services --}}
 
-        @if($isStaff || $isWholesaler)
+        @if($isStaff)
 
             <hr class="border-secondary">
 
@@ -866,7 +901,7 @@
             </a>
 
             <a
-                    href="{{ route('admin.install_requests.index') }}"
+                    href="{{ route('admin.service_requests.index') }}"
                     class="mobile-menu-link {{ request()->routeIs('admin.install_requests.*') ? 'active' : '' }}"
             >
                 <i class="bi bi-tools"></i>
@@ -887,6 +922,24 @@
             >
                 <i class="bi bi-arrow-repeat"></i>
                 <span>دوره سرویس</span>
+            </a>
+
+        @endif
+
+        @if($isInstaller)
+
+            <hr class="border-secondary">
+
+            <div class="text-secondary small mb-2">
+                مدیریت خدمات
+            </div>
+
+            <a href="{{ route('installer.orders.index') }}"
+               class="text-light d-block mb-2 text-decoration-none">
+
+                <i class="bi bi-tools"></i>
+                درخواست‌های سرویس من
+
             </a>
 
         @endif

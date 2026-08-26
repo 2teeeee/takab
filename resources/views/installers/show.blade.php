@@ -41,7 +41,7 @@
                 <div class="row">
 
                     {{-- نام --}}
-                    <div class="col-md-6 mb-3">
+                    <div class="col-md-4 mb-3">
 
                         <label class="form-label text-muted">
                             نام و نام خانوادگی
@@ -55,7 +55,7 @@
 
 
                     {{-- موبایل --}}
-                    <div class="col-md-6 mb-3">
+                    <div class="col-md-4 mb-3">
 
                         <label class="form-label text-muted">
                             شماره موبایل
@@ -63,6 +63,32 @@
 
                         <div class="fw-bold">
                             {{ $user->mobile ?? '-' }}
+                        </div>
+
+                    </div>
+
+
+                    {{-- معرف --}}
+                    <div class="col-md-4 mb-3">
+
+                        <label class="form-label text-muted">
+                            معرف
+                        </label>
+
+                        <div class="fw-bold">
+                            @if($user->registeredBy)
+                                <div>
+                                    {{ $user->registeredBy->name }}
+                                </div>
+
+                                @if($user->registeredBy->mobile)
+                                    <small class="text-muted">
+                                        {{ $user->registeredBy->mobile }}
+                                    </small>
+                                @endif
+                            @else
+                                <span class="text-muted">سیستم</span>
+                            @endif
                         </div>
 
                     </div>

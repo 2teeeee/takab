@@ -477,6 +477,11 @@ Route::middleware('auth')
                 [InstallRequestController::class, 'storeFromOrder']
             )->name('install_requests.store_from_order');
 
+            Route::get(
+                '/service-requests',
+                [InstallRequestController::class, 'serviceRequests']
+            )->name('service_requests.index');
+
             Route::resource(
                 'install_requests',
                 InstallRequestController::class
@@ -669,6 +674,42 @@ Route::middleware([
             CustomerSaleController::class,
             'store'
         ])->name('customers.sale.store');
+
+    });
+
+
+/*
+|--------------------------------------------------------------------------
+| Installer
+|--------------------------------------------------------------------------
+*/
+Route::middleware([
+    'auth',
+    'role:installer',
+])
+    ->prefix('installer')
+    ->name('installer.')
+    ->group(function () {
+
+        Route::get('/orders', [
+            InstallScheduleController::class,
+            'installerOrders'
+        ])->name('orders.index');
+
+        Route::get(
+            '/install_schedules/{install_schedule}/report',
+            [InstallScheduleController::class, 'report']
+        )->name('install_schedules.report');
+
+        Route::get(
+            '/install_schedules/{install_schedule}/show/report',
+            [InstallScheduleController::class, 'showReport']
+        )->name('install-reports.show');
+
+        Route::post(
+            '/install_schedules/{install_schedule}/report',
+            [InstallScheduleController::class, 'storeReport']
+        )->name('install_schedules.report.store');
 
     });
 

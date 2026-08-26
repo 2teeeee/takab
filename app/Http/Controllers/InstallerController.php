@@ -21,7 +21,10 @@ class InstallerController extends Controller
     {
         $usersQuery = User::query()
             ->role('installer')
-            ->with('installer');
+            ->with([
+                'registeredBy:id,name,mobile',
+                'installer',
+            ]);
 
         // Search installers
         if ($request->filled('search')) {
@@ -139,7 +142,7 @@ class InstallerController extends Controller
         });
 
         return redirect()
-            ->route('admin.installers.index')
+            ->route('admin.installers.create')
             ->with(
                 'success',
                 'اطلاعات نصاب با موفقیت به سیستم اضافه شد و منتظر تایید مدیریت می باشد.'
@@ -383,17 +386,42 @@ class InstallerController extends Controller
 
     public function wholesalers(User $user): View
     {
+        $user->load([
+            'registeredBy',
+            'installer.wholesalers',
+        ]);
+
         $wholesalers = User::query()
             ->role('wholesaler')
             ->orderBy('name')
             ->get();
 
-        $user->installer->load('wholesalers');
+        /*
+         * Existing relationships.
+         */
+        $selectedWholesalerIds = $user->installer
+            ? $user->installer->wholesalers
+                ->pluck('id')
+                ->toArray()
+            : [];
 
-        return view(
-            'installers.wholesalers',
-            compact('user', 'wholesalers')
-        );
+        /*
+         * On the first opening of the form, automatically select
+         * the wholesaler who registered the installer.
+         */
+        if (
+            empty($selectedWholesalerIds) &&
+            $user->registered_by &&
+            $user->registeredBy?->hasRole('wholesaler')
+        ) {
+            $selectedWholesalerIds[] = $user->registered_by;
+        }
+
+        return view('installers.wholesalers', compact(
+            'user',
+            'wholesalers',
+            'selectedWholesalerIds'
+        ));
     }
 
     public function syncWholesalers(

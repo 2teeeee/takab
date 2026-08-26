@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 
 class InstallSchedule extends Model
 {
@@ -19,16 +20,24 @@ class InstallSchedule extends Model
         'scheduled_date' => 'date',
     ];
 
-    public function installer()
+    public function installer(): BelongsTo
     {
         return $this->belongsTo(Installer::class);
     }
 
-    public function installRequest()
+    public function installRequest(): BelongsTo
     {
         return $this->belongsTo(
             InstallRequest::class,
             'install_request_id'
+        );
+    }
+
+    public function report(): HasOne
+    {
+        return $this->hasOne(
+            InstallReport::class,
+            'install_schedule_id'
         );
     }
 }

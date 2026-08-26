@@ -84,7 +84,7 @@ class InstallRequestController extends Controller
         abort_unless(
             $order->wholesaler_id,
             422,
-            'این سفارش عمده‌فروش ندارد.'
+            'This order does not have a wholesaler.'
         );
 
         $installers = Installer::query()
@@ -98,19 +98,28 @@ class InstallRequestController extends Controller
             ->with('user')
             ->get();
 
+        /*
+         * Select the installer registered by the order wholesaler
+         * as the default installer.
+         */
+        $defaultInstallerId = $installers
+            ->first(function (Installer $installer) use ($order) {
+                return (int) $installer->user?->registered_by
+                    === (int) $order->wholesaler_id;
+            })
+            ?->id;
+
         return view(
             'install_requests.create_for_order',
             compact(
                 'order',
-                'installers'
+                'installers',
+                'defaultInstallerId'
             )
         );
     }
 
-    public function storeFromOrder(
-        Request $request,
-        Order $order
-    ): RedirectResponse {
+    public function storeFromOrder(Request $request,Order $order): RedirectResponse {
 
         $validated = $request->validate([
             'installer_id' => [
@@ -187,5 +196,85 @@ class InstallRequestController extends Controller
                 'success',
                 'درخواست نصب با موفقیت ثبت و به نصاب اختصاص داده شد.'
             );
+    }
+
+    public function serviceRequests(Request $request): View
+    {
+        $query = InstallRequest::query()
+            ->with([
+                'user',
+                'schedules.installer',
+            ]);
+
+        if ($request->filled('search')) {
+
+            $search = trim($request->search);
+
+            $query->where(function ($q) use ($search) {
+
+                $q->where('device_model', 'like', "%{$search}%")
+                    ->orWhere('serial_number', 'like', "%{$search}%")
+                    ->orWhereHas('user', function ($userQuery) use ($search) {
+                        $userQuery
+                            ->where('name', 'like', "%{$search}%")
+                            ->orWhere('mobile', 'like', "%{$search}%");
+                    });
+
+            });
+        }
+
+        if ($request->filled('status')) {
+            $query->where('status', $request->status);
+        }
+
+        /*
+         * Requests scheduled for today are displayed first.
+         * Then future requests, followed by older requests.
+         */
+        $query->orderByRaw("
+        CASE
+            WHEN EXISTS (
+                SELECT 1
+                FROM install_schedules
+                WHERE install_schedules.install_request_id = install_requests.id
+                AND install_schedules.scheduled_date = CURDATE()
+                AND install_schedules.status != 'cancelled'
+            ) THEN 0
+
+            WHEN EXISTS (
+                SELECT 1
+                FROM install_schedules
+                WHERE install_schedules.install_request_id = install_requests.id
+                AND install_schedules.scheduled_date > CURDATE()
+                AND install_schedules.status != 'cancelled'
+            ) THEN 1
+
+            ELSE 2
+        END
+    ");
+
+        $query->latest('install_requests.created_at');
+
+        $requests = $query
+            ->paginate(20)
+            ->withQueryString();
+
+        return view(
+            'install_requests.service_requests',
+            compact('requests')
+        );
+    }
+
+    public function show(InstallRequest $installRequest): View
+    {
+        $installRequest->load([
+            'user',
+            'schedules.installer',
+        ]);
+
+        return view(
+            'install_requests.show',
+            compact('installRequest')
+        );
     }
 }
