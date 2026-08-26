@@ -167,10 +167,6 @@
                                     class="form-select @error('type') is-invalid @enderror"
                                     required>
 
-                                <option value="">
-                                    انتخاب نوع درخواست
-                                </option>
-
                                 <option value="installation"
                                         @selected(old('type') === 'installation')>
                                     نصب
@@ -215,7 +211,7 @@
                                    name="device_model"
                                    id="device_model"
                                    class="form-control @error('device_model') is-invalid @enderror"
-                                   value="{{ old('device_model') }}"
+                                   value="{{ old('device_model', $deviceModel) }}"
                                    placeholder="مدل دستگاه"
                                    required>
 

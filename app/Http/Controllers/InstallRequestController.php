@@ -109,12 +109,25 @@ class InstallRequestController extends Controller
             })
             ?->id;
 
+        /*
+         * Get purchased product models.
+         * Remove duplicate models and join them with comma.
+         */
+        $deviceModel = $order->items
+            ->map(function ($item) {
+                return $item->product?->translation->title;
+            })
+            ->filter()
+            ->unique()
+            ->implode(', ');
+
         return view(
             'install_requests.create_for_order',
             compact(
                 'order',
                 'installers',
-                'defaultInstallerId'
+                'defaultInstallerId',
+                'deviceModel'
             )
         );
     }
