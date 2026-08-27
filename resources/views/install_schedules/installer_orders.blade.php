@@ -49,6 +49,7 @@
                             <th>مدل دستگاه</th>
                             <th>شماره سریال</th>
                             <th>آدرس</th>
+                            <th>توضیحات</th>
                             <th>وضعیت</th>
                             <th></th>
                         </tr>
@@ -77,7 +78,6 @@
                                     {{ $loop->iteration + (($schedules->currentPage() - 1) * $schedules->perPage()) }}
                                 </td>
 
-
                                 <td>
 
                                     @if($isToday)
@@ -91,31 +91,29 @@
 
                                 </td>
 
-
                                 <td>
                                     {{ $request?->user?->name ?? '-' }}
                                 </td>
-
 
                                 <td>
                                     {{ $request?->user?->mobile ?? '-' }}
                                 </td>
 
-
                                 <td>
                                     {{ $request?->device_model ?? '-' }}
                                 </td>
-
 
                                 <td>
                                     {{ $request?->serial_number ?? '-' }}
                                 </td>
 
-
                                 <td style="min-width: 250px;">
                                     {{ $request?->address ?? '-' }}
                                 </td>
 
+                                <td style="min-width: 250px;">
+                                    {{ $request?->description ?? '-' }}
+                                </td>
 
                                 <td>
 

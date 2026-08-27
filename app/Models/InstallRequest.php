@@ -19,6 +19,7 @@ class InstallRequest extends Model
         'address',
         'status',
         'installation_date',
+        'description',
     ];
 
     protected $casts = [

@@ -162,6 +162,10 @@ class InstallRequestController extends Controller
                 'required',
                 'date',
             ],
+
+            'description' => [
+                'nullable',
+            ],
         ]);
 
         /*
@@ -179,6 +183,7 @@ class InstallRequestController extends Controller
                 );
             })
             ->firstOrFail();
+
         DB::transaction(function () use (
             $validated,
             $order,
@@ -193,6 +198,7 @@ class InstallRequestController extends Controller
                 'serial_number' => $validated['serial_number'] ?? null,
                 'address' => $validated['address'],
                 'status' => 'scheduled',
+                'description' => $validated['description']
             ]);
 
             InstallSchedule::create([

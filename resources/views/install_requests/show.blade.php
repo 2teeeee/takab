@@ -418,6 +418,40 @@
 
                             </div>
 
+                            @if($schedule->report)
+
+                                {{-- Description --}}
+
+                                <div class="col-md-2 pt-2 border-top">
+
+                                    <strong>
+                                        توضیحات نصاب
+                                    </strong>
+
+                                    <div class="mt-1">
+
+                                        @if($schedule->report->description)
+
+                                            <div>
+
+                                                {!! nl2br(e($schedule->report->description)) !!}
+
+                                            </div>
+
+                                        @else
+
+                                            <div class="text-muted">
+                                                توضیحی توسط نصاب ثبت نشده است.
+                                            </div>
+
+                                        @endif
+
+                                    </div>
+
+                                </div>
+
+                            @endif
+                            
                         </div>
 
                     </div>

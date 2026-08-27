@@ -104,6 +104,21 @@
 
                 </div>
 
+                {{-- Description --}}
+
+                <div class="alert alert-light border">
+
+                    <strong>
+                        <i class="bi bi-newspaper"></i>
+                        توضیحات نصب:
+                    </strong>
+
+                    <div class="mt-2">
+                        {{ $install_schedule->installRequest->description }}
+                    </div>
+
+                </div>
+
 
                 {{-- Schedule --}}
 
