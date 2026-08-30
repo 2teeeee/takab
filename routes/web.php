@@ -24,6 +24,7 @@ use App\Http\Controllers\StoreProductController;
 use App\Http\Controllers\StoreSaleController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\UserInstallRequestController;
+use App\Http\Controllers\WalletController;
 use App\Http\Controllers\WholesaleProductController;
 use App\Http\Controllers\WholesalerSaleController;
 use App\Http\Controllers\ZarinpalController;
@@ -271,7 +272,6 @@ Route::middleware('auth')
 
             });
 
-
         /*
         |--------------------------------------------------------------------------
         | Store Profile
@@ -334,6 +334,15 @@ Route::middleware('auth')
                 'users.product-user',
                 InventoryController::class
             );
+
+            Route::prefix('users/wallet')
+                ->name('users.wallet.')
+                ->group(function () {
+
+                    Route::get('/{user}', [WalletController::class,'userWallet'])
+                        ->name('index');
+
+                });
 
 
             /*
@@ -731,6 +740,22 @@ Route::middleware('auth')->group(function () {
         AssemblyController::class,
         'store'
     ])->name('assembly.store');
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | Wallet Profile
+    |--------------------------------------------------------------------------
+    */
+
+    Route::prefix('wallet')
+        ->name('wallet.')
+        ->group(function () {
+
+            Route::get('/', [WalletController::class,'index'])
+                ->name('index');
+
+        });
 
 });
 

@@ -6,12 +6,12 @@ use App\Models\Order;
 use App\Models\ReferralCommission;
 use App\Services\Sms\NikSmsService;
 use Illuminate\Support\Facades\DB;
-use RuntimeException;
 
 class CommissionService
 {
     public function __construct(
-        protected NikSmsService $sms
+        protected NikSmsService $sms,
+        protected WalletService $walletService
     ) {
     }
 
@@ -126,7 +126,7 @@ class CommissionService
             order: $order,
             userId: $seller->id,
             type: 'store',
-            amount: $amount,
+            amount: $amount * 2,
             note: __('commissions.notes.store')
         );
     }
@@ -209,7 +209,7 @@ class CommissionService
         string $type,
         int $amount,
         ?string $note = null,
-        bool $isPaid = false
+        bool $isPaid = true
     ): ReferralCommission {
 
         return $order->commissions()->create([
@@ -220,6 +220,7 @@ class CommissionService
             'paid_at'   => $isPaid ? now() : null,
             'paid_by'   => $isPaid ? auth()->id() : null,
             'note'      => $note,
+            'status'    => 'approved'
         ]);
     }
 
@@ -295,5 +296,75 @@ class CommissionService
         return "کاربر گرامی،\n"
             . "کمیسیون‌های شما بابت سفارش شماره {$order->id} ثبت شد.\n"
             . "\nمبلغ: {$totalFormatted} تومان";
+    }
+
+    public function payToWallet(ReferralCommission $commission): void
+    {
+        if ($commission->status === 'paid') {
+            return;
+        }
+
+        if ($commission->status !== 'approved') {
+            return;
+        }
+
+        $user = $commission->user;
+
+        if (!$user) {
+            return;
+        }
+
+        $this->walletService->credit(
+            user: $user,
+            amount: $commission->amount,
+            description: $this->commissionDescription($commission),
+            reference: $commission
+        );
+
+        $commission->update([
+            'status' => 'paid',
+            'paid_at' => now(),
+        ]);
+    }
+
+    protected function commissionDescription(ReferralCommission $commission): string
+    {
+        return match ($commission->type) {
+
+            'wholesaler' =>
+                'کمیسیون عمده‌فروشی بابت سفارش شماره '
+                . $commission->order_id,
+
+            'store' =>
+                'کمیسیون فروشگاه بابت سفارش شماره '
+                . $commission->order_id,
+
+            'referral' =>
+                'کمیسیون معرفی بابت سفارش شماره '
+                . $commission->order_id,
+
+            default =>
+                'کمیسیون بابت سفارش شماره '
+                . $commission->order_id,
+        };
+    }
+
+    public function payOrderCommissionsToWallet(Order $order): void
+    {
+        $commissions = ReferralCommission::query()
+            ->where('order_id', $order->id)
+            ->where('type', '!=', 'customer_discount')
+            ->where('status', 'approved')
+            ->with('user')
+            ->get();
+
+        foreach ($commissions as $commission) {
+
+            if (!$commission->user) {
+                continue;
+            }
+
+            $this->payToWallet($commission);
+        }
     }
 }

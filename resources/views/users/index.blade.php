@@ -69,6 +69,15 @@
                         @if(auth()->user()->hasRole(['admin','manager','personel','seller']))
                         <a href="{{ route('store.customers.sale',$user) }}" class="btn btn-sm btn-success">فروش کالا</a>
                         @endif
+
+                        @if(auth()->user()->hasRole(['admin','manager','personel']))
+                        <a href="{{ route('admin.users.wallet.index',$user) }}"
+                                class="btn btn-sm btn-light {{ request()->routeIs('wallet.*') ? 'active' : '' }}"
+                        >
+                            <i class="bi bi-wallet2"></i>
+                            کیف پول
+                        </a>
+                        @endif
                         @if(auth()->user()->hasRole(['admin']))
                         <form action="{{ route('admin.users.destroy', $user) }}" method="POST" class="d-inline">
                             @csrf

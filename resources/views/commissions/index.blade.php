@@ -374,11 +374,6 @@
                                                 {{ jdate($commission->paid_at)->format('Y/m/d H:i') }}
                                             </div>
                                         @endif
-                                        @if($commission->paidBy)
-                                            <div class="small text-muted">
-                                                توسط: {{ $commission->paidBy->name }}
-                                            </div>
-                                        @endif
                                     @else
                                         <span class="badge bg-danger">
                                             پرداخت نشده

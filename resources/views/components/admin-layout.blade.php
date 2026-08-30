@@ -1009,7 +1009,7 @@
 
         {{-- Desktop Actions --}}
 
-        <div class="d-none d-md-flex align-items-center gap-2">
+        <div class="d-none d-md-flex align-items-center gap-2 mt-2">
 
             <a
                     href="{{ route('main.index') }}"
@@ -1017,6 +1017,14 @@
             >
                 <i class="bi bi-house"></i>
                 صفحه اصلی
+            </a>
+
+            <a
+                    href="{{ route('wallet.index') }}"
+                    class="btn btn-sm btn-light {{ request()->routeIs('wallet.*') ? 'active' : '' }}"
+            >
+                <i class="bi bi-wallet2"></i>
+                کیف پول
             </a>
 
             <span class="admin-user">

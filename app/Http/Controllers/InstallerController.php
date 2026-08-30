@@ -139,6 +139,10 @@ class InstallerController extends Controller
                 // New installers must be reviewed by management
                 'status' => 'pending',
             ]);
+
+            $user->update([
+                'moaref_code' => $user->generateMoarefCode(),
+            ]);
         });
 
         return redirect()

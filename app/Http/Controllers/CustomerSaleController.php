@@ -110,6 +110,8 @@ class CustomerSaleController extends Controller
          */
         $this->commissionService->createForOrder($order);
 
+        $this->commissionService->payOrderCommissionsToWallet($order);
+
         /*
          * Send commission SMS notifications.
          */

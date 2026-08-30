@@ -145,6 +145,18 @@ class User extends Authenticatable
         )->withTimestamps();
     }
 
+    public function wallet(): HasOne
+    {
+        return $this->hasOne(Wallet::class);
+    }
+
+    public function getOrCreateWallet(): Wallet
+    {
+        return $this->wallet()->firstOrCreate([
+            'user_id' => $this->id,
+        ]);
+    }
+
     public function scopeRole($query, string|array $roles)
     {
         $roles = is_array($roles) ? $roles : [$roles];

@@ -16,6 +16,7 @@ class ReferralCommission extends Model
         'paid_at',
         'paid_by',
         'note',
+        'status',
     ];
 
     protected $casts = [
