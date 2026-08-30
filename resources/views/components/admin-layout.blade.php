@@ -666,6 +666,15 @@
         </a>
 
 
+        <a
+                href="{{ route('wallet.index') }}"
+                class="mobile-menu-link"
+        >
+            <i class="bi bi-wallet2"></i>
+            کیف پول من
+        </a>
+
+
         {{-- Users --}}
 
         @if($user->hasRole([

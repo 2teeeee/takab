@@ -294,8 +294,7 @@ class CommissionService
         $totalFormatted = number_format($total);
 
         return "کاربر گرامی،\n"
-            . "کمیسیون‌های شما بابت سفارش شماره {$order->id} ثبت شد.\n"
-            . "\nمبلغ: {$totalFormatted} تومان";
+            . "کمیسیون‌های شما بابت سفارش شماره {$order->id} ثبت شد.\n";
     }
 
     public function payToWallet(ReferralCommission $commission): void
