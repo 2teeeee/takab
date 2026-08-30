@@ -263,7 +263,7 @@
 
                                 <small class="text-muted">
                                     بررسی شده در:
-                                    {{ $user->installer->approved_at->format('Y/m/d H:i') }}
+                                    {{ jdate($user->installer->approved_at->setTimezone('Asia/Tehran'))->format('Y/m/d H:i') }}
                                 </small>
 
                             @endif
@@ -358,7 +358,7 @@
                         </label>
 
                         <div>
-                            {{ $user->installer->created_at?->format('Y/m/d H:i') ?? '-' }}
+                            {{ jdate($user->installer->created_at->setTimezone('Asia/Tehran'))->format('Y/m/d H:i') ?? '-' }}
                         </div>
 
                     </div>
@@ -372,7 +372,7 @@
                         </label>
 
                         <div>
-                            {{ $user->installer->updated_at?->format('Y/m/d H:i') ?? '-' }}
+                            {{ jdate($user->installer->updated_at->setTimezone('Asia/Tehran'))->format('Y/m/d H:i') ?? '-' }}
                         </div>
 
                     </div>

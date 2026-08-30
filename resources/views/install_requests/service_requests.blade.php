@@ -276,7 +276,7 @@
 
                                         @endif
 
-                                        {{ $schedule->scheduled_date->format('Y/m/d') }}
+                                        {{ jdate($schedule->scheduled_date)->format('Y/m/d') ?? '-' }}
 
                                     @else
 

@@ -188,7 +188,7 @@
                                 </td>
 
                                 <td>
-                                    {{ $transaction->created_at->format('Y/m/d H:i') }}
+                                    {{ jdate($transaction->created_at->setTimezone('Asia/Tehran'))->format('Y/m/d H:i') }}
                                 </td>
 
                             </tr>

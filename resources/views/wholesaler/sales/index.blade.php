@@ -152,7 +152,7 @@
 
                                 <td>
 
-                                    {{ jdate($order->created_at)->format('Y/m/d H:i') }}
+                                    {{ jdate($order->created_at->setTimezone('Asia/Tehran'))->format('Y/m/d H:i') }}
 
                                 </td>
 

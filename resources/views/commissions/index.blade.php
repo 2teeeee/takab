@@ -371,7 +371,7 @@
                                         </span>
                                         @if($commission->paid_at)
                                             <div class="small text-muted mt-1">
-                                                {{ jdate($commission->paid_at)->format('Y/m/d H:i') }}
+                                                {{ jdate($commission->paid_at->setTimezone('Asia/Tehran'))->format('Y/m/d H:i') }}
                                             </div>
                                         @endif
                                     @else
@@ -381,7 +381,7 @@
                                     @endif
                                 </td>
                                 <td>
-                                    {{ jdate($commission->created_at)->format('Y/m/d H:i') }}
+                                    {{ jdate($commission->created_at->setTimezone('Asia/Tehran'))->format('Y/m/d H:i') }}
                                 </td>
                             </tr>
                         @empty

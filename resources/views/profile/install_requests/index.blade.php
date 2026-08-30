@@ -57,7 +57,7 @@
                                 <div class="small text-muted">ثبت‌شده: {{ jdate($req->created_at)->format('Y/m/d') }}</div>
 
                                 @if($req->installation_date)
-                                    <div class="small mt-1 text-success">تاریخ پیشنهادی: {{ jdate($req->installation_date)->format('Y/m/d H:i') }}</div>
+                                    <div class="small mt-1 text-success">تاریخ پیشنهادی: {{ jdate($req->installation_date->setTimezone('Asia/Tehran'))->format('Y/m/d H:i') }}</div>
                                 @endif
                             </div>
                         </div>

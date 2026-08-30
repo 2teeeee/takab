@@ -315,7 +315,7 @@
                         <strong>تاریخ ثبت سفارش:</strong>
 
                         <div class="mt-1">
-                            {{ jdate($order->created_at)->format('Y/m/d H:i') }}
+                            {{ jdate($order->created_at->setTimezone('Asia/Tehran'))->format('Y/m/d H:i') }}
                         </div>
 
                     </div>
