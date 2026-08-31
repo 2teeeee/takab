@@ -25,6 +25,7 @@ use App\Http\Controllers\StoreSaleController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\UserInstallRequestController;
 use App\Http\Controllers\WalletController;
+use App\Http\Controllers\WalletWithdrawalController;
 use App\Http\Controllers\WholesaleProductController;
 use App\Http\Controllers\WholesalerSaleController;
 use App\Http\Controllers\ZarinpalController;
@@ -538,6 +539,37 @@ Route::middleware('auth')
 
                 });
 
+            Route::prefix('wallet')
+                ->name('wallet.')
+                ->middleware('role:admin,managerو personel')->group(function () {
+
+                Route::get('/withdrawals', [
+                    WalletWithdrawalController::class,
+                    'indexAdmin'
+                ])->name('withdrawals.index');
+
+                Route::get('/withdrawals/{withdrawal}', [
+                    WalletWithdrawalController::class,
+                    'show'
+                ])->name('withdrawals.show');
+
+                Route::post('/withdrawals/{withdrawal}/approve', [
+                    WalletWithdrawalController::class,
+                    'approve'
+                ])->name('withdrawals.approve');
+
+                Route::post('/withdrawals/{withdrawal}/reject', [
+                    WalletWithdrawalController::class,
+                    'reject'
+                ])->name('withdrawals.reject');
+
+                Route::post('/wallet-withdrawals/{withdrawal}/paid', [
+                    WalletWithdrawalController::class,
+                    'paid'
+                ])->name('withdrawals.paid');
+
+            });
+
         });
 
     });
@@ -752,8 +784,28 @@ Route::middleware('auth')->group(function () {
         ->name('wallet.')
         ->group(function () {
 
-            Route::get('/', [WalletController::class,'index'])
-                ->name('index');
+            Route::get('/', [
+                WalletController::class,
+                'index'
+            ])->name('index');
+
+
+            Route::get('/withdrawals', [
+                WalletWithdrawalController::class,
+                'index'
+            ])->name('withdrawals.index');
+
+
+            Route::get('/withdrawals/create', [
+                WalletWithdrawalController::class,
+                'create'
+            ])->name('withdrawals.create');
+
+
+            Route::post('/withdrawals', [
+                WalletWithdrawalController::class,
+                'store'
+            ])->name('withdrawals.store');
 
         });
 

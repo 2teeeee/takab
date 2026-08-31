@@ -81,6 +81,18 @@
 
             </div>
 
+            @if($wallet->user_id == auth()->id())
+            <div class="card-footer text-end">
+                <a
+                        href="{{ route('wallet.withdrawals.index') }}"
+                        class=" btn btn-sm btn-primary {{ request()->routeIs('wallet.withdrawals.*') ? 'active' : '' }}"
+                >
+                    <i class="bi bi-cash-coin"></i>
+                    درخواست های برداشت
+                </a>
+            </div>
+            @endif
+
         </div>
 
 

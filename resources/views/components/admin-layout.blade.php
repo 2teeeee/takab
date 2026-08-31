@@ -333,6 +333,22 @@
 
         @endif
 
+        @if($user->hasRole([
+            'admin',
+            'manager',
+            'personel'
+        ]))
+
+            <a
+                    href="{{ route('admin.wallet.withdrawals.index') }}"
+                    class="{{ request()->routeIs('admin.wallet.withdrawals.*') ? 'active' : '' }}"
+            >
+                <i class="bi bi-wallet"></i>
+                <span>درخواست برداشت کاربر</span>
+            </a>
+
+        @endif
+
 
         {{-- =====================================================
              Website Management
@@ -694,6 +710,20 @@
                 <span>کاربران</span>
             </a>
 
+        @endif
+
+        @if($user->hasRole([
+                    'admin',
+                    'manager',
+                    'personel'
+                ]))
+        <a
+                href="{{ route('admin.wallet.withdrawals.index') }}"
+                class="mobile-menu-link {{ request()->routeIs('admin.wallet.withdrawals.*') ? 'active' : '' }}"
+        >
+            <i class="bi bi-wallet"></i>
+            <span>درخواست برداشت کاربر</span>
+        </a>
         @endif
 
 

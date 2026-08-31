@@ -157,6 +157,13 @@ class User extends Authenticatable
         ]);
     }
 
+    public function walletWithdrawalRequests(): HasMany
+    {
+        return $this->hasMany(
+            WalletWithdrawalRequest::class
+        );
+    }
+
     public function scopeRole($query, string|array $roles)
     {
         $roles = is_array($roles) ? $roles : [$roles];
