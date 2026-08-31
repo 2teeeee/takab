@@ -66,7 +66,7 @@
                     <td>{{ $user->roles->pluck('label')->join(', ') }}</td>
                     <td>
                         <a href="{{ route('admin.users.edit', $user) }}" class="btn btn-sm btn-warning">ویرایش</a>
-                        @if(auth()->user()->hasRole(['admin','manager','personel','seller']))
+                        @if(auth()->user()->hasRole(['admin','manager','personel','seller']) && auth()->user()->wholesaler_id)
                         <a href="{{ route('store.customers.sale',$user) }}" class="btn btn-sm btn-success">فروش کالا</a>
                         @endif
 
