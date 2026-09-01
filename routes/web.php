@@ -492,6 +492,11 @@ Route::middleware('auth')
                 [InstallRequestController::class, 'serviceRequests']
             )->name('service_requests.index');
 
+            Route::post(
+                '/install-requests/reports/{report}/approve',
+                [InstallRequestController::class, 'approveReport']
+            )->name('install_requests.reports.approve');
+
             Route::resource(
                 'install_requests',
                 InstallRequestController::class

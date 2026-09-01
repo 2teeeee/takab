@@ -3,10 +3,12 @@
 namespace App\Http\Controllers;
 
 use App\Models\Installer;
+use App\Models\InstallReport;
 use App\Models\InstallRequest;
 use App\Models\InstallSchedule;
 use App\Models\Order;
 use App\Models\User;
+use App\Services\CommissionService;
 use Illuminate\Contracts\View\View;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -288,12 +290,73 @@ class InstallRequestController extends Controller
     {
         $installRequest->load([
             'user',
+            'wholesaler',
             'schedules.installer',
+            'schedules.report',
+            'order',
         ]);
 
         return view(
             'install_requests.show',
             compact('installRequest')
+        );
+    }
+
+    public function approveReport(InstallReport $report, CommissionService $commissionService): RedirectResponse {
+
+        $report->load([
+            'schedule.installRequest.order',
+        ]);
+
+        if ($report->status !== 'pending') {
+            return back()->with(
+                'error',
+                'این گزارش قبلاً بررسی شده است.'
+            );
+        }
+
+        if (!$report->completed) {
+            return back()->with(
+                'error',
+                'این گزارش به عنوان انجام‌شده ثبت نشده است.'
+            );
+        }
+
+        $order = $report
+            ->schedule
+            ->installRequest
+            ->order;
+
+        if (!$order) {
+            return back()->with(
+                'error',
+                'سفارش مرتبط با این درخواست نصب پیدا نشد.'
+            );
+        }
+
+        DB::transaction(function () use (
+            $report,
+            $order,
+            $commissionService
+        ) {
+
+            // Approve installer report
+            $report->update([
+                'status' => 'approved',
+                'approved_by' => auth()->id(),
+                'approved_at' => now(),
+            ]);
+
+            // Create and pay installer commission
+            $commissionService->createInstallerCommission(
+                order: $order,
+                installerId: $report->installer->user->id
+            );
+        });
+
+        return back()->with(
+            'success',
+            'گزارش با موفقیت تأیید شد و پورسانت نصاب به کیف پول او واریز گردید.'
         );
     }
 }

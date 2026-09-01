@@ -31,17 +31,17 @@ class InstallRequest extends Model
         return $this->belongsTo(User::class);
     }
 
-    public function order()
+    public function order(): BelongsTo
     {
         return $this->belongsTo(Order::class);
     }
 
-    public function wholesaler()
+    public function wholesaler(): BelongsTo
     {
         return $this->belongsTo(User::class, 'wholesaler_id');
     }
 
-    public function schedules()
+    public function schedules(): HasMany
     {
         return $this->hasMany(InstallSchedule::class);
     }

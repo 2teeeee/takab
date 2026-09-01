@@ -352,6 +352,11 @@
                                                 تخفیف مشتری
                                             </span>
                                             @break
+                                        @case('installer')
+                                            <span class="badge bg-dark text-light">
+                                                نصاب
+                                            </span>
+                                            @break
                                         @default
                                         <span class="badge bg-secondary">
                                             {{ $commission->type }}

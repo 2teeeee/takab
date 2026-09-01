@@ -12,10 +12,15 @@ class InstallReport extends Model
         'installer_id',
         'completed',
         'description',
+        'status',
+        'approved_by',
+        'approved_at',
+        'admin_note',
     ];
 
     protected $casts = [
         'completed' => 'boolean',
+        'approved_at' => 'datetime',
     ];
 
     public function schedule(): BelongsTo
@@ -31,6 +36,14 @@ class InstallReport extends Model
         return $this->belongsTo(
             Installer::class,
             'installer_id'
+        );
+    }
+
+    public function approver(): BelongsTo
+    {
+        return $this->belongsTo(
+            User::class,
+            'approved_by'
         );
     }
 }

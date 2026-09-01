@@ -137,7 +137,7 @@ class InstallScheduleController extends Controller
                 'install_schedule_id' => $install_schedule->id,
             ],
             [
-                'installer_id' => auth()->user()->installer->id,
+                'installer_id' =>$install_schedule->installer->id,
                 'completed' => $validated['completed'],
                 'description' => $validated['description'] ?? null,
             ]

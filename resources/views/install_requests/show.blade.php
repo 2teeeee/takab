@@ -282,7 +282,6 @@
                         $isToday = $schedule->scheduled_date?->isToday();
                     @endphp
 
-
                     <div
                             class="border rounded p-3 mb-3
                         {{ $isToday ? 'border-danger bg-light' : '' }}"
@@ -320,7 +319,7 @@
 
                             {{-- Installer --}}
 
-                            <div class="col-md-4">
+                            <div class="col-md-3">
 
                                 <strong>
                                     نصاب:
@@ -397,24 +396,47 @@
 
                                     @endswitch
 
+                                    <small class="text-muted">
+
+                                        در
+
+                                        {{ jdate($schedule->created_at)->format('Y/m/d') }}
+
+                                    </small>
+
                                 </div>
 
                             </div>
 
+                            <div class="col-md-3">
 
-                            {{-- Created --}}
+                                <strong>
+                                    وضعیت بررسی مدیریت:
+                                </strong>
 
-                            <div class="col-md-2">
+                                <div class="mt-1">
 
-                                <small class="text-muted">
+                                    @switch($schedule->report?->status)
+                                        @case('pending')
+                                            <span class="badge bg-warning text-dark">
+                                                در انتظار بررسی
+                                            </span>
+                                            @break
 
-                                    ثبت شده:
+                                        @case('approved')
+                                            <span class="badge bg-success">
+                                                تأیید شده
+                                            </span>
+                                            @break
 
-                                    <br>
+                                        @case('rejected')
+                                            <span class="badge bg-danger">
+                                                رد شده
+                                            </span>
+                                            @break
+                                    @endswitch
 
-                                    {{ jdate($schedule->created_at)->format('Y/m/d') }}
-
-                                </small>
+                                </div>
 
                             </div>
 
@@ -451,8 +473,33 @@
                                 </div>
 
                             @endif
-                            
+
                         </div>
+
+                        @if($schedule->report?->status === 'pending'
+                            && $schedule->report->completed)
+                        <div class="text-end">
+
+                            <form
+                                    action="{{ route(
+                                                'admin.install_requests.reports.approve',
+                                                $schedule->report
+                                            ) }}"
+                                    method="POST"
+                                    class="d-inline"
+                                    onsubmit="return confirm('آیا از تأیید گزارش و واریز پورسانت نصاب اطمینان دارید؟')"
+                            >
+                                @csrf
+
+                                <button type="submit" class="btn btn-sm btn-success">
+                                    <i class="bi bi-check-circle"></i>
+                                    تأیید گزارش و واریز پورسانت
+                                </button>
+                            </form>
+
+                        </div>
+
+                        @endif
 
                     </div>
 

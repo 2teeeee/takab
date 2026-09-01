@@ -4,6 +4,7 @@ namespace App\Services;
 
 use App\Models\Order;
 use App\Models\ReferralCommission;
+use App\Models\User;
 use App\Services\Sms\NikSmsService;
 use Illuminate\Support\Facades\DB;
 
@@ -188,6 +189,41 @@ class CommissionService
         );
     }
 
+    public function createInstallerCommission(
+        Order $order,
+        int $installerId
+    ): ?ReferralCommission {
+
+        return DB::transaction(function () use (
+            $order,
+            $installerId
+        ) {
+
+            // Prevent duplicate installer commission.
+            $existing = ReferralCommission::query()
+                ->where('order_id', $order->id)
+                ->where('user_id', $installerId)
+                ->where('type', 'installer')
+                ->first();
+
+            if ($existing) {
+                return $existing;
+            }
+
+            $commission = $this->createCommission(
+                order: $order,
+                userId: $installerId,
+                type: 'installer',
+                amount: 1_000_000,
+                note: 'Installer commission for order #' . $order->id,
+            );
+
+            $this->payToWallet($commission);
+
+            return $commission;
+        });
+    }
+
     /**
      * Calculate commission based on the number of ordered products.
      *
@@ -326,8 +362,10 @@ class CommissionService
         ]);
     }
 
-    protected function commissionDescription(ReferralCommission $commission): string
-    {
+    protected function commissionDescription(
+        ReferralCommission $commission
+    ): string {
+
         return match ($commission->type) {
 
             'wholesaler' =>
@@ -340,6 +378,10 @@ class CommissionService
 
             'referral' =>
                 'کمیسیون معرفی بابت سفارش شماره '
+                . $commission->order_id,
+
+            'installer' =>
+                'کمیسیون نصب بابت سفارش شماره '
                 . $commission->order_id,
 
             default =>
