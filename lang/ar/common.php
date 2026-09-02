@@ -3,6 +3,9 @@
 return [
 
     'save' => 'Save',
-    'back' => 'Back',
+    'back' => 'رجوع',
+    'cancel' => 'إلغاء',
+    'validation_error' => 'يرجى تصحيح الأخطاء التالية.',
+    'toman' => 'تومان',
 
 ];

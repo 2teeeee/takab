@@ -721,6 +721,20 @@ Route::middleware([
             'store'
         ])->name('customers.sale.store');
 
+        Route::get('/customer-sale', [
+            CustomerSaleController::class,
+            'createDirect'
+        ])->name('customers.direct-sale');
+
+        Route::post('/customer-sale', [
+            CustomerSaleController::class,
+            'storeDirect'
+        ])->name('customers.direct-sale.store');
+
+        Route::get('/customers/check-mobile', [
+            CustomerSaleController::class,
+            'checkMobile'
+        ])->name('customers.check-mobile');
     });
 
 

@@ -562,12 +562,23 @@
             </a>
 
             <a
+                    href="{{ route('store.customers.direct-sale') }}"
+                    class="{{ request()->routeIs('store.customers.*') ? 'active' : '' }}"
+            >
+                <i class="bi bi-shop"></i>
+                <span>فروش‌ محصول
+                </span>
+            </a>
+
+            <a
                     href="{{ route('store.sales.index') }}"
                     class="{{ request()->routeIs('store.sales.*') ? 'active' : '' }}"
             >
                 <i class="bi bi-graph-up"></i>
                 <span>فروش‌های فروشگاه</span>
             </a>
+
+
 
         @endif
 
@@ -908,6 +919,15 @@
             >
                 <i class="bi bi-bag-check"></i>
                 <span>خریدهای فروشگاه</span>
+            </a>
+
+            <a
+                    href="{{ route('store.customers.direct-sale') }}"
+                    class="mobile-menu-link {{ request()->routeIs('store.customers.*') ? 'active' : '' }}"
+            >
+                <i class="bi bi-shop"></i>
+                <span>فروش‌ محصول
+                </span>
             </a>
 
             <a
