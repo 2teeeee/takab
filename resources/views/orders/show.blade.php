@@ -488,8 +488,6 @@
                     <div>
                         <div class="fw-semibold">
                             وضعیت سفارش
-
-                            <x-status_badge status="{{ $order->status }}" />
                         </div>
 
                         <div class="small text-muted">
@@ -502,6 +500,17 @@
             </div>
 
             <div class="card-body">
+
+                <div class="col-md-4 mb-2">
+
+                    <div class="fw-semibold">
+
+                        <x-status_badge status="{{ $order->status }}" />
+
+                    </div>
+
+                </div>
+
 
                 @if(
                     $order->from_user_id &&

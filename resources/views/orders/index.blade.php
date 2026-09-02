@@ -30,7 +30,7 @@
 
         <!-- جدول -->
         <div class="card shadow-sm">
-            <div class="card-body p-0">
+            <div class="card-body p-0 table-responsive">
 
                 <table class="table table-hover mb-0">
                     <thead class="table-light">
@@ -80,12 +80,12 @@
                             <td>{{ $order->moaref?->name }}</td>
                             <td>
                                 <a href="{{ route('admin.orders.show', $order->id) }}"
-                                   class="btn btn-sm btn-outline-primary">
+                                   class="btn btn-sm btn-outline-primary mb-2">
                                     مشاهده
                                 </a>
 
                                 <a href="{{ route('admin.install_requests.create_from_order', $order) }}"
-                                   class="btn btn-sm btn-info">
+                                   class="btn btn-sm btn-info mb-2">
                                     <i class="bi bi-tools"></i>
                                     ثبت نصب / سرویس
                                 </a>
