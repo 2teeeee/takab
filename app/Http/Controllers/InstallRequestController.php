@@ -9,6 +9,7 @@ use App\Models\InstallSchedule;
 use App\Models\Order;
 use App\Models\User;
 use App\Services\CommissionService;
+use App\Services\Sms\NikSmsService;
 use Illuminate\Contracts\View\View;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -134,7 +135,11 @@ class InstallRequestController extends Controller
         );
     }
 
-    public function storeFromOrder(Request $request,Order $order): RedirectResponse {
+    public function storeFromOrder(
+        Request $request,
+        Order $order,
+        NikSmsService $sms
+    ): RedirectResponse {
 
         $validated = $request->validate([
             'installer_id' => [
@@ -174,7 +179,6 @@ class InstallRequestController extends Controller
          * Make sure the selected installer belongs
          * to the wholesaler of this order.
          */
-
         $installer = Installer::query()
             ->where('id', $validated['installer_id'])
             ->where('status', 'approved')
@@ -184,9 +188,18 @@ class InstallRequestController extends Controller
                     $order->wholesaler_id
                 );
             })
+            ->with('user')
             ->firstOrFail();
 
-        DB::transaction(function () use (
+        /*
+         * Load customer information.
+         */
+        $order->load('user');
+
+        /*
+         * Create installation request and schedule.
+         */
+        $installRequest = DB::transaction(function () use (
             $validated,
             $order,
             $installer
@@ -200,16 +213,81 @@ class InstallRequestController extends Controller
                 'serial_number' => $validated['serial_number'] ?? null,
                 'address' => $validated['address'],
                 'status' => 'scheduled',
-                'description' => $validated['description']
+                'description' => $validated['description'] ?? null,
             ]);
 
+
             InstallSchedule::create([
+                /*
+                 * install_schedules.installer_id references users.id
+                 */
                 'installer_id' => $installer->id,
+
                 'install_request_id' => $installRequest->id,
+
                 'scheduled_date' => $validated['scheduled_date'],
+
                 'status' => 'waiting',
             ]);
+
+            return $installRequest;
         });
+
+        /*
+         * Prepare installation date for SMS.
+         */
+        $scheduledDate = jdate(
+            $validated['scheduled_date']
+        )->format('Y/m/d');
+
+        /*
+         * Installer notification.
+         */
+        if (
+            $installer->user &&
+            !empty($installer->user->mobile)
+        ) {
+
+            $installerMessage =
+                "نصاب گرامی،\n"
+                . "یک درخواست نصب برای شما ثبت شد.\n"
+                . "مدل دستگاه: {$validated['device_model']}\n"
+                . "تاریخ مراجعه: {$scheduledDate}\n"
+                . "آدرس: {$validated['address']}\n"
+                . "شماره سفارش: {$order->id}";
+
+            $sms->sendSingle(
+                $installer->user->mobile,
+                $installerMessage
+            );
+        }
+
+
+        /*
+         * Customer notification.
+         */
+        if (
+            $order->user &&
+            !empty($order->user->mobile)
+        ) {
+
+            $installerName = $installer->user?->name
+                ?? 'نصاب';
+
+
+            $customerMessage =
+                "مشتری گرامی،\n"
+                . "نصب دستگاه شما برنامه‌ریزی شد.\n"
+                . "مدل دستگاه: {$validated['device_model']}\n"
+                . "نصاب: {$installerName}\n"
+                . "تاریخ مراجعه: {$scheduledDate}\n"
+                . "شماره سفارش: {$order->id}";
+
+            $sms->sendSingle(
+                $order->user->mobile,
+                $customerMessage
+            );
+        }
 
         return redirect()
             ->route('admin.orders.show', $order)
