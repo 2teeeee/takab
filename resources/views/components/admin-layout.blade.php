@@ -35,6 +35,11 @@
             href="{{ asset('fonts/fontstyle.css') }}"
     >
 
+    <link
+            rel="stylesheet"
+            href="{{ asset('css/jalalidatepicker.min.css') }}"
+    >
+
     <style>
         :root {
             --sidebar-width: 250px;
@@ -1129,6 +1134,29 @@
 <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
 
 <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+
+<script
+        src="{{ asset('js/jalalidatepicker.min.js') }}">
+</script>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+
+        jalaliDatepicker.startWatch({
+            date: true,
+            time: false,
+            persianDigits: true,
+            autoClose: true,
+            showTodayBtn: true,
+            showEmptyBtn: true,
+            separatorChars: {
+                date: '/',
+                between: ' '
+            }
+        });
+
+    });
+</script>
 
 @stack('scripts')
 

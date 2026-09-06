@@ -14,6 +14,7 @@ use Illuminate\Contracts\View\View;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Morilog\Jalali\Jalalian;
 
 class InstallRequestController extends Controller
 {
@@ -167,13 +168,18 @@ class InstallRequestController extends Controller
 
             'scheduled_date' => [
                 'required',
-                'date',
+                'regex:/^\d{4}\/\d{2}\/\d{2}$/',
             ],
 
             'description' => [
                 'nullable',
             ],
         ]);
+
+        $scheduledDate = Jalalian::fromFormat(
+            'Y/m/d',
+            $validated['scheduled_date']
+        )->toCarbon()->format('Y-m-d');
 
         /*
          * Make sure the selected installer belongs
@@ -202,7 +208,8 @@ class InstallRequestController extends Controller
         $installRequest = DB::transaction(function () use (
             $validated,
             $order,
-            $installer
+            $installer,
+            $scheduledDate
         ) {
 
             $installRequest = InstallRequest::create([
@@ -218,15 +225,9 @@ class InstallRequestController extends Controller
 
 
             InstallSchedule::create([
-                /*
-                 * install_schedules.installer_id references users.id
-                 */
                 'installer_id' => $installer->id,
-
                 'install_request_id' => $installRequest->id,
-
-                'scheduled_date' => $validated['scheduled_date'],
-
+                'scheduled_date' => $scheduledDate,
                 'status' => 'waiting',
             ]);
 
@@ -236,9 +237,8 @@ class InstallRequestController extends Controller
         /*
          * Prepare installation date for SMS.
          */
-        $scheduledDate = jdate(
-            $validated['scheduled_date']
-        )->format('Y/m/d');
+        $scheduledDateForSms = jdate($scheduledDate)
+            ->format('Y/m/d');
 
         /*
          * Installer notification.
@@ -252,7 +252,7 @@ class InstallRequestController extends Controller
                 "نصاب گرامی،\n"
                 . "یک درخواست نصب برای شما ثبت شد.\n"
                 . "مدل دستگاه: {$validated['device_model']}\n"
-                . "تاریخ مراجعه: {$scheduledDate}\n"
+                . "تاریخ مراجعه: {$scheduledDateForSms}\n"
                 . "آدرس: {$validated['address']}\n"
                 . "شماره سفارش: {$order->id}";
 

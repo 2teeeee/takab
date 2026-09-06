@@ -209,29 +209,23 @@
                         {{-- From date --}}
 
                         <div class="col-md-2">
-                            <label class="form-label">
-                                از تاریخ
-                            </label>
-                            <input
-                                    type="date"
+                            <x-jalali-date
                                     name="from"
-                                    class="form-control"
-                                    value="{{ request('from') }}"
-                            >
+                                    label="از تاریخ"
+                                    :minDate="jdate()->format('Y/m/d')"
+                                    required
+                            />
                         </div>
 
                         {{-- To date --}}
 
                         <div class="col-md-2">
-                            <label class="form-label">
-                                تا تاریخ
-                            </label>
-                            <input
-                                    type="date"
+                            <x-jalali-date
                                     name="to"
-                                    class="form-control"
-                                    value="{{ request('to') }}"
-                            >
+                                    label="تا تاریخ"
+                                    :minDate="jdate()->format('Y/m/d')"
+                                    required
+                            />
                         </div>
 
                         {{-- Buttons --}}

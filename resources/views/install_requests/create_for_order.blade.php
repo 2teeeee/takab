@@ -188,15 +188,12 @@
                         </div>
 
                         <div class="col-md-4">
-                            <label class="form-label">تاریخ نصب</label>
-                            <input type="date" name="scheduled_date" class="form-control @error('scheduled_date') is-invalid @enderror" required>
-
-                            @error('scheduled_date')
-                            <div class="invalid-feedback">
-                                {{ $message }}
-                            </div>
-                            @enderror
-
+                            <x-jalali-date
+                                    name="scheduled_date"
+                                    label="تاریخ نصب"
+                                    :minDate="jdate()->format('Y/m/d')"
+                                    required
+                            />
                         </div>
 
                         {{-- Device Model --}}

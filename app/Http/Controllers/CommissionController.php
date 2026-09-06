@@ -6,6 +6,7 @@ use App\Models\ReferralCommission;
 use App\Models\User;
 use Illuminate\Contracts\View\View;
 use Illuminate\Http\Request;
+use Morilog\Jalali\Jalalian;
 
 class CommissionController extends Controller
 {
@@ -66,18 +67,30 @@ class CommissionController extends Controller
          * Filter by date range.
          */
         if ($request->filled('from')) {
+
+            $fromDate = Jalalian::fromFormat(
+                'Y/m/d',
+                $request->from
+            )->toCarbon()->format('Y-m-d');
+
             $query->whereDate(
                 'created_at',
                 '>=',
-                $request->from
+                $fromDate
             );
         }
 
         if ($request->filled('to')) {
+
+            $toDate = Jalalian::fromFormat(
+                'Y/m/d',
+                $request->to
+            )->toCarbon()->format('Y-m-d');
+
             $query->whereDate(
                 'created_at',
                 '<=',
-                $request->to
+                $toDate
             );
         }
 
