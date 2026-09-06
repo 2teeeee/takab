@@ -485,8 +485,8 @@ class CustomerSaleController extends Controller
                 fromUserId: $storeId,
                 toUserId: $customer->id,
                 products: $products->toArray(),
-                address: $validated['address'],
-                discount: 1_000_000
+                discountPerItem: 1_000_000,
+                address: $validated['address']
             );
 
             /*
