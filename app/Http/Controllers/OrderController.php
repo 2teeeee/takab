@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Letter;
 use App\Models\Order;
+use App\Services\CommissionService;
 use App\Services\InventoryTransferService;
 use App\Services\Sms\NikSmsService;
 use Illuminate\Contracts\View\View;
@@ -13,6 +14,15 @@ use Illuminate\Support\Facades\Auth;
 
 class OrderController extends Controller
 {
+
+    protected CommissionService $commissionService;
+
+    public function __construct(
+        CommissionService $commissionService
+    ) {
+        $this->commissionService = $commissionService;
+    }
+
     public function index(Request $request): View
     {
         $query = Order::with('user');
@@ -99,6 +109,21 @@ class OrderController extends Controller
 
                 if ($newStatus === 'success') {
                     $service->approve($order);
+
+                    if($order->seller_role == 'user') {
+                        /*
+                         * Create commissions.
+                         */
+                        $this->commissionService->createForOrder($order);
+
+                        $this->commissionService->payOrderCommissionsToWallet($order);
+
+                        /*
+                         * Send commission SMS.
+                         */
+                        $this->commissionService->sendCommissionSms($order);
+                    }
+
                 } else {
                     $service->reject($order);
                 }

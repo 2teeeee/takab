@@ -81,7 +81,6 @@ Route::prefix('product')->group(function () {
 
 });
 
-
 /*
 |--------------------------------------------------------------------------
 | Cart
@@ -293,6 +292,24 @@ Route::middleware('auth')
                     ->name('create');
 
             });
+
+        Route::prefix('customer')->name('customer.')->group(function () {
+
+            Route::get('/sale', [
+                CustomerSaleController::class,
+                'createCustomer'
+            ])->name('sale.create');
+
+            Route::post('/sale', [
+                CustomerSaleController::class,
+                'storeCustomer'
+            ])->name('sale.store');
+
+            Route::get('/check-mobile', [
+                CustomerSaleController::class,
+                'checkMobile'
+            ])->name('check-mobile');
+        });
 
     });
 
@@ -730,11 +747,6 @@ Route::middleware([
             CustomerSaleController::class,
             'storeDirect'
         ])->name('customers.direct-sale.store');
-
-        Route::get('/customers/check-mobile', [
-            CustomerSaleController::class,
-            'checkMobile'
-        ])->name('customers.check-mobile');
     });
 
 

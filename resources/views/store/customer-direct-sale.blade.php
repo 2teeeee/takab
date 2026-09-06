@@ -1177,7 +1177,7 @@
             try {
 
             const url =
-            `{{ route('store.customers.check-mobile') }}`
+            `{{ route('profile.customer.check-mobile') }}`
             + `?mobile=${encodeURIComponent(mobile)}`;
 
 

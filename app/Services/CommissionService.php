@@ -82,10 +82,6 @@ class CommissionService
             return;
         }
 
-        if (!$wholesaler->hasRole('wholesaler')) {
-            return;
-        }
-
         $amount = $this->calculateCommissionAmount($order);
 
         if ($amount <= 0) {
@@ -113,21 +109,21 @@ class CommissionService
             return;
         }
 
-        if (!$seller->hasRole('seller')) {
-            return;
-        }
-
         $amount = $this->calculateCommissionAmount($order);
 
         if ($amount <= 0) {
             return;
         }
 
+        if($order->seller_role != 'user') {
+            $amount *= 2;
+        }
+
         $this->createCommission(
             order: $order,
             userId: $seller->id,
             type: 'store',
-            amount: $amount * 2,
+            amount:  $amount,
             note: __('commissions.notes.store')
         );
     }

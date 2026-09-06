@@ -2,14 +2,17 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Product;
 use App\Models\ProductUser;
 use App\Models\User;
 use App\Services\CommissionService;
 use App\Services\InventoryTransferService;
 use Cassandra\Exception\ValidationException;
+use Illuminate\Database\Query\JoinClause;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
 use Illuminate\View\View;
@@ -350,4 +353,161 @@ class CustomerSaleController extends Controller
             ],
         ]);
     }
+
+    public function createCustomer(): View
+    {
+        $locale = app()->getLocale();
+
+        $products = Product::query()
+            ->where('products.category_id', 1)
+            ->where('products.status', 1)
+            ->join('product_translations as t', function (JoinClause $join) use ($locale) {
+                $join->on('t.product_id', '=', 'products.id')
+                    ->where('t.locale', $locale);
+            })
+            ->join('product_images as image', function (JoinClause $join) {
+                $join->on('image.product_id', '=', 'products.id')
+                    ->where('image.is_main', 1);
+            })
+            ->select([
+                'products.id',
+                'products.sell_price',
+                'products.slug',
+                't.title',
+                'image.small_image_name',
+            ])
+            ->paginate(20);
+
+        return view(
+            'customer.sale.create',
+            compact('products')
+        );
+    }
+
+    public function storeCustomer(
+        Request $request,
+        InventoryTransferService $inventoryTransferService,
+        CommissionService $commissionService
+    ): RedirectResponse {
+
+        $validated = $request->validate([
+            'name' => [
+                'required',
+                'string',
+                'max:255',
+            ],
+
+            'mobile' => [
+                'required',
+                'string',
+                'max:11',
+            ],
+
+            'national_code' => [
+                'nullable',
+                'string',
+                'size:10',
+            ],
+
+            'address' => [
+                'required',
+                'string',
+                'max:1000',
+            ],
+
+            'products' => [
+                'required',
+                'array',
+            ],
+        ]);
+
+        /*
+         * Remove products with zero quantity.
+         */
+        $products = collect($validated['products'])
+            ->map(fn ($quantity) => (int) $quantity)
+            ->filter(fn ($quantity) => $quantity > 0);
+
+        if ($products->isEmpty()) {
+            return back()
+                ->withErrors([
+                    'products' => 'حداقل یک محصول را انتخاب کنید.',
+                ])
+                ->withInput();
+        }
+
+        $order = DB::transaction(function () use (
+            $validated,
+            $products,
+            $inventoryTransferService,
+            $commissionService
+        ) {
+
+            $storeId = config('shop.company_user_id');
+            $wholesalerId = auth()->user()->wholesaler_id;
+            $referrerId = auth()->user()->id;
+            /*
+             * Resolve customer on the server.
+             */
+            $customer = User::query()
+                ->where('mobile', $validated['mobile'])
+                ->first();
+
+            /*
+             * Create new customer if necessary.
+             */
+            if (!$customer) {
+
+                $customer = User::create([
+                    'name' => $validated['name'],
+                    'mobile' => $validated['mobile'],
+                    'national_code' => $validated['national_code'] ?? null,
+                    'password' => Hash::make(
+                        Str::random(32)
+                    ),
+                    'registered_by' => $storeId,
+                    'wholesaler_id' => $wholesalerId,
+                ]);
+
+                $customer->assignRole('user');
+
+                $customer->update([
+                    'moaref_code' => $customer->generateMoarefCode(),
+                ]);
+
+            }
+
+            /*
+             * Transfer products from the authenticated user
+             * to the final customer.
+             */
+            $order = $inventoryTransferService->transfer(
+                fromUserId: $storeId,
+                toUserId: $customer->id,
+                products: $products->toArray(),
+                address: $validated['address'],
+                discount: 1_000_000
+            );
+
+            /*
+             * The authenticated user is the seller/referrer.
+             */
+            $order->update([
+                'seller_id' => $storeId,
+                'wholesaler_id' => $wholesalerId,
+                'seller_role' => 'user',
+                'moaref_id'     => $referrerId,
+            ]);
+
+            return $order;
+        });
+
+        return redirect()
+            ->route('profile.customer.sale.create', $order)
+            ->with(
+                'success',
+                'فروش با موفقیت ثبت شد و پورسانت معرف برای شما ثبت گردید.'
+            );
+    }
+
 }
