@@ -237,9 +237,7 @@
                     <table class="table table-bordered table-hover align-middle mb-0">
 
                         <thead class="table-light">
-
                         <tr>
-
                             <th style="width: 70px;">
                                 تصویر
                             </th>
@@ -249,7 +247,7 @@
                             </th>
 
                             <th style="width: 130px;">
-                                قیمت
+                                قیمت واحد
                             </th>
 
                             <th style="width: 120px;">
@@ -259,9 +257,7 @@
                             <th style="width: 150px;">
                                 جمع
                             </th>
-
                         </tr>
-
                         </thead>
 
 
@@ -273,30 +269,23 @@
 
                                 {{-- Image --}}
                                 <td>
-
                                     <img
                                             src="{{ asset('storage/'.$product->small_image_name) }}"
                                             class="img-thumbnail"
                                             style="width:60px; height:60px; object-fit:cover;"
                                             alt="{{ $product->title }}"
                                     >
-
                                 </td>
-
 
                                 {{-- Product --}}
                                 <td>
-
                                     <div class="fw-semibold">
                                         {{ $product->title }}
                                     </div>
-
                                 </td>
 
-
-                                {{-- Price --}}
+                                {{-- Unit Price --}}
                                 <td>
-
                                     <span class="text-nowrap">
                                         {{ number_format($product->sell_price) }}
                                     </span>
@@ -304,9 +293,7 @@
                                     <small class="text-muted">
                                         تومان
                                     </small>
-
                                 </td>
-
 
                                 {{-- Quantity --}}
                                 <td>
@@ -318,25 +305,23 @@
                                             step="1"
                                             inputmode="numeric"
                                             value="{{ old('products.'.$product->id, 0) }}"
-                                            class="form-control quantity text-center @error('products.'.$product->id) is-invalid @enderror"
+                                            class="form-control quantity text-center
+                                            @error('products.'.$product->id) is-invalid @enderror"
                                             data-price="{{ $product->sell_price }}"
+                                            data-discount="1000000"
                                             name="products[{{ $product->id }}]"
                                     >
 
                                     @error('products.'.$product->id)
-
                                     <div class="invalid-feedback">
                                         {{ $message }}
                                     </div>
-
                                     @enderror
 
                                 </td>
 
-
                                 {{-- Line Total --}}
                                 <td>
-
                                     <span class="line-total">
                                         0
                                     </span>
@@ -344,7 +329,6 @@
                                     <small class="text-muted">
                                         تومان
                                     </small>
-
                                 </td>
 
                             </tr>
@@ -352,16 +336,12 @@
                         @empty
 
                             <tr>
-
                                 <td
-                                        colspan="5"
+                                        colspan="7"
                                         class="text-center text-muted py-5"
                                 >
-
                                     <div class="mb-2">
-
                                         <i class="bi bi-box-seam fs-1"></i>
-
                                     </div>
 
                                     <div class="fw-semibold mb-1">
@@ -371,9 +351,7 @@
                                     <small>
                                         در حال حاضر محصولی با موجودی قابل فروش وجود ندارد.
                                     </small>
-
                                 </td>
-
                             </tr>
 
                         @endforelse
@@ -392,7 +370,7 @@
                                         colspan="4"
                                         class="text-end"
                                 >
-                                    جمع کل
+                                    جمع کل محصولات
                                 </th>
 
                                 <th>
@@ -410,19 +388,22 @@
                             </tr>
 
 
-                            {{-- Available Discount --}}
+                            {{-- Discount --}}
                             <tr>
 
                                 <th
                                         colspan="4"
                                         class="text-end"
                                 >
-                                    تخفیف
+                                    مجموع تخفیف
                                 </th>
 
                                 <th>
 
-                                    <span id="discount_available">
+                                    <span
+                                            id="discount_available"
+                                            class="text-success"
+                                    >
                                         0
                                     </span>
 
@@ -447,9 +428,12 @@
 
                                 <th>
 
-                                    <span id="final">
+                                    <strong
+                                            id="final"
+                                            class="fs-5"
+                                    >
                                         0
-                                    </span>
+                                    </strong>
 
                                     <small>
                                         تومان
@@ -467,6 +451,137 @@
 
                 </div>
 
+                {{-- Payment Method --}}
+                @if($products->count())
+
+                    <div class="card-body border-top">
+
+                        <div class="mb-3">
+
+                            <div class="d-flex align-items-center gap-2">
+
+                                <i class="bi bi-credit-card fs-5 text-secondary"></i>
+
+                                <div>
+
+                                    <h6 class="mb-0">
+                                        روش پرداخت
+                                    </h6>
+
+                                    <small class="text-muted">
+                                        روش پرداخت مشتری را انتخاب کنید
+                                    </small>
+
+                                </div>
+
+                            </div>
+
+                        </div>
+
+
+                        <div class="row g-3">
+
+                            {{-- Online Payment --}}
+                            <div class="col-12 col-md-6">
+
+                                <div class="form-check border rounded p-3 h-100">
+
+                                    <input
+                                            class="form-check-input"
+                                            type="radio"
+                                            name="payment_method"
+                                            id="payment_online"
+                                            value="online"
+                                            {{ old('payment_method', 'online') === 'online' ? 'checked' : '' }}
+                                            required
+                                    >
+
+                                    <label
+                                            class="form-check-label w-100"
+                                            for="payment_online"
+                                    >
+
+                                        <div class="d-flex align-items-center gap-2">
+
+                                            <i class="bi bi-credit-card text-primary fs-4"></i>
+
+                                            <div>
+
+                                                <div class="fw-semibold">
+                                                    پرداخت آنلاین
+                                                </div>
+
+                                                <small class="text-muted">
+                                                    پرداخت مبلغ سفارش از طریق درگاه پرداخت
+                                                </small>
+
+                                            </div>
+
+                                        </div>
+
+                                    </label>
+
+                                </div>
+
+                            </div>
+
+
+                            {{-- Cash on Delivery --}}
+                            <div class="col-12 col-md-6">
+
+                                <div class="form-check border rounded p-3 h-100">
+
+                                    <input
+                                            class="form-check-input"
+                                            type="radio"
+                                            name="payment_method"
+                                            id="payment_cod"
+                                            value="cash_on_delivery"
+                                            {{ old('payment_method') === 'cash_on_delivery' ? 'checked' : '' }}
+                                            required
+                                    >
+
+                                    <label
+                                            class="form-check-label w-100"
+                                            for="payment_cod"
+                                    >
+
+                                        <div class="d-flex align-items-center gap-2">
+
+                                            <i class="bi bi-cash-coin text-success fs-4"></i>
+
+                                            <div>
+
+                                                <div class="fw-semibold">
+                                                    پرداخت در محل
+                                                </div>
+
+                                                <small class="text-muted">
+                                                    پرداخت مبلغ سفارش هنگام تحویل
+                                                </small>
+
+                                            </div>
+
+                                        </div>
+
+                                    </label>
+
+                                </div>
+
+                            </div>
+
+                        </div>
+
+
+                        @error('payment_method')
+                        <div class="text-danger small mt-2">
+                            {{ $message }}
+                        </div>
+                        @enderror
+
+                    </div>
+
+                @endif
 
                 {{-- Footer --}}
                 @if($products->count())
@@ -507,121 +622,195 @@
 
     </div>
 
+    @push('styles')
+        <style>
+            .payment-method-card {
+                cursor: pointer;
+                transition: all .2s ease;
+            }
+
+            .payment-method-card:hover {
+                border-color: var(--bs-primary) !important;
+            }
+
+            .payment-method-card:has(input:checked) {
+                border-color: var(--bs-primary) !important;
+                background-color: rgba(var(--bs-primary-rgb), .05);
+            }
+        </style>
+    @endpush
 
     @push('scripts')
 
         <script>
-
             document.addEventListener('DOMContentLoaded', function () {
 
-                const discountInput = document.getElementById('discount');
+                const discountPerProduct = 1000000;
+
+                function formatPrice(value) {
+                    return Number(value).toLocaleString('fa-IR');
+                }
 
                 function calculate() {
 
                     let total = 0;
                     let discountAvailable = 0;
+                    let finalAmount = 0;
 
                     document.querySelectorAll('.quantity').forEach(function (input) {
 
-                        let quantity =
-                            parseInt(input.value) || 0;
+                        let quantity = parseInt(input.value) || 0;
 
                         const price =
                             parseInt(input.dataset.price) || 0;
 
+                        const max =
+                            parseInt(input.max) || 0;
 
-                        // Prevent negative quantity
+
+                        // جلوگیری از مقدار منفی
                         if (quantity < 0) {
                             quantity = 0;
                             input.value = 0;
                         }
 
 
-                        // Prevent quantity higher than stock
-                        const max =
-                            parseInt(input.max) || 0;
-
+                        // جلوگیری از بیشتر شدن تعداد از موجودی
                         if (max > 0 && quantity > max) {
                             quantity = max;
                             input.value = max;
                         }
 
 
-                        const rowTotal =
+                        // جمع قیمت محصول
+                        const lineTotal =
                             quantity * price;
+
+
+                        // تخفیف این محصول
+                        const lineDiscount =
+                            quantity * discountPerProduct;
+
+
+                        // مبلغ نهایی این محصول
+                        const lineFinal =
+                            Math.max(lineTotal - lineDiscount, 0);
 
 
                         const row =
                             input.closest('tr');
 
 
-                        const lineTotal =
+                        if (!row) {
+                            return;
+                        }
+
+
+                        const lineTotalElement =
                             row.querySelector('.line-total');
 
 
-                        if (lineTotal) {
+                        const lineDiscountElement =
+                            row.querySelector('.line-discount');
 
-                            lineTotal.textContent =
-                                rowTotal.toLocaleString('fa-IR');
+
+                        const lineFinalElement =
+                            row.querySelector('.line-final');
+
+
+                        if (lineTotalElement) {
+
+                            lineTotalElement.textContent =
+                                formatPrice(lineTotal);
 
                         }
 
 
-                        total += rowTotal;
+                        if (lineDiscountElement) {
+
+                            lineDiscountElement.textContent =
+                                formatPrice(
+                                    Math.min(lineDiscount, lineTotal)
+                                );
+
+                        }
 
 
-                        // 1,000,000 Toman discount per product
+                        if (lineFinalElement) {
+
+                            lineFinalElement.textContent =
+                                formatPrice(lineFinal);
+
+                        }
+
+
+                        // جمع کل
+                        total += lineTotal;
+
+
+                        // تخفیف واقعی
                         discountAvailable +=
-                            quantity * 1000000;
+                            Math.min(lineDiscount, lineTotal);
+
+
+                        // مبلغ نهایی
+                        finalAmount += lineFinal;
 
                     });
 
 
-                    const finalAmount =
-                        Math.max(total - discountAvailable, 0);
+                    // نمایش جمع کل
+                    const totalElement =
+                        document.getElementById('total');
+
+                    if (totalElement) {
+
+                        totalElement.textContent =
+                            formatPrice(total);
+
+                    }
 
 
-                    document.getElementById('total').textContent =
-                        total.toLocaleString('fa-IR');
+                    // نمایش تخفیف
+                    const discountElement =
+                        document.getElementById('discount_available');
+
+                    if (discountElement) {
+
+                        discountElement.textContent =
+                            formatPrice(discountAvailable);
+
+                    }
 
 
-                    document.getElementById('discount_available').textContent =
-                        discountAvailable.toLocaleString('fa-IR');
+                    // نمایش مبلغ نهایی
+                    const finalElement =
+                        document.getElementById('final');
 
+                    if (finalElement) {
 
-                    document.getElementById('final').textContent =
-                        finalAmount.toLocaleString('fa-IR');
+                        finalElement.textContent =
+                            formatPrice(finalAmount);
+
+                    }
 
                 }
 
 
+                // تغییر تعداد محصولات
                 document.querySelectorAll('.quantity').forEach(function (input) {
 
                     input.addEventListener('input', calculate);
 
-                });
-
-
-                discountInput?.addEventListener('input', function () {
-
-                    let value =
-                        parseInt(this.value) || 0;
-
-
-                    if (value < 0) {
-                        this.value = 0;
-                    }
-
-
-                    calculate();
+                    input.addEventListener('change', calculate);
 
                 });
 
 
+                // محاسبه اولیه
                 calculate();
 
             });
-
         </script>
 
     @endpush

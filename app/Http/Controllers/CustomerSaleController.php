@@ -419,6 +419,11 @@ class CustomerSaleController extends Controller
                 'required',
                 'array',
             ],
+
+            'payment_method' => [
+                'required',
+                'in:online,cash_on_delivery',
+            ],
         ]);
 
         /*
