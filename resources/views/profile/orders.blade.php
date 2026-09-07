@@ -1,58 +1,139 @@
 <x-profile-layout title="سفارش‌های من">
 
-    <div class="table-responsive">
-        <table class="table table-hover align-middle">
-            <thead class="table-light">
-            <tr>
-                <th>#</th>
-                <th>تاریخ سفارش</th>
-                <th>مبلغ کل</th>
-                <th>وضعیت</th>
-                <th>کد تراکنش</th>
-                <th>جزئیات</th>
-            </tr>
-            </thead>
-            <tbody>
-            @forelse ($orders as $order)
-                <tr>
-                    <td>{{ $order->id }}</td>
-                    <td>{{ jdate($order->created_at)->format('Y/m/d - H:i') }}</td>
-                    <td>{{ number_format($order->total) }} تومان</td>
-                    <td>
-                        @php
-                            $badgeClass = match($order->status) {
-                                'paid' => 'success',
-                                'pending' => 'warning',
-                                'canceled' => 'danger',
-                                default => 'secondary'
-                            };
-                            $statusLabel = match($order->status) {
-                                'paid' => 'پرداخت‌شده',
-                                'pending' => 'در انتظار پرداخت',
-                                'canceled' => 'لغوشده',
-                                default => 'نامشخص'
-                            };
-                        @endphp
-                        <span class="badge bg-{{ $badgeClass }}">{{ $statusLabel }}</span>
-                    </td>
-                    <td>{{ $order->reference_id ?? '-' }}</td>
-                    <td>
-                        <a href="{{ route('profile.orders.details', ['id'=>$order->id]) }}" class="btn btn-sm btn-success">
-                            <i class="bi bi-eye"></i>
-                        </a>
-                    </td>
-                </tr>
-            @empty
-                <tr>
-                    <td colspan="6" class="text-center text-muted">هیچ سفارشی ثبت نشده است.</td>
-                </tr>
-            @endforelse
-            </tbody>
-        </table>
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h4 class="fw-bold mb-1">
+                سفارش‌های من
+            </h4>
+
+            <p class="text-muted mb-0">
+                لیست سفارش‌هایی که ثبت کرده‌اید
+            </p>
+        </div>
+
+        <span class="badge bg-primary rounded-pill px-3 py-2">
+            {{ $orders->total() }} سفارش
+        </span>
     </div>
 
-    <div class="mt-3">
-        {{ $orders->links() }}
-    </div>
+    @if($orders->count())
+
+        <div class="card border-0 shadow-sm">
+            <div class="card-body p-0">
+
+                <div class="table-responsive">
+
+                    <table class="table table-hover align-middle mb-0">
+
+                        <thead class="table-light">
+                        <tr>
+                            <th class="px-4">شماره سفارش</th>
+                            <th>تاریخ</th>
+                            <th>تعداد کالا</th>
+                            <th>مبلغ</th>
+                            <th>وضعیت</th>
+                            <th></th>
+                        </tr>
+                        </thead>
+
+                        <tbody>
+
+                        @foreach($orders as $order)
+
+                            <tr>
+
+                                <td class="px-4">
+                                    <div class="fw-bold">
+                                        #{{ $order->id }}
+                                    </div>
+                                </td>
+
+                                <td>
+                                    <div>
+                                        {{ jdate($order->created_at->setTimezone('Asia/Tehran'))->format('Y/m/d H:i') }}
+                                    </div>
+
+                                    <small class="text-muted">
+                                        {{ $order->created_at->setTimezone('Asia/Tehran')->format('H:i') }}
+                                    </small>
+                                </td>
+
+                                <td>
+                                    <span class="badge bg-light text-dark">
+                                        {{ $order->items_count }} کالا
+                                    </span>
+                                </td>
+
+                                <td>
+                                    <strong>
+                                        {{ number_format($order->final_total) }}
+                                    </strong>
+
+                                    <small class="text-muted">
+                                        تومان
+                                    </small>
+                                </td>
+
+                                <td>
+                                    <x-status_badge status="{{ $order->status }}" />
+                                </td>
+
+                                <td class="text-end px-4">
+
+                                    <a
+                                            href="{{ route('profile.orders.show', $order) }}"
+                                            class="btn btn-sm btn-outline-primary"
+                                    >
+                                        مشاهده
+                                        <i class="bi bi-chevron-left ms-1"></i>
+                                    </a>
+
+                                </td>
+
+                            </tr>
+
+                        @endforeach
+
+                        </tbody>
+
+                    </table>
+
+                </div>
+
+            </div>
+        </div>
+
+        <div class="mt-4">
+            {{ $orders->links() }}
+        </div>
+
+    @else
+
+        <div class="card border-0 shadow-sm">
+            <div class="card-body text-center py-5">
+
+                <div class="mb-3">
+                    <i class="bi bi-bag-x fs-1 text-muted"></i>
+                </div>
+
+                <h5 class="fw-bold">
+                    هنوز سفارشی ثبت نکرده‌اید
+                </h5>
+
+                <p class="text-muted mb-4">
+                    سفارش‌های خریداری‌شده شما در این قسمت نمایش داده می‌شوند.
+                </p>
+
+                <a
+                        href="{{ route('home') }}"
+                        class="btn btn-primary px-4"
+                >
+                    مشاهده محصولات
+                </a>
+
+            </div>
+        </div>
+
+    @endif
 
 </x-profile-layout>

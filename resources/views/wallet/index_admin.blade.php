@@ -1,4 +1,4 @@
-<x-profile-layout
+<x-admin-layout
         title="کیف پول"
         header="کیف پول"
 >
@@ -18,6 +18,47 @@
                 {{ session('error') }}
             </div>
         @endif
+
+        {{-- User Info --}}
+        <div class="card mb-4 shadow-sm">
+
+            <div class="card-header bg-primary text-white">
+                <i class="bi bi-person"></i>
+                اطلاعات کاربر
+            </div>
+
+            <div class="card-body">
+
+                <div class="row">
+
+                    <div class="col-md-4 mb-3">
+                        <strong>نام:</strong>
+
+                        <div class="mt-1">
+                            {{ $user->name ?? '—' }}
+                        </div>
+                    </div>
+
+                    <div class="col-md-4 mb-3">
+                        <strong>موبایل:</strong>
+
+                        <div class="mt-1">
+                            {{ $user->mobile ?? '—' }}
+                        </div>
+                    </div>
+
+                    <div class="col-md-4 mb-3">
+                        <strong>کد ملی:</strong>
+
+                        <div class="mt-1">
+                            {{ $user->national_code ?? '—' }}
+                        </div>
+                    </div>
+
+                </div>
+
+            </div>
+        </div>
 
         {{-- Balance --}}
         <div class="card shadow-sm mb-4">
@@ -198,4 +239,4 @@
 
     </div>
 
-</x-profile-layout>
+</x-admin-layout>

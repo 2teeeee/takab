@@ -94,6 +94,21 @@
 
                             </a>
 
+                            <a
+                                    href="{{ route('wallet.index') }}"
+                                    class="list-group-item list-group-item-action
+                                d-flex align-items-center gap-2
+                                {{ request()->routeIs('wallet.*') ? 'active' : '' }}"
+                            >
+
+                                <i class="bi bi-wallet2"></i>
+
+                                <span>
+                                کیف پول
+                                </span>
+
+                            </a>
+
 
                             <a
                                     href="{{ route('profile.orders.index') }}"
@@ -142,9 +157,14 @@
 
                             </a>
 
-
-                            {{-- Divider --}}
-                            <div class="border-top my-1"></div>
+                            <a
+                                href="{{ route('profile.marketing-orders.index') }}"
+                                class="list-group-item list-group-item-action
+                                    {{ request()->routeIs('profile.marketing-orders.*') ? 'active' : '' }}"
+                            >
+                                <i class="bi bi-megaphone me-2"></i>
+                                فروش‌های من
+                            </a>
 
 
                             <a
@@ -248,6 +268,21 @@
 
                         </a>
 
+                        <a
+                                href="{{ route('wallet.index') }}"
+                                class="list-group-item list-group-item-action
+                                d-flex align-items-center gap-2
+                                {{ request()->routeIs('wallet.*') ? 'active' : '' }}"
+                        >
+
+                            <i class="bi bi-wallet2"></i>
+
+                            <span>
+                                کیف پول
+                                </span>
+
+                        </a>
+
 
                         <a
                                 href="{{ route('profile.orders.index') }}"
@@ -294,6 +329,15 @@
                                 فروش دستگاه
                             </span>
 
+                        </a>
+
+                        <a
+                            href="{{ route('profile.marketing-orders.index') }}"
+                            class="list-group-item list-group-item-action
+                                    {{ request()->routeIs('profile.marketing-orders.*') ? 'active' : '' }}"
+                        >
+                            <i class="bi bi-megaphone me-2"></i>
+                            فروش‌های من
                         </a>
 
 

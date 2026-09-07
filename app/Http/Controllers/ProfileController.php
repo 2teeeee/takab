@@ -65,22 +65,26 @@ class ProfileController extends Controller
 
     public function orders(): View
     {
-        $orders = Order::where('user_id', Auth::id())
-            ->whereIn('status', ['paid', 'canceled', 'success']) // فیلتر وضعیت‌ها
-            ->with('items.product')
+        $orders = Order::query()
+            ->where('user_id', auth()->id())
+            ->withCount('items')
             ->latest()
             ->paginate(10);
 
         return view('profile.orders', compact('orders'));
     }
 
-    public function orderDetails($id): View
+    public function orderDetails(Order $order): View
     {
-        $order = Order::where('id', $id)
-            ->where('user_id', Auth::id())
-            ->whereIn('status', ['paid', 'success', 'canceled'])
-            ->with('items.product')
-            ->firstOrFail();
+        abort_unless(
+            $order->user_id === auth()->id(),
+            403
+        );
+
+        $order->load([
+            'items.product',
+        ]);
+
 
         return view('profile.order-details', compact('order'));
     }

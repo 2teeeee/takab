@@ -8,9 +8,9 @@ use Illuminate\Http\Request;
 
 class WalletController extends Controller
 {
-    public function index(Request $request): View
+    public function index(): View
     {
-        $user = $request->user();
+        $user = auth()->user();
 
         $wallet = $user->getOrCreateWallet();
 
@@ -39,7 +39,7 @@ class WalletController extends Controller
             ->withQueryString();
 
         return view(
-            'wallet.index',
+            'wallet.index_admin',
             compact(
                 'user',
                 'wallet',
@@ -47,4 +47,5 @@ class WalletController extends Controller
             )
         );
     }
+
 }

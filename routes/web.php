@@ -12,6 +12,7 @@ use App\Http\Controllers\InstallScheduleController;
 use App\Http\Controllers\InventoryController;
 use App\Http\Controllers\LetterController;
 use App\Http\Controllers\MainController;
+use App\Http\Controllers\MarketingOrderController;
 use App\Http\Controllers\OrderController;
 use App\Http\Controllers\PageController;
 use App\Http\Controllers\PeriodicServiceController;
@@ -245,10 +246,20 @@ Route::middleware('auth')
                 Route::get('/', [ProfileController::class, 'orders'])
                     ->name('index');
 
-                Route::get('/{id}', [ProfileController::class, 'orderDetails'])
-                    ->name('details');
+                Route::get('/{order}', [ProfileController::class, 'orderDetails'])
+                    ->name('show');
 
             });
+
+        Route::get('/marketing-orders', [
+            MarketingOrderController::class,
+            'index'
+        ])->name('marketing-orders.index');
+
+        Route::get('/marketing-orders/{order}', [
+            MarketingOrderController::class,
+            'show'
+        ])->name('marketing-orders.show');
 
 
         /*

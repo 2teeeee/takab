@@ -1,4 +1,4 @@
-<x-admin-layout
+<x-profile-layout
         title="درخواست‌های برداشت"
         header="درخواست‌های برداشت از کیف پول"
 >
@@ -185,4 +185,4 @@
 
     </div>
 
-</x-admin-layout>
+</x-profile-layout>
