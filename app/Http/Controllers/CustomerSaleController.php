@@ -448,7 +448,8 @@ class CustomerSaleController extends Controller
             $commissionService
         ) {
 
-            $storeId = config('shop.company_user_id');
+            $stock = config('shop.company_user_id');
+            $storeId = auth()->user()->registered_by;
             $wholesalerId = auth()->user()->wholesaler_id;
             $referrerId = auth()->user()->id;
             /*
@@ -470,7 +471,7 @@ class CustomerSaleController extends Controller
                     'password' => Hash::make(
                         Str::random(32)
                     ),
-                    'registered_by' => $storeId,
+                    'registered_by' => $referrerId,
                     'wholesaler_id' => $wholesalerId,
                 ]);
 
@@ -487,7 +488,7 @@ class CustomerSaleController extends Controller
              * to the final customer.
              */
             $order = $inventoryTransferService->transfer(
-                fromUserId: $storeId,
+                fromUserId: $stock,
                 toUserId: $customer->id,
                 products: $products->toArray(),
                 discountPerItem: 1_000_000,
