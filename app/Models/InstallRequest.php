@@ -14,6 +14,7 @@ class InstallRequest extends Model
         'user_id',
         'order_id',
         'wholesaler_id',
+        'request_type',
         'device_model',
         'serial_number',
         'address',

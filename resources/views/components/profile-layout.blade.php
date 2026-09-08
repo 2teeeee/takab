@@ -127,10 +127,10 @@
 
 
                             <a
-                                    href="{{ route('profile.install_requests.index') }}"
+                                    href="{{ route('profile.service-requests.create') }}"
                                     class="list-group-item list-group-item-action
                                 d-flex align-items-center gap-2
-                                {{ request()->routeIs('profile.install_requests.*') ? 'active' : '' }}"
+                                {{ request()->routeIs('profile.service-requests.*') ? 'active' : '' }}"
                             >
 
                                 <i class="bi bi-tools"></i>
@@ -301,10 +301,10 @@
 
 
                         <a
-                                href="{{ route('profile.install_requests.index') }}"
+                                href="{{ route('profile.service-requests.create') }}"
                                 class="list-group-item list-group-item-action
                             d-flex align-items-center gap-2
-                            {{ request()->routeIs('profile.install_requests.*') ? 'active' : '' }}"
+                            {{ request()->routeIs('profile.service-requests.*') ? 'active' : '' }}"
                         >
 
                             <i class="bi bi-tools"></i>

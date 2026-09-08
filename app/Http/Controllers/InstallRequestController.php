@@ -216,13 +216,13 @@ class InstallRequestController extends Controller
                 'user_id' => $order->user_id,
                 'order_id' => $order->id,
                 'wholesaler_id' => $order->wholesaler_id,
+                'request_type' => 'installation',
                 'device_model' => $validated['device_model'],
                 'serial_number' => $validated['serial_number'] ?? null,
                 'address' => $validated['address'],
                 'status' => 'scheduled',
                 'description' => $validated['description'] ?? null,
             ]);
-
 
             InstallSchedule::create([
                 'installer_id' => $installer->id,

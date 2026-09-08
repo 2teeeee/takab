@@ -167,6 +167,10 @@
                             </th>
 
                             <th>
+                                درخواست
+                            </th>
+
+                            <th>
                                 تاریخ سرویس
                             </th>
 
@@ -259,6 +263,46 @@
 
                                 </td>
 
+                                <td>
+
+                                    @switch($serviceRequest->request_type)
+
+                                        @case('installation')
+
+                                            <span class="badge bg-dark">
+                                                نصب
+                                            </span>
+
+                                            @break
+
+
+                                        @case('service')
+
+                                            <span class="badge bg-dark">
+                                                سروس دوره ای
+                                            </span>
+
+                                            @break
+
+
+                                        @case('repair')
+
+                                            <span class="badge bg-dark">
+                                                تعمیر
+                                            </span>
+
+                                            @break
+
+                                        @default
+
+                                            <span class="badge bg-dark">
+                                                مشخص نشده
+                                            </span>
+
+                                    @endswitch
+
+                                </td>
+
 
                                 {{-- Schedule --}}
 
@@ -317,7 +361,6 @@
                                 {{-- Status --}}
 
                                 <td>
-
                                     @switch($serviceRequest->status)
 
                                         @case('pending')

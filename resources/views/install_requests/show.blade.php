@@ -51,6 +51,42 @@
                     #{{ $installRequest->id }}
                 </span>
 
+                @switch($installRequest->request_type)
+
+                    @case('installation')
+
+                        <span class="badge bg-dark">
+                            نصب
+                        </span>
+
+                    @break
+
+
+                    @case('service')
+
+                        <span class="badge bg-dark">
+                            سروس دوره ای
+                        </span>
+
+                    @break
+
+
+                    @case('repair')
+
+                        <span class="badge bg-dark">
+                            تعمیر
+                        </span>
+
+                    @break
+
+                    @default
+
+                        <span class="badge bg-dark">
+                            مشخص نشده
+                        </span>
+
+                @endswitch
+
             </div>
 
 

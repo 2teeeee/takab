@@ -19,12 +19,12 @@ use App\Http\Controllers\PeriodicServiceController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\SearchController;
+use App\Http\Controllers\ServiceRequestController;
 use App\Http\Controllers\SliderController;
 use App\Http\Controllers\StoreController;
 use App\Http\Controllers\StoreProductController;
 use App\Http\Controllers\StoreSaleController;
 use App\Http\Controllers\UserController;
-use App\Http\Controllers\UserInstallRequestController;
 use App\Http\Controllers\WalletController;
 use App\Http\Controllers\WalletWithdrawalController;
 use App\Http\Controllers\WholesaleProductController;
@@ -268,18 +268,19 @@ Route::middleware('auth')
         |--------------------------------------------------------------------------
         */
 
-        Route::prefix('install-requests')
-            ->name('install_requests.')
+        Route::prefix('service-requests')
+            ->name('service-requests.')
             ->group(function () {
 
-                Route::get('/', [UserInstallRequestController::class, 'index'])
-                    ->name('index');
+                Route::get(
+                    '/service-requests/create',
+                    [ServiceRequestController::class, 'create']
+                )->name('create');
 
-                Route::get('/create', [UserInstallRequestController::class, 'create'])
-                    ->name('create');
-
-                Route::post('/', [UserInstallRequestController::class, 'store'])
-                    ->name('store');
+                Route::post(
+                    '/service-requests',
+                    [ServiceRequestController::class, 'store']
+                )->name('store');
 
             });
 
