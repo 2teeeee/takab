@@ -273,6 +273,16 @@ Route::middleware('auth')
             ->group(function () {
 
                 Route::get(
+                    '/',
+                    [ServiceRequestController::class, 'index']
+                )->name('index');
+
+                Route::get(
+                    '/show',
+                    [ServiceRequestController::class, 'show']
+                )->name('show');
+
+                Route::get(
                     '/service-requests/create',
                     [ServiceRequestController::class, 'create']
                 )->name('create');

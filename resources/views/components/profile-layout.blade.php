@@ -89,7 +89,7 @@
                                 <i class="bi bi-person"></i>
 
                                 <span>
-                                    اطلاعات کاربر
+                                    داشبورد
                                 </span>
 
                             </a>
@@ -125,21 +125,16 @@
 
                             </a>
 
-
                             <a
-                                    href="{{ route('profile.service-requests.create') }}"
+                                    href="{{ route('profile.service-requests.index') }}"
                                     class="list-group-item list-group-item-action
-                                d-flex align-items-center gap-2
-                                {{ request()->routeIs('profile.service-requests.*') ? 'active' : '' }}"
+                            d-flex align-items-center gap-2
+                            {{ request()->routeIs('profile.service-requests.*') ? 'active' : '' }}"
                             >
-
                                 <i class="bi bi-tools"></i>
-
-                                <span>
-                                    درخواست نصب / سرویس
-                                </span>
-
+                                درخواست‌های من
                             </a>
+
 
 
                             <a
@@ -263,7 +258,7 @@
                             <i class="bi bi-person"></i>
 
                             <span>
-                                اطلاعات کاربر
+                                داشبورد
                             </span>
 
                         </a>
@@ -299,22 +294,15 @@
 
                         </a>
 
-
                         <a
-                                href="{{ route('profile.service-requests.create') }}"
+                                href="{{ route('profile.service-requests.index') }}"
                                 class="list-group-item list-group-item-action
                             d-flex align-items-center gap-2
                             {{ request()->routeIs('profile.service-requests.*') ? 'active' : '' }}"
                         >
-
                             <i class="bi bi-tools"></i>
-
-                            <span>
-                                درخواست نصب / سرویس
-                            </span>
-
+                            درخواست‌های من
                         </a>
-
 
                         <a
                                 href="{{ route('profile.customer.sale.create') }}"

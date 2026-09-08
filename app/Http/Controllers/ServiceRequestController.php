@@ -9,6 +9,22 @@ use Illuminate\View\View;
 
 class ServiceRequestController extends Controller
 {
+    public function index(): View
+    {
+        $requests = auth()->user()
+            ->installRequests()
+            ->with('order.items')
+            ->latest()
+            ->paginate(10);
+
+        return view('profile.service-requests.index', compact('requests'));
+    }
+
+    public function show(InstallRequest $installRequest)
+    {
+        //
+    }
+
     public function create(): View
     {
         $user = auth()->user();
