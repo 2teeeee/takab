@@ -19,6 +19,7 @@ class Order extends Model
         'address',
         'status',
         'payment_status',
+        'payment_type',
         'status_note',
         'total',
         'discount',

@@ -39,7 +39,7 @@
                         <th>کاربر</th>
                         <th>مبلغ</th>
                         <th>وضعیت</th>
-                        <th>کد تراکنش</th>
+                        <th>وضعیت پرداخت</th>
                         <th>تاریخ</th>
                         <th>فروشگاه</th>
                         <th>معرف</th>
@@ -65,11 +65,11 @@
                             </td>
 
                             <td>
-                                @if($order->reference_id)
-                                    <span class="text-primary fw-bold">{{ $order->reference_id }}</span>
-                                @else
-                                    <span class="text-muted">---</span>
-                                @endif
+
+                                <x-payment_type_badge payment_type="{{ $order->payment_type }}" />
+
+                                <x-payment_status_badge payment_status="{{ $order->payment_status }}" />
+
                             </td>
 
                             <td>

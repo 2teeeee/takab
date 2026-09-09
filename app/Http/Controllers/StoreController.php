@@ -78,6 +78,8 @@ class StoreController extends Controller
             'user_id' => $user->id,
             'address' => $request->address,
             'status' => 'success',
+            'payment_status' => 'paid',
+            'payment_type'   => 'cash',
             'total' => $product->sell_price,
             'moarefStore_id' => auth()->id(),
             'moaref_id' => $moaref ? $moaref->id : null,

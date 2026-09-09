@@ -56,7 +56,9 @@ class StoreProductController extends Controller
 
         $order->update([
             'wholesaler_id' => auth()->user()->registered_by,
-            'seller_role' => 'wholesaler'
+            'seller_role' => 'wholesaler',
+            'payment_status'=> 'paid',
+            'payment_type'  => 'cash',
         ]);
 
         return redirect()

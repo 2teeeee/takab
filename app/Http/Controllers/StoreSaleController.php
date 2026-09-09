@@ -159,6 +159,8 @@ class StoreSaleController extends Controller
             'wholesaler_id' => $wholesalerId,
             'seller_id' => $user->id,
             'seller_role' => 'wholesaler',
+            'payment_status'=> 'paid',
+            'payment_type'  => 'cash',
         ]);
 
         if ($user->hasRole('wholesaler')) {

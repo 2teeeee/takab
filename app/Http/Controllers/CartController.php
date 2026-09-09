@@ -225,18 +225,20 @@ class CartController extends Controller
         $order = Order::create([
             'user_id'       => auth()->id(),
 
-            'seller_id'     => $sellerId,
-            'wholesaler_id' => $wholesalerId,
-            'moaref_id'     => $referrer?->id,
+            'seller_id'      => $sellerId,
+            'wholesaler_id'  => $wholesalerId,
+            'moaref_id'      => $referrer?->id,
 
-            'address'       => $request->address,
-            'postal_code'   => $request->postal_code,
+            'address'        => $request->address,
+            'postal_code'    => $request->postal_code,
 
-            'status'        => 'pending',
+            'status'         => 'pending',
+            'payment_status' => 'unpaid',
+            'payment_type'   => 'online',
 
-            'total'         => $total,
-            'discount'      => $discount,
-            'final_total'   => $finalTotal,
+            'total'          => $total,
+            'discount'       => $discount,
+            'final_total'    => $finalTotal,
         ]);
 
         foreach ($cart->items as $item) {

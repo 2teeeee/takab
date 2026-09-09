@@ -32,6 +32,7 @@
                             <th>تعداد کالا</th>
                             <th>مبلغ</th>
                             <th>وضعیت</th>
+                            <th>وضعیت پرداخت</th>
                             <th></th>
                         </tr>
                         </thead>
@@ -76,6 +77,14 @@
 
                                 <td>
                                     <x-status_badge status="{{ $order->status }}" />
+                                </td>
+
+                                <td>
+
+                                    <x-payment_type_badge payment_type="{{ $order->payment_type }}" />
+
+                                    <x-payment_status_badge payment_status="{{ $order->payment_status }}" />
+
                                 </td>
 
                                 <td class="text-end px-4">

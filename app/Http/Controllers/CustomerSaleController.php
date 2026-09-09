@@ -108,6 +108,8 @@ class CustomerSaleController extends Controller
             'wholesaler_id' => $wholesalerId,
             'seller_role'   => 'store',
             'moaref_id'     => $referrerId,
+            'payment_status'=> 'paid',
+            'payment_type'  => 'cash',
         ]);
 
         $inventoryTransferService->approve($order);
@@ -299,6 +301,8 @@ class CustomerSaleController extends Controller
             'wholesaler_id' => $wholesalerId,
             'seller_role' => 'store',
             'moaref_id'     => $referrerId,
+            'payment_status'=> 'paid',
+            'payment_type'  => 'cash',
         ]);
 
         /*
@@ -499,10 +503,12 @@ class CustomerSaleController extends Controller
              * The authenticated user is the seller/referrer.
              */
             $order->update([
-                'seller_id' => $storeId,
+                'seller_id'     => $storeId,
                 'wholesaler_id' => $wholesalerId,
-                'seller_role' => 'user',
+                'seller_role'   => 'user',
                 'moaref_id'     => $referrerId,
+                'payment_status'=> 'unpaid',
+                'payment_type'  => $validated['payment_method'],
             ]);
 
             return $order;
