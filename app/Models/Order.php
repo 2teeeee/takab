@@ -18,6 +18,7 @@ class Order extends Model
         'moaref_id',
         'address',
         'status',
+        'payment_status',
         'status_note',
         'total',
         'discount',

@@ -80,6 +80,16 @@
 
                                 <td class="text-end px-4">
 
+                                    @if($order->payment_status == 'unpaid')
+                                    <a
+                                            href="{{ route('profile.orders.payment', $order) }}"
+                                            class="btn btn-sm btn-secondary"
+                                    >
+                                        <i class="bi bi-paypal ms-1"></i>
+                                        پرداخت
+                                    </a>
+                                    @endif
+
                                     <a
                                             href="{{ route('profile.orders.show', $order) }}"
                                             class="btn btn-sm btn-outline-primary"

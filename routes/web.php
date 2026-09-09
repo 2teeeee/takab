@@ -14,6 +14,7 @@ use App\Http\Controllers\LetterController;
 use App\Http\Controllers\MainController;
 use App\Http\Controllers\MarketingOrderController;
 use App\Http\Controllers\OrderController;
+use App\Http\Controllers\OrderPaymentController;
 use App\Http\Controllers\PageController;
 use App\Http\Controllers\PeriodicServiceController;
 use App\Http\Controllers\ProductController;
@@ -243,11 +244,25 @@ Route::middleware('auth')
             ->name('orders.')
             ->group(function () {
 
-                Route::get('/', [ProfileController::class, 'orders'])
-                    ->name('index');
+                Route::get(
+                    '/',
+                    [ProfileController::class, 'orders']
+                )->name('index');
 
-                Route::get('/{order}', [ProfileController::class, 'orderDetails'])
-                    ->name('show');
+                Route::get(
+                    '/{order}',
+                    [ProfileController::class, 'orderDetails']
+                )->name('show');
+
+                Route::get(
+                    '/{order}/payment',
+                    [OrderPaymentController::class, 'show']
+                )->name('payment');
+
+                Route::post(
+                    '/{order}/payment',
+                    [OrderPaymentController::class, 'pay']
+                )->name('payment.pay');
 
             });
 
