@@ -517,7 +517,7 @@ class CustomerSaleController extends Controller
                 'payment_type'  => $validated['payment_method'],
             ]);
 
-            if$order->payment_type == 'online')
+            if($order->payment_type == 'online')
             {
                 $user = $order->user;
                 $url = route('profile.orders.payment', $order);

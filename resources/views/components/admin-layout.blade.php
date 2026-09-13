@@ -615,14 +615,6 @@
             </a>
 
             <a
-                    href="{{ route('admin.install_schedules.index') }}"
-                    class="{{ request()->routeIs('admin.install_schedules.*') ? 'active' : '' }}"
-            >
-                <i class="bi bi-calendar3"></i>
-                <span>زمان‌بندی سرویس</span>
-            </a>
-
-            <a
                     href="{{ route('admin.periodic_services.index') }}"
                     class="{{ request()->routeIs('admin.periodic_services.*') ? 'active' : '' }}"
             >
@@ -970,14 +962,6 @@
             >
                 <i class="bi bi-tools"></i>
                 <span>درخواست سرویس</span>
-            </a>
-
-            <a
-                    href="{{ route('admin.install_schedules.index') }}"
-                    class="mobile-menu-link {{ request()->routeIs('admin.install_schedules.*') ? 'active' : '' }}"
-            >
-                <i class="bi bi-calendar3"></i>
-                <span>زمان‌بندی سرویس</span>
             </a>
 
             <a
