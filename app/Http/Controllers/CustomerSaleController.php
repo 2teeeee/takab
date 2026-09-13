@@ -7,6 +7,7 @@ use App\Models\ProductUser;
 use App\Models\User;
 use App\Services\CommissionService;
 use App\Services\InventoryTransferService;
+use App\Services\Sms\NikSmsService;
 use Cassandra\Exception\ValidationException;
 use Illuminate\Database\Query\JoinClause;
 use Illuminate\Http\JsonResponse;
@@ -394,7 +395,8 @@ class CustomerSaleController extends Controller
     public function storeCustomer(
         Request $request,
         InventoryTransferService $inventoryTransferService,
-        CommissionService $commissionService
+        CommissionService $commissionService,
+        NikSmsService $sms
     ): RedirectResponse {
 
         $validated = $request->validate([
@@ -452,7 +454,8 @@ class CustomerSaleController extends Controller
             $validated,
             $products,
             $inventoryTransferService,
-            $commissionService
+            $commissionService,
+            $sms
         ) {
 
             $stock = config('shop.company_user_id');
@@ -513,6 +516,24 @@ class CustomerSaleController extends Controller
                 'payment_status'=> 'unpaid',
                 'payment_type'  => $validated['payment_method'],
             ]);
+
+            if$order->payment_type == 'online')
+            {
+                $user = $order->user;
+                $url = route('profile.orders.payment', $order);
+
+                $message = <<<TEXT
+یک سفارش جدید برای شما ثبت شده است.
+
+لینک پرداخت:
+{$url}
+TEXT;
+
+                $sms->sendSingle(
+                    $user->mobile,
+                    $message
+                );
+            }
 
             return $order;
         });
