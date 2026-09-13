@@ -420,10 +420,18 @@
 
                                     <a
                                             href="{{ route('admin.install_requests.show', $serviceRequest) }}"
-                                            class="btn btn-sm btn-info"
+                                            class="btn btn-sm btn-info mb-2"
                                     >
                                         <i class="bi bi-eye"></i>
                                         مشاهده
+                                    </a>
+
+                                    <a
+                                            href="{{ route('admin.install_requests.show.request', $serviceRequest) }}"
+                                            class="btn btn-sm btn-secondary mb-2"
+                                    >
+                                        <i class="bi bi-calendar-date"></i>
+                                        زمانبندی
                                     </a>
 
                                 </td>

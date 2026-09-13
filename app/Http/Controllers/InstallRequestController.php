@@ -437,4 +437,134 @@ class InstallRequestController extends Controller
             'گزارش با موفقیت تأیید شد و پورسانت نصاب به کیف پول او واریز گردید.'
         );
     }
+
+    public function showRequest(InstallRequest $installRequest): View
+    {
+        $installRequest->load([
+            'user',
+            'order',
+            'schedules.installer.user',
+        ]);
+
+        $order = $installRequest->order;
+
+        $installers = Installer::query()
+            ->where('status', 'approved')
+            ->whereHas('wholesalers', function ($query) use ($order) {
+                $query->where(
+                    'users.id',
+                    $order->wholesaler_id
+                );
+            })
+            ->with('user')
+            ->get();
+
+        return view(
+            'install_requests.show_request',
+            compact(
+                'installRequest',
+                'installers'
+            )
+        );
+    }
+
+    public function scheduleRequest(Request $request,InstallRequest $installRequest)
+    {
+        $validated = $request->validate([
+            'installer_id' => [
+                'required',
+                'integer',
+                'exists:installers,id',
+            ],
+
+            'scheduled_date' => [
+                'required',
+                'string',
+            ],
+        ]);
+
+        if (
+            !in_array(
+                $installRequest->status,
+                ['pending', 'scheduled'],
+                true
+            )
+        ) {
+            return back()
+                ->withErrors([
+                    'error' =>
+                        'این درخواست در حال حاضر قابل زمان‌بندی نیست.'
+                ]);
+        }
+
+        try {
+
+            $scheduledDate = Jalalian::fromFormat(
+                'Y/m/d',
+                $validated['scheduled_date']
+            )->toCarbon()->format('Y-m-d');
+
+        } catch (\Throwable $e) {
+
+            return back()
+                ->withErrors([
+                    'scheduled_date' =>
+                        'تاریخ وارد شده معتبر نیست.'
+                ])
+                ->withInput();
+        }
+
+        $installer = Installer::query()
+            ->where('id', $validated['installer_id'])
+            ->where('status', 'approved')
+            ->with('user')
+            ->firstOrFail();
+
+        DB::transaction(function () use (
+            $installRequest,
+            $installer,
+            $scheduledDate
+        ) {
+
+            $schedule = InstallSchedule::query()
+                ->where(
+                    'install_request_id',
+                    $installRequest->id
+                )
+                ->first();
+
+            if ($schedule) {
+
+                $schedule->update([
+                    'installer_id' => $installer->id,
+                    'scheduled_date' => $scheduledDate,
+                    'status' => 'waiting',
+                ]);
+
+            } else {
+
+                InstallSchedule::create([
+                    'installer_id' => $installer->id,
+                    'install_request_id' => $installRequest->id,
+                    'scheduled_date' => $scheduledDate,
+                    'status' => 'waiting',
+                ]);
+            }
+
+            $installRequest->update([
+                'status' => 'scheduled',
+                'installation_date' => $scheduledDate,
+            ]);
+        });
+
+        return redirect()
+            ->route(
+                'admin.service_requests.index',
+                $installRequest
+            )
+            ->with(
+                'success',
+                'درخواست با موفقیت زمان‌بندی شد.'
+            );
+    }
 }

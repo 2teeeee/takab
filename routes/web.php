@@ -551,6 +551,16 @@ Route::middleware('auth')
                 [InstallRequestController::class, 'approveReport']
             )->name('install_requests.reports.approve');
 
+            Route::get(
+                '/installer-requests/{installRequest}/show',
+                [InstallRequestController::class, 'showRequest']
+            )->name('install_requests.show.request');
+
+            Route::post(
+                '/installer-requests/{installRequest}/schedule',
+                [InstallRequestController::class, 'scheduleRequest']
+            )->name('install_requests.schedule.request');
+
             Route::resource(
                 'install_requests',
                 InstallRequestController::class
