@@ -13,113 +13,139 @@
 
             @csrf
 
-            {{-- گیرندگان --}}
-            <div class="mb-3">
-                <label class="form-label">گیرندگان</label>
+            <div class="row">
+                {{-- دپارتمان --}}
+                <div class="col-md-6 mb-3">
+                    <label class="form-label">دپارتمان</label>
 
-                <select
-                        id="receiver_ids"
-                        name="receiver_ids[]"
-                        class="form-select"
-                        multiple
-                        required>
+                    <select
+                            id="department_id"
+                            name="department_id"
+                            class="form-select">
 
-                    @foreach($users as $user)
-                        <option value="{{ $user->id }}"
-                                @selected(in_array($user->id, old('receiver_ids', [])))>
-                            {{ $user->name }}
+                        <option>انتخاب کنید...</option>
+
+                        @foreach($departments as $department)
+                            <option value="{{ $department->id }}"
+                                    @selected(old('department_id'))>
+                                {{ $department->name }}
+                            </option>
+                        @endforeach
+
+                    </select>
+
+                    @error('department_id')
+                    <small class="text-danger">{{ $message }}</small>
+                    @enderror
+                </div>
+
+                {{-- گیرندگان --}}
+                <div class="col-md-6 mb-3">
+                    <label class="form-label">گیرندگان</label>
+
+                    <select
+                            id="receiver_ids"
+                            name="receiver_ids[]"
+                            class="form-select"
+                            multiple>
+
+                        @foreach($users as $user)
+                            <option value="{{ $user->id }}"
+                                    @selected(in_array($user->id, old('receiver_ids', [])))>
+                                {{ $user->name }}
+                            </option>
+                        @endforeach
+
+                    </select>
+
+                    @error('receiver_ids')
+                    <small class="text-danger">{{ $message }}</small>
+                    @enderror
+
+                    @error('receiver_ids.*')
+                    <small class="text-danger">{{ $message }}</small>
+                    @enderror
+                </div>
+
+                {{-- موضوع --}}
+                <div class="col-md-12 mb-3">
+                    <label for="subject" class="form-label">
+                        موضوع
+                    </label>
+
+                    <input
+                            type="text"
+                            name="subject"
+                            id="subject"
+                            value="{{ old('subject') }}"
+                            class="form-control"
+                            required>
+
+                    @error('subject')
+                    <small class="text-danger">{{ $message }}</small>
+                    @enderror
+                </div>
+
+                {{-- متن --}}
+                <div class="col-md-12 mb-3">
+                    <label for="body" class="form-label">
+                        متن نامه
+                    </label>
+
+                    <textarea
+                            name="body"
+                            id="body"
+                            rows="8"
+                            class="form-control"
+                            required>{{ old('body') }}</textarea>
+
+                    @error('body')
+                    <small class="text-danger">{{ $message }}</small>
+                    @enderror
+                </div>
+
+                {{-- اولویت --}}
+                <div class="col-md-12 mb-3">
+                    <label class="form-label">
+                        اولویت
+                    </label>
+
+                    <select name="priority" class="form-select">
+
+                        <option value="low"
+                                @selected(old('priority')=='low')>
+                            کم
                         </option>
-                    @endforeach
 
-                </select>
+                        <option value="medium"
+                                @selected(old('priority','medium')=='medium')>
+                            متوسط
+                        </option>
 
-                @error('receiver_ids')
-                <small class="text-danger">{{ $message }}</small>
-                @enderror
+                        <option value="high"
+                                @selected(old('priority')=='high')>
+                            زیاد
+                        </option>
 
-                @error('receiver_ids.*')
-                <small class="text-danger">{{ $message }}</small>
-                @enderror
-            </div>
+                    </select>
+                </div>
 
-            {{-- موضوع --}}
-            <div class="mb-3">
-                <label for="subject" class="form-label">
-                    موضوع
-                </label>
+                {{-- ضمیمه --}}
+                <div class="col-md-12 mb-3">
+                    <label class="form-label">
+                        فایل‌های ضمیمه
+                    </label>
 
-                <input
-                        type="text"
-                        name="subject"
-                        id="subject"
-                        value="{{ old('subject') }}"
-                        class="form-control"
-                        required>
+                    <input
+                            type="file"
+                            name="attachments[]"
+                            class="form-control"
+                            multiple>
 
-                @error('subject')
-                <small class="text-danger">{{ $message }}</small>
-                @enderror
-            </div>
-
-            {{-- متن --}}
-            <div class="mb-3">
-                <label for="body" class="form-label">
-                    متن نامه
-                </label>
-
-                <textarea
-                        name="body"
-                        id="body"
-                        rows="8"
-                        class="form-control"
-                        required>{{ old('body') }}</textarea>
-
-                @error('body')
-                <small class="text-danger">{{ $message }}</small>
-                @enderror
-            </div>
-
-            {{-- اولویت --}}
-            <div class="mb-3">
-                <label class="form-label">
-                    اولویت
-                </label>
-
-                <select name="priority" class="form-select">
-
-                    <option value="low"
-                            @selected(old('priority')=='low')>
-                        کم
-                    </option>
-
-                    <option value="medium"
-                            @selected(old('priority','medium')=='medium')>
-                        متوسط
-                    </option>
-
-                    <option value="high"
-                            @selected(old('priority')=='high')>
-                        زیاد
-                    </option>
-
-                </select>
-            </div>
-
-            {{-- ضمیمه --}}
-            <div class="mb-3">
-                <label class="form-label">
-                    فایل‌های ضمیمه
-                </label>
-
-                <input
-                        type="file"
-                        name="attachments[]"
-                        class="form-control"
-                        multiple>
-
-                @error('attachments.*')
-                <small class="text-danger">{{ $message }}</small>
-                @enderror
+                    @error('attachments.*')
+                    <small class="text-danger">{{ $message }}</small>
+                    @enderror
+                </div>
             </div>
 
             <div class="d-flex justify-content-between">

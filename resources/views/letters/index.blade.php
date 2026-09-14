@@ -73,6 +73,7 @@
                     <th>موضوع</th>
                     <th>فرستنده</th>
                     <th>گیرنده</th>
+                    <th>دپارتمان</th>
                     <th>اولویت</th>
                     <th>وضعیت</th>
                     <th>تاریخ</th>
@@ -129,6 +130,23 @@
                                     {{ $item->user->name }}
                                 </span>
                             @endforeach
+                        </td>
+
+                        <td>
+                            @if($letter->department)
+
+                                <span class="badge bg-primary-subtle text-primary">
+                                    <i class="bi bi-building me-1"></i>
+                                    {{ $letter->department->name }}
+                                </span>
+
+                            @else
+
+                                <span class="badge bg-secondary-subtle text-secondary">
+                                    مستقیم
+                                </span>
+
+                            @endif
                         </td>
 
                         <td>

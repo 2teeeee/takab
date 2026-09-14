@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Department;
 use App\Models\Letter;
 use App\Models\LetterReference;
 use App\Models\Attachment;
@@ -11,6 +12,7 @@ use Illuminate\Contracts\View\View;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 use Throwable;
@@ -24,18 +26,70 @@ class LetterController extends Controller
 
         $letters = Letter::query()->with([
             'sender',
+            'receiver',
+            'department',
             'receiverItems.user',
             'references' => function ($q) {
                 $q->latest();
             },
         ]);
 
-        if(!$user->hasRole('admin')){
-            $letters->where(function ($q) use ($user){
-                $q->where('sender_id',$user->id)
-                    ->orWhereHas('receiverItems',function($q) use ($user){
-                        $q->where('user_id',$user->id);
-                    });
+        if (!$user->hasAnyRole(['admin', 'manager'])) {
+            $letters->where(function ($q) use ($user) {
+
+                /*
+                 * نامه‌هایی که خود کاربر ارسال کرده
+                 */
+                $q->where(
+                    'sender_id',
+                    $user->id
+                )
+
+                    /*
+                     * نامه‌های مستقیم دریافتی
+                     */
+                    ->orWhereHas(
+                        'receiverItems',
+                        function ($q) use ($user) {
+
+                            $q->where(
+                                'user_id',
+                                $user->id
+                            );
+
+                        }
+                    )
+
+                    /*
+                     * نامه‌های دپارتمان‌هایی که کاربر مسئول آنهاست
+                     */
+                    ->orWhereHas(
+                        'department.users',
+                        function ($q) use ($user) {
+
+                            $q->where(
+                                'users.id',
+                                $user->id
+                            );
+
+                        }
+                    )
+
+                    /*
+                     * نامه‌هایی که به کاربر ارجاع شده
+                     */
+                    ->orWhereHas(
+                        'references',
+                        function ($q) use ($user) {
+
+                            $q->where(
+                                'to_user_id',
+                                $user->id
+                            );
+
+                        }
+                    );
+
             });
         }
 
@@ -48,8 +102,25 @@ class LetterController extends Controller
         switch ($request->get('tab')) {
 
             case 'received':
-                $letters->whereHas('receiverItems',function($q) use ($user){
-                    $q->where('user_id',$user->id);
+
+                $letters->where(function ($q) use ($user) {
+                    $q->whereHas(
+                        'receiverItems',
+                        function ($q) use ($user) {
+                            $q->where(
+                                'user_id',
+                                $user->id
+                            );
+                        }
+                    )->orWhereHas(
+                        'department.users',
+                        function ($q) use ($user) {
+                            $q->where(
+                                'users.id',
+                                $user->id
+                            );
+                        }
+                    );
                 });
                 break;
 
@@ -58,10 +129,13 @@ class LetterController extends Controller
                 break;
 
             case 'unread':
-                $letters->whereHas('receiverItems',function($q) use ($user){
-                    $q->where('user_id',$user->id)
-                        ->where('status','new');
-                });
+                $letters->whereHas(
+                    'receiverItems',
+                    function ($q) use ($user) {
+                        $q->where('user_id', $user->id)
+                            ->where('status', 'new');
+                    }
+                );
                 break;
 
             case 'read':
@@ -137,25 +211,132 @@ class LetterController extends Controller
             ->orderBy('name')
             ->get();
 
-        return view('letters.create', compact('users'));
+        $departments = Department::query()
+            ->where('is_active', true)
+            ->withCount('users')
+            ->orderBy('name')
+            ->get();
+
+        return view(
+            'letters.create',
+            compact(
+                'users',
+                'departments'
+            )
+        );
     }
 
     public function store(Request $request, NikSmsService $sms): RedirectResponse
     {
         $validated = $request->validate([
-            'receiver_ids' => 'required|array|min:1',
-            'receiver_ids.*' => 'exists:users,id',
-            'subject' => 'required|string|max:255',
-            'body' => 'required|string',
-            'priority' => 'required|in:low,medium,high',
-            'attachments.*' => 'nullable|file|max:2048',
+            'department_id' => [
+                'nullable',
+                'integer',
+                'exists:departments,id',
+            ],
+
+            'receiver_ids' => [
+                'nullable',
+                'array',
+            ],
+
+            'receiver_ids.*' => [
+                'integer',
+                'exists:users,id',
+            ],
+
+            'subject' => [
+                'required',
+                'string',
+                'max:255',
+            ],
+
+            'body' => [
+                'required',
+                'string',
+            ],
+
+            'priority' => [
+                'required',
+                'in:low,medium,high',
+            ],
+
+            'attachments.*' => [
+                'nullable',
+                'file',
+                'max:2048',
+            ],
         ]);
 
-        $allowedIds = $this->getAllowedReceivers(Auth::user())
+        if (
+            empty($validated['department_id']) &&
+            empty($validated['receiver_ids'])
+        ) {
+            return back()
+                ->withInput()
+                ->withErrors([
+                    'receiver_ids' => 'حداقل یک دپارتمان یا یک کاربر را انتخاب کنید.',
+                ]);
+        }
+
+        $user = Auth::user();
+
+        $allowedIds = $this->getAllowedReceivers($user)
             ->pluck('id')
             ->toArray();
 
-        foreach ($validated['receiver_ids'] as $receiverId) {
+        $receiverIds = collect(
+            $validated['receiver_ids'] ?? []
+        )
+            ->unique()
+            ->values()
+            ->toArray();
+
+        foreach ($receiverIds as $receiverId) {
+
+            if (!in_array($receiverId, $allowedIds)) {
+
+                abort(
+                    403,
+                    'شما اجازه ارسال نامه به این کاربر را ندارید.'
+                );
+            }
+        }
+
+        $departmentUserIds = [];
+
+        if (!empty($validated['department_id'])) {
+
+            $department = Department::query()
+                ->with('users')
+                ->findOrFail($validated['department_id']);
+
+            $departmentUserIds = $department->users
+                ->pluck('id')
+                ->toArray();
+
+
+            foreach ($departmentUserIds as $receiverId) {
+
+                if (!in_array($receiverId, $allowedIds)) {
+
+                    abort(
+                        403,
+                        'شما اجازه ارسال نامه به یکی از کاربران این دپارتمان را ندارید.'
+                    );
+                }
+            }
+        }
+
+        $finalReceiverIds = collect([
+            ...$receiverIds,
+            ...$departmentUserIds,
+        ])
+            ->unique()
+            ->values()
+            ->toArray();
+
+        foreach ($finalReceiverIds as $receiverId) {
 
             if (!in_array($receiverId, $allowedIds)) {
                 abort(403, 'شما اجازه ارسال نامه به این کاربر را ندارید.');
@@ -164,44 +345,108 @@ class LetterController extends Controller
 
         try {
 
-            $letter = Letter::create([
-                'sender_id' => Auth::id(),
-                'subject' => $validated['subject'],
-                'body' => $validated['body'],
-                'priority' => $validated['priority'],
-            ]);
+            $letter = DB::transaction(function () use (
+                $validated,
+                $finalReceiverIds,
+                $request
+            ) {
 
-            foreach ($validated['receiver_ids'] as $receiverId) {
-                $letter->receiverItems()->create([
-                    'user_id' => $receiverId,
-                    'status' => 'new',
-                    'last_received_at'=>now(),
+                $letter = Letter::create([
+                    'sender_id' => Auth::id(),
+
+                    'subject' => $validated['subject'],
+
+                    'body' => $validated['body'],
+
+                    'priority' => $validated['priority'],
+
+                    'department_id' =>
+                        $validated['department_id'] ?? null,
                 ]);
-            }
 
-            if ($request->hasFile('attachments')) {
-                foreach ($request->file('attachments') as $file) {
-                    $originalName = pathinfo(
-                        $file->getClientOriginalName(),
-                        PATHINFO_FILENAME
-                    );
-                    $extension = $file->getClientOriginalExtension();
-                    $random = Str::random(8);
-                    $fileName = $originalName . '_' . $random . '.' . $extension;
-                    $path = $file->storeAs(
-                        'attachments',
-                        $fileName,
-                        'public'
-                    );
-                    Attachment::create([
-                        'letter_id' => $letter->id,
-                        'file_path' => $path,
-                        'file_name' => $fileName,
+
+                /*
+                |--------------------------------------------------------------------------
+                | Letter Receivers
+                |--------------------------------------------------------------------------
+                */
+
+                foreach ($finalReceiverIds as $receiverId) {
+
+                    $letter->receiverItems()->create([
+                        'user_id' => $receiverId,
+
+                        'status' => 'new',
+
+                        'read_at' => null,
+
+                        'last_received_at' => now(),
                     ]);
                 }
-            }
 
-            foreach ($letter->receiverItems as $receiver){
+                /*
+                |--------------------------------------------------------------------------
+                | Attachments
+                |--------------------------------------------------------------------------
+                */
+
+                if ($request->hasFile('attachments')) {
+
+                    foreach ($request->file('attachments') as $file) {
+
+                        $originalName = pathinfo(
+                            $file->getClientOriginalName(),
+                            PATHINFO_FILENAME
+                        );
+
+                        $extension =
+                            $file->getClientOriginalExtension();
+
+                        $random =
+                            Str::random(8);
+
+                        $fileName =
+                            $originalName
+                            . '_'
+                            . $random
+                            . '.'
+                            . $extension;
+
+
+                        $path = $file->storeAs(
+                            'attachments',
+                            $fileName,
+                            'public'
+                        );
+
+                        Attachment::create([
+                            'letter_id' => $letter->id,
+                            'file_path' => $path,
+                            'file_name' => $fileName,
+                        ]);
+                    }
+                }
+
+
+                return $letter;
+            });
+
+
+            /*
+            |--------------------------------------------------------------------------
+            | SMS
+            |--------------------------------------------------------------------------
+            */
+
+            $letter->load('receiverItems.user');
+
+
+            foreach ($letter->receiverItems as $receiver) {
+
+                if (!$receiver->user?->mobile) {
+                    continue;
+                }
+
 
                 $message = <<<TEXT
 یک نامه جدید برای شما ثبت شده است.
@@ -212,14 +457,24 @@ class LetterController extends Controller
 {$letter->url}
 TEXT;
 
+
                 $sms->sendSingle(
                     $receiver->user->mobile,
                     $message
                 );
             }
 
-            return redirect()->route('admin.letters.show', $letter->id)
-                ->with('success', 'نامه با موفقیت ارسال شد.');
+
+            return redirect()
+                ->route(
+                    'admin.letters.show',
+                    $letter->id
+                )
+                ->with(
+                    'success',
+                    'نامه با موفقیت ارسال شد.'
+                );
+
 
         } catch (Throwable $e) {
 
@@ -227,7 +482,10 @@ TEXT;
 
             return back()
                 ->withInput()
-                ->with('error', 'خطایی در ثبت نامه رخ داد.');
+                ->with(
+                    'error',
+                    'خطایی در ثبت نامه رخ داد.'
+                );
         }
     }
 
@@ -237,6 +495,8 @@ TEXT;
 
         $letter->load([
             'sender',
+            'receiver',
+            'department.users',
             'receiverItems.user',
             'attachments',
         ]);
@@ -250,12 +510,40 @@ TEXT;
 
         $isReceiver = $receiver !== null;
 
+        $isAdminOrManager = $user->hasAnyRole(['admin', 'manager']);
+
+        $isDepartmentUser = false;
+
+        if ($letter->department_id) {
+            $isDepartmentUser =
+                $letter->department
+                    ->users()
+                    ->where(
+                        'users.id',
+                        $user->id
+                    )
+                    ->exists();
+        }
+
+        $isReferred =
+            $letter->references()
+                ->where(
+                    'to_user_id',
+                    $user->id
+                )
+                ->exists();
+
         if (
-            ! $isAdmin &&
+            ! $isAdminOrManager &&
             $letter->sender_id !== $user->id &&
-            ! $isReceiver
+            ! $isReceiver &&
+            ! $isDepartmentUser &&
+            ! $isReferred
         ) {
-            abort(403, 'شما به این نامه دسترسی ندارید.');
+            abort(
+                403,
+                'شما به این نامه دسترسی ندارید.'
+            );
         }
 
         if($receiver && $receiver->status=='new'){
@@ -407,19 +695,68 @@ TEXT;
 
     protected function authorizeView(Letter $letter): void
     {
-        if (Auth::user()->hasRole('admin')) {
+        $user = Auth::user();
+
+
+        if (
+            $user->hasAnyRole([
+                'admin',
+                'manager',
+            ])
+        ) {
             return;
         }
 
+
         $isReceiver = $letter->receiverItems()
-            ->where('user_id', Auth::id())
+            ->where(
+                'user_id',
+                $user->id
+            )
             ->exists();
 
+
+        $isDepartmentUser = false;
+
+        if ($letter->department_id) {
+
+            $isDepartmentUser =
+                $letter->department()
+                    ->whereHas(
+                        'users',
+                        function ($q) use ($user) {
+
+                            $q->where(
+                                'users.id',
+                                $user->id
+                            );
+
+                        }
+                    )
+                    ->exists();
+        }
+
+
+        $isReferred =
+            $letter->references()
+                ->where(
+                    'to_user_id',
+                    $user->id
+                )
+                ->exists();
+
+
         if (
-            $letter->sender_id !== Auth::id() &&
-            ! $isReceiver
+            $letter->sender_id !== $user->id &&
+            ! $isReceiver &&
+            ! $isDepartmentUser &&
+            ! $isReferred
         ) {
-            abort(403, 'شما اجازه مشاهده این نامه را ندارید.');
+
+            abort(
+                403,
+                'شما اجازه مشاهده این نامه را ندارید.'
+            );
         }
     }
 
