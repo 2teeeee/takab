@@ -345,6 +345,14 @@
         ]))
 
             <a
+                    href="{{ route('admin.departments.index') }}"
+                    class="{{ request()->routeIs('admin.departments.*') ? 'active' : '' }}"
+            >
+                <i class="bi bi-wallet"></i>
+                <span>دپارتمان ها</span>
+            </a>
+
+            <a
                     href="{{ route('admin.wallet.withdrawals.index') }}"
                     class="{{ request()->routeIs('admin.wallet.withdrawals.*') ? 'active' : '' }}"
             >
@@ -725,6 +733,15 @@
                     'manager',
                     'personel'
                 ]))
+
+        <a
+                href="{{ route('admin.departments.index') }}"
+                class="mobile-menu-link {{ request()->routeIs('admin.departments.*') ? 'active' : '' }}"
+        >
+            <i class="bi bi-building"></i>
+            <span>دپارتمان ها</span>
+        </a>
+
         <a
                 href="{{ route('admin.wallet.withdrawals.index') }}"
                 class="mobile-menu-link {{ request()->routeIs('admin.wallet.withdrawals.*') ? 'active' : '' }}"

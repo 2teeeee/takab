@@ -341,6 +341,36 @@ class UserController extends Controller
         }
     }
 
+    public function search(Request $request)
+    {
+        $search = trim($request->input('q', ''));
+
+        if ($search === '') {
+            return response()->json([]);
+        }
+
+        $users = User::query()
+            ->select([
+                'id',
+                'name',
+                'mobile',
+                'email',
+            ])
+            ->where(function ($query) use ($search) {
+
+                $query
+                    ->where('name', 'like', "%{$search}%")
+                    ->orWhere('mobile', 'like', "%{$search}%")
+                    ->orWhere('email', 'like', "%{$search}%");
+
+            })
+            ->orderBy('name')
+            ->limit(20)
+            ->get();
+
+        return response()->json($users);
+    }
+
     static function getRoles(): Collection
     {
         $user = Auth::user();

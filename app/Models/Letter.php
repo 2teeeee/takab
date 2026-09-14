@@ -48,6 +48,21 @@ class Letter extends Model
         return $this->hasMany(LetterReceiver::class);
     }
 
+    public function department(): BelongsTo
+    {
+        return $this->belongsTo(
+            Department::class
+        );
+    }
+
+    public function receiver(): BelongsTo
+    {
+        return $this->belongsTo(
+            User::class,
+            'receiver_id'
+        );
+    }
+
     public function getUrlAttribute(): string
     {
         return route('admin.letters.show', $this);

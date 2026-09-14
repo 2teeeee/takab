@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Admin\DepartmentController;
 use App\Http\Controllers\AssemblyController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\CartController;
@@ -383,6 +384,12 @@ Route::middleware('auth')
             |--------------------------------------------------------------------------
             */
 
+            Route::get(
+                '/users/search',
+                [UserController::class, 'search']
+            )->middleware('auth')
+                ->name('users.search');
+
             Route::resource('users', UserController::class);
 
             Route::resource(
@@ -399,6 +406,32 @@ Route::middleware('auth')
 
                 });
 
+
+            /*
+            |--------------------------------------------------------------------------
+            | Department
+            |--------------------------------------------------------------------------
+            */
+
+            Route::prefix('departments')
+                ->name('departments.')
+                ->group(function () {
+
+                    Route::get(
+                        '/',
+                        [DepartmentController::class, 'index']
+                    )->name('index');
+
+                    Route::get(
+                        '/{department}/users',
+                        [DepartmentController::class, 'users']
+                    )->name('users');
+
+                    Route::put(
+                        '/{department}/users',
+                        [DepartmentController::class, 'updateUsers']
+                    )->name('users.update');
+                });
 
             /*
             |--------------------------------------------------------------------------

@@ -164,6 +164,14 @@ class User extends Authenticatable
         );
     }
 
+    public function departments(): BelongsToMany
+    {
+        return $this->belongsToMany(
+            Department::class,
+            'department_user'
+        )->withTimestamps();
+    }
+
     public function scopeRole($query, string|array $roles)
     {
         $roles = is_array($roles) ? $roles : [$roles];
