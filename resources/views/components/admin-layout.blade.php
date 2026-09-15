@@ -591,8 +591,6 @@
                 <span>فروش‌های فروشگاه</span>
             </a>
 
-
-
         @endif
 
 
@@ -646,6 +644,22 @@
                 <i class="bi bi-tools"></i>
                 درخواست‌های سرویس من
 
+            </a>
+
+        @endif
+
+        @if($isStaff)
+
+            <div class="sidebar-section-title">
+                تولید
+            </div>
+
+            <a
+                    href="{{ route('admin.product-boms.index') }}"
+                    class="{{ request()->routeIs('admin.product-boms.*') ? 'active' : '' }}"
+            >
+                <i class="bi bi-tools"></i>
+                <span>فرمول‌های ساخت</span>
             </a>
 
         @endif
@@ -1000,7 +1014,7 @@
             </div>
 
             <a href="{{ route('installer.orders.index') }}"
-               class="text-light d-block mb-2 text-decoration-none">
+               class="mobile-menu-link text-light d-block mb-2 text-decoration-none">
 
                 <i class="bi bi-tools"></i>
                 درخواست‌های سرویس من
@@ -1008,6 +1022,24 @@
             </a>
 
         @endif
+
+
+        @if($isStaff)
+
+            <div class="sidebar-section-title">
+                تولید
+            </div>
+
+            <a
+                    href="{{ route('admin.product-boms.index') }}"
+                    class="mobile-menu-link {{ request()->routeIs('admin.product-boms.*') ? 'active' : '' }}"
+            >
+                <i class="bi bi-tools"></i>
+                <span>فرمول‌های ساخت</span>
+            </a>
+
+        @endif
+
 
 
         <hr class="border-secondary">

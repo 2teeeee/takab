@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Admin\DepartmentController;
+use App\Http\Controllers\Admin\ProductBomController;
 use App\Http\Controllers\AssemblyController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\CartController;
@@ -669,6 +670,47 @@ Route::middleware('auth')
                     WalletWithdrawalController::class,
                     'paid'
                 ])->name('withdrawals.paid');
+
+            });
+
+            Route::prefix('product-boms')
+                ->name('product-boms.')
+                ->middleware('role:admin,managerو personel')->group(function () {
+
+                    Route::get(
+                        '/',
+                        [ProductBomController::class, 'index']
+                    )->name('index');
+
+                    Route::get(
+                        '/create',
+                        [ProductBomController::class, 'create']
+                    )->name('create');
+
+                    Route::post(
+                        '/',
+                        [ProductBomController::class, 'store']
+                    )->name('store');
+
+                    Route::get(
+                        '/{productBom}',
+                        [ProductBomController::class, 'show']
+                    )->name('show');
+
+                    Route::get(
+                        '/{productBom}/edit',
+                        [ProductBomController::class, 'edit']
+                    )->name('edit');
+
+                    Route::put(
+                        '/{productBom}',
+                        [ProductBomController::class, 'update']
+                    )->name('update');
+
+                    Route::delete(
+                        '/{productBom}',
+                        [ProductBomController::class, 'destroy']
+                    )->name('destroy');
 
             });
 

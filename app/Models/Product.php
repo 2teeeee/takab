@@ -56,11 +56,6 @@ class Product extends Model
             ->where('locale', app()->getLocale());
     }
 
-    public function statusText(): string
-    {
-        return $this->status? "فعال" : "غیر فعال";
-    }
-
     public function inventories(): HasMany
     {
         return $this->hasMany(ProductUser::class);
@@ -76,5 +71,34 @@ class Product extends Model
     public function productUsers(): HasMany
     {
         return $this->hasMany(ProductUser::class);
+    }
+
+    /**
+     * BOM هایی که این محصول به عنوان دستگاه نهایی دارد
+     */
+    public function boms(): HasMany
+    {
+        return $this->hasMany(ProductBom::class);
+    }
+
+    /**
+     * BOM هایی که این محصول به عنوان قطعه در آنها استفاده شده
+     */
+    public function componentBoms(): HasMany
+    {
+        return $this->hasMany(
+            ProductBom::class,
+            'component_product_id'
+        );
+    }
+
+    public function productionPlans(): HasMany
+    {
+        return $this->hasMany(ProductionPlan::class);
+    }
+
+    public function statusText(): string
+    {
+        return $this->status? "فعال" : "غیر فعال";
     }
 }

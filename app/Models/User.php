@@ -172,6 +172,17 @@ class User extends Authenticatable
         )->withTimestamps();
     }
 
+    /**
+     * BOM هایی که این کاربر به عنوان تأمین‌کننده در آنها حضور دارد
+     */
+    public function bomSuppliers(): HasMany
+    {
+        return $this->hasMany(
+            ProductBomSupplier::class,
+            'supplier_id'
+        );
+    }
+
     public function scopeRole($query, string|array $roles)
     {
         $roles = is_array($roles) ? $roles : [$roles];
@@ -225,6 +236,8 @@ class User extends Authenticatable
             $prefix = 'N';
         } elseif ($this->hasRole('user')) {
             $prefix = 'C';
+        } elseif ($this->hasRole('supplier')) {
+            $prefix = 'U';
         }
 
         return $prefix . $this->id . rand(1111, 9999);
