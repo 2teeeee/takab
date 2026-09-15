@@ -252,7 +252,7 @@
                             </div>
 
 
-                            <div class="mb-4">
+                            <div class="mb-3">
 
                                 <label class="form-label">
                                     تاریخ مراجعه
@@ -274,6 +274,28 @@
                                         placeholder="1405/06/22"
                                         required
                                 >
+
+                            </div>
+
+
+                            {{-- Description --}}
+                            <div class="mb-4">
+
+                                <label for="description" class="form-label">
+                                    توضیحات
+                                </label>
+
+                                <textarea name="description"
+                                          id="description"
+                                          rows="3"
+                                          class="form-control @error('description') is-invalid @enderror"
+                                          placeholder="توضیحات مربوط به نصب یا سرویس...">{{ old('description') }}</textarea>
+
+                                @error('description')
+                                <div class="invalid-feedback">
+                                    {{ $message }}
+                                </div>
+                                @enderror
 
                             </div>
 

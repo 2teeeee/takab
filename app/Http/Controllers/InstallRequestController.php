@@ -481,6 +481,10 @@ class InstallRequestController extends Controller
                 'required',
                 'string',
             ],
+
+            'description' => [
+                'nullable',
+            ],
         ]);
 
         if (
@@ -521,6 +525,7 @@ class InstallRequestController extends Controller
             ->firstOrFail();
 
         DB::transaction(function () use (
+            $validated,
             $installRequest,
             $installer,
             $scheduledDate
@@ -554,6 +559,7 @@ class InstallRequestController extends Controller
             $installRequest->update([
                 'status' => 'scheduled',
                 'installation_date' => $scheduledDate,
+                'description' => $validated['description'] ?? null,
             ]);
         });
 
