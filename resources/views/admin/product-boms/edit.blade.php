@@ -1,452 +1,449 @@
-<x-admin-layout title="ویرایش فرمول ساخت">
+<x-admin-layout title="ویرایش فرمول دستگاه">
 
-    <div class="d-flex justify-content-between align-items-center mb-4">
+    <div class="container-fluid">
 
-        <div>
-            <h4 class="mb-1">
-                ویرایش فرمول ساخت
-            </h4>
+        <div class="d-flex justify-content-between align-items-center mb-4">
 
-            <div class="text-muted small">
-                {{ $productBom->product?->title }}
+            <div>
+                <h4 class="mb-1">
+                    <i class="bi bi-diagram-3"></i>
+                    ویرایش فرمول دستگاه
+                </h4>
+
+                <div class="text-muted">
+                    تمام قطعات و تأمین‌کنندگان دستگاه را در این صفحه مدیریت کنید.
+                </div>
             </div>
-        </div>
 
-        <a
-                href="{{ route('admin.product-boms.show', $productBom) }}"
-                class="btn btn-sm btn-outline-secondary"
-        >
-            بازگشت
-        </a>
-
-    </div>
-
-    @if($errors->any())
-
-        <div class="alert alert-danger">
-
-            <ul class="mb-0">
-
-                @foreach($errors->all() as $error)
-                    <li>{{ $error }}</li>
-                @endforeach
-
-            </ul>
+            <a href="{{ route('admin.product-boms.index') }}"
+               class="btn btn-outline-secondary">
+                <i class="bi bi-arrow-right"></i>
+                بازگشت
+            </a>
 
         </div>
 
-    @endif
 
-    <form
-            method="POST"
-            action="{{ route('admin.product-boms.update', $productBom) }}"
-    >
+        <form method="POST"
+              action="{{ route('admin.product-boms.update', $product->boms->first()) }}">
 
-        @csrf
-        @method('PUT')
+            @csrf
+            @method('PUT')
 
-        <div class="card border-0 shadow-sm mb-4">
 
-            <div class="card-body">
+            {{-- Device --}}
+            <div class="card shadow-sm mb-4">
 
-                <div class="row g-3">
+                <div class="card-header bg-white">
+                    <strong>
+                        <i class="bi bi-cpu"></i>
+                        دستگاه
+                    </strong>
+                </div>
 
-                    <div class="col-md-6">
+                <div class="card-body">
 
-                        <label class="form-label">
-                            دستگاه
-                        </label>
+                    <label class="form-label">
+                        دستگاه
+                    </label>
 
-                        <select
-                                name="product_id"
-                                class="form-select"
-                                required
-                        >
+                    <select id="product_id"
+                            class="form-select"
+                            disabled>
 
-                            @foreach($products as $product)
+                        <option value="{{ $product->id }}" selected>
+                            {{ $product->title }}
+                        </option>
 
-                                <option
-                                        value="{{ $product->id }}"
-                                        @selected(
-                                            old(
-                                                'product_id',
-                                                $productBom->product_id
-                                            ) == $product->id
-                                        )
-                                >
-                                    {{ $product->title }}
-                                </option>
+                    </select>
 
-                            @endforeach
-
-                        </select>
-
-                    </div>
-
-                    <div class="col-md-6">
-
-                        <label class="form-label">
-                            قطعه / ماده اولیه
-                        </label>
-
-                        <select
-                                name="component_product_id"
-                                class="form-select"
-                                required
-                        >
-
-                            @foreach($products as $product)
-
-                                <option
-                                        value="{{ $product->id }}"
-                                        @selected(
-                                            old(
-                                                'component_product_id',
-                                                $productBom->component_product_id
-                                            ) == $product->id
-                                        )
-                                >
-                                    {{ $product->title }}
-                                </option>
-
-                            @endforeach
-
-                        </select>
-
-                    </div>
-
-                    <div class="col-md-3">
-
-                        <label class="form-label">
-                            مقدار
-                        </label>
-
-                        <input
-                                type="number"
-                                step="0.0001"
-                                min="0.0001"
-                                name="quantity"
-                                class="form-control"
-                                value="{{ old('quantity', $productBom->quantity) }}"
-                                required
-                        >
-
-                    </div>
-
-                    <div class="col-md-3">
-
-                        <label class="form-label">
-                            واحد
-                        </label>
-
-                        <input
-                                type="text"
-                                name="unit"
-                                class="form-control"
-                                value="{{ old('unit', $productBom->unit) }}"
-                        >
-
-                    </div>
-
-                    <div class="col-md-3">
-
-                        <label class="form-label">
-                            قیمت پایه
-                        </label>
-
-                        <input
-                                type="number"
-                                min="0"
-                                name="unit_price"
-                                class="form-control"
-                                value="{{ old('unit_price', $productBom->unit_price) }}"
-                                required
-                        >
-
-                    </div>
-
-                    <div class="col-md-3">
-
-                        <label class="form-label d-block">
-                            وضعیت
-                        </label>
-
-                        <div class="form-check form-switch mt-2">
-
-                            <input
-                                    type="hidden"
-                                    name="is_active"
-                                    value="0"
-                            >
-
-                            <input
-                                    class="form-check-input"
-                                    type="checkbox"
-                                    name="is_active"
-                                    value="1"
-                                    @checked(
-                                        old(
-                                            'is_active',
-                                            $productBom->is_active
-                                        )
-                                    )
-                            >
-
-                            <label class="form-check-label">
-                                فعال
-                            </label>
-
-                        </div>
-
-                    </div>
-
-                    <div class="col-12">
-
-                        <label class="form-label">
-                            توضیحات
-                        </label>
-
-                        <textarea
-                                name="note"
-                                class="form-control"
-                                rows="3"
-                        >{{ old('note', $productBom->note) }}</textarea>
-
+                    <div class="form-text">
+                        دستگاه در این صفحه قابل تغییر نیست.
+                        برای دستگاه دیگر باید فرمول جدید ایجاد شود.
                     </div>
 
                 </div>
 
             </div>
 
-        </div>
 
-        <div class="card border-0 shadow-sm mb-4">
+            {{-- Components --}}
+            <div class="card shadow-sm">
 
-            <div class="card-header bg-white d-flex justify-content-between">
+                <div class="card-header bg-white
+                            d-flex justify-content-between align-items-center">
 
-                <strong>
-                    تأمین‌کنندگان
-                </strong>
+                    <strong>
+                        <i class="bi bi-boxes"></i>
+                        قطعات و مواد اولیه
+                    </strong>
 
-                <button
-                        type="button"
-                        class="btn btn-sm btn-success"
-                        id="addSupplier"
-                >
-                    <i class="bi bi-plus"></i>
-                    افزودن تأمین‌کننده
-                </button>
+                    <button type="button"
+                            class="btn btn-primary btn-sm"
+                            id="addComponentBtn">
 
-            </div>
+                        <i class="bi bi-plus-lg"></i>
+                        افزودن قطعه
 
-            <div class="card-body">
+                    </button>
 
-                <div id="suppliersContainer">
+                </div>
 
-                    @foreach(
-                        old(
-                            'suppliers',
-                            $productBom->suppliers->map(function ($item) {
-                                return [
-                                    'supplier_id' => $item->supplier_id,
-                                    'unit_price' => $item->unit_price,
-                                    'is_default' => $item->is_default,
-                                    'is_active' => $item->is_active,
-                                    'note' => $item->note,
-                                ];
-                            })->toArray()
-                        )
-                        as $index => $supplier
-                    )
 
-                        <div class="supplier-row border rounded p-3 mb-3">
+                <div class="card-body">
 
-                            <div class="row g-3 align-items-end">
+                    <div id="componentsContainer">
 
-                                <div class="col-md-4">
+                        @foreach($product->boms as $componentIndex => $bom)
 
-                                    <label class="form-label">
-                                        تأمین‌کننده
-                                    </label>
+                            <div class="component-card border rounded p-3 mb-4"
+                                 data-component-index="{{ $componentIndex }}">
 
-                                    <select
-                                            name="suppliers[{{ $index }}][supplier_id]"
-                                            class="form-select"
-                                            required
-                                    >
+                                <input type="hidden"
+                                       class="component-id"
+                                       name="components[{{ $componentIndex }}][id]"
+                                       value="{{ $bom->id }}">
 
-                                        <option value="">
-                                            انتخاب تأمین‌کننده
-                                        </option>
+                                <div class="d-flex justify-content-between
+                                            align-items-center mb-3">
 
-                                        @foreach($suppliers as $user)
+                                    <h6 class="mb-0">
+                                        قطعه #{{ $componentIndex + 1 }}
+                                    </h6>
 
-                                            <option
-                                                    value="{{ $user->id }}"
-                                                    @selected(
-                                                        $supplier['supplier_id']
-                                                        == $user->id
-                                                    )
-                                            >
-                                                {{ $user->name }}
-                                                @if($user->mobile)
-                                                    - {{ $user->mobile }}
-                                                @endif
-                                            </option>
+                                    <button type="button"
+                                            class="btn btn-outline-danger btn-sm remove-component">
 
-                                        @endforeach
-
-                                    </select>
-
-                                </div>
-
-                                <div class="col-md-3">
-
-                                    <label class="form-label">
-                                        قیمت واحد
-                                    </label>
-
-                                    <input
-                                            type="number"
-                                            min="0"
-                                            name="suppliers[{{ $index }}][unit_price]"
-                                            class="form-control"
-                                            value="{{ $supplier['unit_price'] }}"
-                                            required
-                                    >
-
-                                </div>
-
-                                <div class="col-md-2">
-
-                                    <div class="form-check">
-
-                                        <input
-                                                type="hidden"
-                                                name="suppliers[{{ $index }}][is_default]"
-                                                value="0"
-                                        >
-
-                                        <input
-                                                type="checkbox"
-                                                class="form-check-input"
-                                                name="suppliers[{{ $index }}][is_default]"
-                                                value="1"
-                                                @checked($supplier['is_default'])
-                                        >
-
-                                        <label class="form-check-label">
-                                            پیش‌فرض
-                                        </label>
-
-                                    </div>
-
-                                </div>
-
-                                <div class="col-md-2">
-
-                                    <div class="form-check">
-
-                                        <input
-                                                type="hidden"
-                                                name="suppliers[{{ $index }}][is_active]"
-                                                value="0"
-                                        >
-
-                                        <input
-                                                type="checkbox"
-                                                class="form-check-input"
-                                                name="suppliers[{{ $index }}][is_active]"
-                                                value="1"
-                                                @checked($supplier['is_active'])
-                                        >
-
-                                        <label class="form-check-label">
-                                            فعال
-                                        </label>
-
-                                    </div>
-
-                                </div>
-
-                                <div class="col-md-1">
-
-                                    <button
-                                            type="button"
-                                            class="btn btn-sm btn-outline-danger remove-supplier"
-                                    >
                                         <i class="bi bi-trash"></i>
+                                        حذف قطعه
+
                                     </button>
 
                                 </div>
 
-                                <div class="col-12">
 
-                                    <input
-                                            type="text"
-                                            name="suppliers[{{ $index }}][note]"
-                                            class="form-control"
-                                            value="{{ $supplier['note'] }}"
-                                            placeholder="توضیحات"
-                                    >
+                                <div class="row g-3">
+
+                                    {{-- Component --}}
+                                    <div class="col-md-5">
+
+                                        <label class="form-label">
+                                            قطعه / ماده اولیه
+                                        </label>
+
+                                        <select class="form-select select2-product component-product">
+
+                                            <option value=""></option>
+
+                                            @foreach($products as $item)
+
+                                                <option value="{{ $item->id }}"
+                                                        @selected($item->id == $bom->component_product_id)>
+
+                                                    {{ $item->title }}
+
+                                                </option>
+
+                                            @endforeach
+
+                                        </select>
+
+                                    </div>
+
+
+                                    {{-- Quantity --}}
+                                    <div class="col-md-2">
+
+                                        <label class="form-label">
+                                            مقدار
+                                        </label>
+
+                                        <input type="number"
+                                               step="0.0001"
+                                               min="0.0001"
+                                               class="form-control component-quantity"
+                                               value="{{ $bom->quantity }}">
+
+                                    </div>
+
+
+                                    {{-- Unit --}}
+                                    <div class="col-md-2">
+
+                                        <label class="form-label">
+                                            واحد
+                                        </label>
+
+                                        <input type="text"
+                                               class="form-control component-unit"
+                                               value="{{ $bom->unit }}"
+                                               placeholder="عدد / کیلو / متر">
+
+                                    </div>
+
+
+                                    {{-- Unit Price --}}
+                                    <div class="col-md-3">
+
+                                        <label class="form-label">
+                                            قیمت واحد
+                                        </label>
+
+                                        <input type="number"
+                                               min="0"
+                                               class="form-control component-price"
+                                               value="{{ $bom->unit_price }}">
+
+                                    </div>
+
+
+                                    {{-- Note --}}
+                                    <div class="col-12">
+
+                                        <label class="form-label">
+                                            توضیحات
+                                        </label>
+
+                                        <textarea class="form-control component-note"
+                                                  rows="2"
+                                                  placeholder="توضیحات مربوط به این قطعه...">{{ $bom->note }}</textarea>
+
+                                    </div>
+
+                                </div>
+
+
+                                {{-- Suppliers --}}
+                                <div class="mt-4">
+
+                                    <div class="d-flex justify-content-between
+                                                align-items-center mb-2">
+
+                                        <strong>
+                                            <i class="bi bi-truck"></i>
+                                            تأمین‌کنندگان
+                                        </strong>
+
+                                        <button type="button"
+                                                class="btn btn-outline-primary btn-sm add-supplier">
+
+                                            <i class="bi bi-plus"></i>
+                                            افزودن تأمین‌کننده
+
+                                        </button>
+
+                                    </div>
+
+
+                                    <div class="suppliers-container">
+
+                                        @foreach($bom->suppliers as $supplierIndex => $bomSupplier)
+
+                                            <div class="supplier-row border rounded p-2 mb-2">
+
+                                                <div class="row g-2 align-items-end">
+
+                                                    <div class="col-md-4">
+
+                                                        <label class="form-label">
+                                                            تأمین‌کننده
+                                                        </label>
+
+                                                        <select class="form-select select2-supplier supplier-select">
+
+                                                            <option value=""></option>
+
+                                                            @foreach($suppliers as $supplier)
+
+                                                                <option value="{{ $supplier->id }}"
+                                                                        @selected($supplier->id == $bomSupplier->supplier_id)>
+
+                                                                    {{ $supplier->name }}
+                                                                    {{ $supplier->mobile ? ' - '.$supplier->mobile : '' }}
+
+                                                                </option>
+
+                                                            @endforeach
+
+                                                        </select>
+
+                                                    </div>
+
+
+                                                    <div class="col-md-3">
+
+                                                        <label class="form-label">
+                                                            قیمت خرید
+                                                        </label>
+
+                                                        <input type="number"
+                                                               min="0"
+                                                               class="form-control supplier-price"
+                                                               value="{{ $bomSupplier->unit_price }}">
+
+                                                    </div>
+
+
+                                                    <div class="col-md-2">
+
+                                                        <div class="form-check mb-2">
+
+                                                            <input type="checkbox"
+                                                                   class="form-check-input supplier-default"
+                                                                    @checked($bomSupplier->is_default)>
+
+                                                            <label class="form-check-label">
+                                                                تأمین‌کننده پیش‌فرض
+                                                            </label>
+
+                                                        </div>
+
+                                                    </div>
+
+
+                                                    <div class="col-md-2">
+
+                                                        <div class="form-check mb-2">
+
+                                                            <input type="checkbox"
+                                                                   class="form-check-input supplier-active"
+                                                                    @checked($bomSupplier->is_active)>
+
+                                                            <label class="form-check-label">
+                                                                فعال
+                                                            </label>
+
+                                                        </div>
+
+                                                    </div>
+
+
+                                                    <div class="col-md-1">
+
+                                                        <button type="button"
+                                                                class="btn btn-outline-danger w-100 remove-supplier">
+
+                                                            <i class="bi bi-trash"></i>
+
+                                                        </button>
+
+                                                    </div>
+
+
+                                                    <div class="col-12">
+
+                                                        <input type="text"
+                                                               class="form-control supplier-note"
+                                                               value="{{ $bomSupplier->note }}"
+                                                               placeholder="توضیحات تأمین‌کننده">
+
+                                                    </div>
+
+                                                </div>
+
+                                            </div>
+
+                                        @endforeach
+
+                                    </div>
 
                                 </div>
 
                             </div>
 
+                        @endforeach
+
+                    </div>
+
+
+                    @if($product->boms->isEmpty())
+
+                        <div id="emptyComponents"
+                             class="text-center text-muted py-5">
+
+                            <i class="bi bi-box-seam fs-1 d-block mb-3"></i>
+
+                            هنوز قطعه‌ای برای این دستگاه تعریف نشده است.
+
                         </div>
 
-                    @endforeach
+                    @endif
+
+                </div>
+
+
+                <div class="card-footer bg-white
+                            d-flex justify-content-end gap-2">
+
+                    <a href="{{ route('admin.product-boms.index') }}"
+                       class="btn btn-secondary">
+
+                        انصراف
+
+                    </a>
+
+                    <button type="submit"
+                            class="btn btn-success">
+
+                        <i class="bi bi-check-lg"></i>
+                        ذخیره فرمول دستگاه
+
+                    </button>
 
                 </div>
 
             </div>
 
-        </div>
+        </form>
 
-        <div class="text-end">
+    </div>
 
-            <button
-                    type="submit"
-                    class="btn btn-sm btn-primary px-5"
-            >
-                <i class="bi bi-check-lg"></i>
-                ذخیره تغییرات
-            </button>
 
-        </div>
+    {{-- Component Template --}}
+    <template id="componentTemplate">
 
-    </form>
+        <div class="component-card border rounded p-3 mb-4"
+             data-component-index="__INDEX__">
 
-    <template id="supplierTemplate">
+            <input type="hidden"
+                   class="component-id"
+                   value="">
 
-        <div class="supplier-row border rounded p-3 mb-3">
 
-            <div class="row g-3 align-items-end">
+            <div class="d-flex justify-content-between
+                        align-items-center mb-3">
 
-                <div class="col-md-4">
+                <h6 class="mb-0">
+                    قطعه
+                </h6>
+
+                <button type="button"
+                        class="btn btn-outline-danger btn-sm remove-component">
+
+                    <i class="bi bi-trash"></i>
+                    حذف قطعه
+
+                </button>
+
+            </div>
+
+
+            <div class="row g-3">
+
+                <div class="col-md-5">
 
                     <label class="form-label">
-                        تأمین‌کننده
+                        قطعه / ماده اولیه
                     </label>
 
-                    <select
-                            class="form-select"
-                            data-field="supplier_id"
-                            required
-                    >
+                    <select class="form-select select2-product component-product">
 
-                        <option value="">
-                            انتخاب تأمین‌کننده
-                        </option>
+                        <option value=""></option>
 
-                        @foreach($suppliers as $user)
+                        @foreach($products as $item)
 
-                            <option value="{{ $user->id }}">
-                                {{ $user->name }}
-                                @if($user->mobile)
-                                    - {{ $user->mobile }}
-                                @endif
+                            <option value="{{ $item->id }}">
+                                {{ $item->title }}
                             </option>
 
                         @endforeach
@@ -455,38 +452,143 @@
 
                 </div>
 
+
+                <div class="col-md-2">
+
+                    <label class="form-label">
+                        مقدار
+                    </label>
+
+                    <input type="number"
+                           step="0.0001"
+                           min="0.0001"
+                           class="form-control component-quantity">
+
+                </div>
+
+
+                <div class="col-md-2">
+
+                    <label class="form-label">
+                        واحد
+                    </label>
+
+                    <input type="text"
+                           class="form-control component-unit"
+                           placeholder="عدد / کیلو / متر">
+
+                </div>
+
+
                 <div class="col-md-3">
 
                     <label class="form-label">
                         قیمت واحد
                     </label>
 
-                    <input
-                            type="number"
-                            min="0"
-                            class="form-control"
-                            data-field="unit_price"
-                            required
-                    >
+                    <input type="number"
+                           min="0"
+                           class="form-control component-price">
 
                 </div>
 
+
+                <div class="col-12">
+
+                    <label class="form-label">
+                        توضیحات
+                    </label>
+
+                    <textarea class="form-control component-note"
+                              rows="2"></textarea>
+
+                </div>
+
+            </div>
+
+
+            <div class="mt-4">
+
+                <div class="d-flex justify-content-between
+                            align-items-center mb-2">
+
+                    <strong>
+                        <i class="bi bi-truck"></i>
+                        تأمین‌کنندگان
+                    </strong>
+
+                    <button type="button"
+                            class="btn btn-outline-primary btn-sm add-supplier">
+
+                        <i class="bi bi-plus"></i>
+                        افزودن تأمین‌کننده
+
+                    </button>
+
+                </div>
+
+
+                <div class="suppliers-container"></div>
+
+            </div>
+
+        </div>
+
+    </template>
+
+
+    {{-- Supplier Template --}}
+    <template id="supplierTemplate">
+
+        <div class="supplier-row border rounded p-2 mb-2">
+
+            <div class="row g-2 align-items-end">
+
+                <div class="col-md-4">
+
+                    <label class="form-label">
+                        تأمین‌کننده
+                    </label>
+
+                    <select class="form-select select2-supplier supplier-select">
+
+                        <option value=""></option>
+
+                        @foreach($suppliers as $supplier)
+
+                            <option value="{{ $supplier->id }}">
+
+                                {{ $supplier->name }}
+                                {{ $supplier->mobile ? ' - '.$supplier->mobile : '' }}
+
+                            </option>
+
+                        @endforeach
+
+                    </select>
+
+                </div>
+
+
+                <div class="col-md-3">
+
+                    <label class="form-label">
+                        قیمت خرید
+                    </label>
+
+                    <input type="number"
+                           min="0"
+                           class="form-control supplier-price">
+
+                </div>
+
+
                 <div class="col-md-2">
 
-                    <div class="form-check">
+                    <div class="form-check mb-2">
 
-                        <input
-                                type="hidden"
-                                data-field="is_default"
-                                value="0"
-                        >
-
-                        <input
-                                type="checkbox"
-                                class="form-check-input"
-                                data-field="is_default"
-                                value="1"
-                        >
+                        <input type="checkbox"
+                               class="form-check-input supplier-default">
 
                         <label class="form-check-label">
                             پیش‌فرض
@@ -496,23 +598,14 @@
 
                 </div>
 
+
                 <div class="col-md-2">
 
-                    <div class="form-check">
+                    <div class="form-check mb-2">
 
-                        <input
-                                type="hidden"
-                                data-field="is_active"
-                                value="0"
-                        >
-
-                        <input
-                                type="checkbox"
-                                class="form-check-input"
-                                data-field="is_active"
-                                value="1"
-                                checked
-                        >
+                        <input type="checkbox"
+                               class="form-check-input supplier-active"
+                               checked>
 
                         <label class="form-check-label">
                             فعال
@@ -522,25 +615,24 @@
 
                 </div>
 
+
                 <div class="col-md-1">
 
-                    <button
-                            type="button"
-                            class="btn btn-sm btn-outline-danger remove-supplier"
-                    >
+                    <button type="button"
+                            class="btn btn-outline-danger w-100 remove-supplier">
+
                         <i class="bi bi-trash"></i>
+
                     </button>
 
                 </div>
 
+
                 <div class="col-12">
 
-                    <input
-                            type="text"
-                            class="form-control"
-                            data-field="note"
-                            placeholder="توضیحات"
-                    >
+                    <input type="text"
+                           class="form-control supplier-note"
+                           placeholder="توضیحات تأمین‌کننده">
 
                 </div>
 
@@ -550,76 +642,305 @@
 
     </template>
 
-    <script>
 
-        document.addEventListener('DOMContentLoaded', function () {
+    @push('scripts')
 
-            const container =
-                document.getElementById('suppliersContainer');
+        <script>
 
-            const template =
-                document.getElementById('supplierTemplate');
+            $(function () {
 
-            const addButton =
-                document.getElementById('addSupplier');
+                let componentIndex =
+                    $('#componentsContainer .component-card').length;
 
-            function refreshNames() {
 
-                const rows =
-                    container.querySelectorAll('.supplier-row');
+                function initProductSelect(element) {
 
-                rows.forEach((row, index) => {
+                    const $element = $(element);
 
-                    row.querySelectorAll('[data-field]')
-                        .forEach(element => {
-
-                            const field =
-                                element.dataset.field;
-
-                            element.name =
-                                `suppliers[${index}][${field}]`;
-
-                        });
-
-                });
-            }
-
-            addButton.addEventListener(
-                'click',
-                function () {
-
-                    const clone =
-                        template.content.cloneNode(true);
-
-                    container.appendChild(clone);
-
-                    refreshNames();
-                }
-            );
-
-            container.addEventListener(
-                'click',
-                function (event) {
-
-                    const button =
-                        event.target.closest(
-                            '.remove-supplier'
-                        );
-
-                    if (!button) {
+                    if ($element.hasClass('select2-hidden-accessible')) {
                         return;
                     }
 
-                    button
-                        .closest('.supplier-row')
-                        .remove();
+                    $element.select2({
+                        theme: 'bootstrap-5',
+                        dir: 'rtl',
+                        width: '100%',
+                        placeholder: 'قطعه را انتخاب کنید',
+                        allowClear: true,
+                        language: {
+                            noResults: function () {
+                                return 'موردی یافت نشد';
+                            }
+                        }
+                    });
+                }
+
+
+                function initSupplierSelect(element) {
+
+                    const $element = $(element);
+
+                    if ($element.hasClass('select2-hidden-accessible')) {
+                        return;
+                    }
+
+                    $element.select2({
+                        theme: 'bootstrap-5',
+                        dir: 'rtl',
+                        width: '100%',
+                        placeholder: 'تأمین‌کننده را انتخاب کنید',
+                        allowClear: true,
+                        language: {
+                            noResults: function () {
+                                return 'موردی یافت نشد';
+                            }
+                        }
+                    });
+                }
+
+
+                $('.component-product').each(function () {
+                    initProductSelect(this);
+                });
+
+
+                $('.supplier-select').each(function () {
+                    initSupplierSelect(this);
+                });
+
+
+                function refreshNames() {
+
+                    $('#componentsContainer .component-card')
+                        .each(function (componentIndex) {
+
+                            const $component = $(this);
+
+                            $component.attr(
+                                'data-component-index',
+                                componentIndex
+                            );
+
+
+                            $component.find('.component-id')
+                                .attr(
+                                    'name',
+                                    `components[${componentIndex}][id]`
+                                );
+
+
+                            $component.find('.component-product')
+                                .attr(
+                                    'name',
+                                    `components[${componentIndex}][component_product_id]`
+                                );
+
+
+                            $component.find('.component-quantity')
+                                .attr(
+                                    'name',
+                                    `components[${componentIndex}][quantity]`
+                                );
+
+
+                            $component.find('.component-unit')
+                                .attr(
+                                    'name',
+                                    `components[${componentIndex}][unit]`
+                                );
+
+
+                            $component.find('.component-price')
+                                .attr(
+                                    'name',
+                                    `components[${componentIndex}][unit_price]`
+                                );
+
+
+                            $component.find('.component-note')
+                                .attr(
+                                    'name',
+                                    `components[${componentIndex}][note]`
+                                );
+
+
+                            $component.find('.supplier-row')
+                                .each(function (supplierIndex) {
+
+                                    const $row = $(this);
+
+                                    $row.find('.supplier-select')
+                                        .attr(
+                                            'name',
+                                            `components[${componentIndex}][suppliers][${supplierIndex}][supplier_id]`
+                                        );
+
+
+                                    $row.find('.supplier-price')
+                                        .attr(
+                                            'name',
+                                            `components[${componentIndex}][suppliers][${supplierIndex}][unit_price]`
+                                        );
+
+
+                                    $row.find('.supplier-default')
+                                        .attr(
+                                            'name',
+                                            `components[${componentIndex}][suppliers][${supplierIndex}][is_default]`
+                                        );
+
+
+                                    $row.find('.supplier-active')
+                                        .attr(
+                                            'name',
+                                            `components[${componentIndex}][suppliers][${supplierIndex}][is_active]`
+                                        );
+
+
+                                    $row.find('.supplier-note')
+                                        .attr(
+                                            'name',
+                                            `components[${componentIndex}][suppliers][${supplierIndex}][note]`
+                                        );
+
+                                });
+
+                        });
+
+                }
+
+
+                function addSupplier(component) {
+
+                    const template =
+                        $('#supplierTemplate')
+                            .html()
+                            .replace(/__INDEX__/g, Date.now());
+
+                    const $row = $(template);
+
+                    component
+                        .find('.suppliers-container')
+                        .append($row);
+
+                    initSupplierSelect(
+                        $row.find('.supplier-select')
+                    );
 
                     refreshNames();
                 }
-            );
 
-        });
 
-    </script>
+                $('#addComponentBtn').on('click', function () {
+
+                    const index = componentIndex++;
+
+                    const html =
+                        $('#componentTemplate')
+                            .html()
+                            .replace(/__INDEX__/g, index);
+
+                    const $component = $(html);
+
+                    $('#componentsContainer')
+                        .append($component);
+
+                    initProductSelect(
+                        $component.find('.component-product')
+                    );
+
+                    addSupplier($component);
+
+                    $('#emptyComponents').remove();
+
+                    refreshNames();
+
+                });
+
+
+                $(document).on(
+                    'click',
+                    '.add-supplier',
+                    function () {
+
+                        const $component =
+                            $(this).closest('.component-card');
+
+                        addSupplier($component);
+
+                    }
+                );
+
+
+                $(document).on(
+                    'click',
+                    '.remove-supplier',
+                    function () {
+
+                        $(this)
+                            .closest('.supplier-row')
+                            .remove();
+
+                        refreshNames();
+
+                    }
+                );
+
+
+                $(document).on(
+                    'click',
+                    '.remove-component',
+                    function () {
+
+                        const $component =
+                            $(this).closest('.component-card');
+
+                        $component
+                            .find('.select2-hidden-accessible')
+                            .each(function () {
+
+                                $(this).select2('destroy');
+
+                            });
+
+                        $component.remove();
+
+                        refreshNames();
+
+                    }
+                );
+
+
+                /*
+                 * فقط یک تأمین‌کننده پیش‌فرض برای هر قطعه
+                 */
+                $(document).on(
+                    'change',
+                    '.supplier-default',
+                    function () {
+
+                        if (!this.checked) {
+                            return;
+                        }
+
+                        const $component =
+                            $(this).closest('.component-card');
+
+                        $component
+                            .find('.supplier-default')
+                            .not(this)
+                            .prop('checked', false);
+
+                    }
+                );
+
+
+                refreshNames();
+
+            });
+
+        </script>
+
+    @endpush
 
 </x-admin-layout>

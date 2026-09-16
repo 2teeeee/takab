@@ -190,17 +190,34 @@ class ProductBomController extends Controller
     /**
      * فرم ویرایش BOM
      */
-    public function edit(ProductBom $productBom): View
+    public function edit(ProductBom $productBom)
     {
-        $productBom->load([
-            'product',
-            'componentProduct',
-            'suppliers.supplier',
+        $locale = app()->getLocale();
+
+        $product = $productBom->product;
+
+        $product->load([
+            'boms' => function ($query) {
+                $query->where('is_active', true)
+                    ->with([
+                        'componentProduct',
+                        'suppliers.supplier',
+                    ])
+                    ->orderBy('id');
+            },
         ]);
 
         $products = Product::query()
-            ->orderBy('title')
-            ->get();
+            ->where('products.status', 1)
+            ->join('product_translations as t', function (JoinClause $join) use ($locale) {
+                $join->on('t.product_id', '=', 'products.id')
+                    ->where('t.locale', $locale);
+            })
+            ->orderBy('t.title')
+            ->select([
+                'products.id',
+                't.title',
+            ])->get();
 
         $suppliers = User::query()
             ->whereHas('roles', function ($query) {
@@ -210,134 +227,151 @@ class ProductBomController extends Controller
             ->get();
 
         return view('admin.product-boms.edit', compact(
-            'productBom',
+            'product',
             'products',
             'suppliers'
         ));
     }
 
-    /**
-     * بروزرسانی BOM
-     */
-    public function update(
-        Request $request,
-        ProductBom $productBom
-    ): RedirectResponse {
+    public function update(Request $request, ProductBom $productBom)
+    {
+        $product = $productBom->product;
 
         $validated = $request->validate([
-            'product_id' => [
+            'components' => ['required', 'array', 'min:1'],
+
+            'components.*.id' => [
+                'nullable',
+                'integer',
+                'exists:product_boms,id',
+            ],
+
+            'components.*.component_product_id' => [
                 'required',
                 'integer',
                 'exists:products,id',
             ],
 
-            'component_product_id' => [
-                'required',
-                'integer',
-                'exists:products,id',
-            ],
-
-            'quantity' => [
+            'components.*.quantity' => [
                 'required',
                 'numeric',
                 'gt:0',
             ],
 
-            'unit' => [
+            'components.*.unit' => [
                 'nullable',
                 'string',
                 'max:50',
             ],
 
-            'unit_price' => [
+            'components.*.unit_price' => [
                 'required',
                 'integer',
                 'min:0',
             ],
 
-            'is_active' => [
-                'nullable',
-                'boolean',
-            ],
-
-            'note' => [
+            'components.*.note' => [
                 'nullable',
                 'string',
-                'max:2000',
             ],
 
-            'suppliers' => [
+            'components.*.suppliers' => [
                 'nullable',
                 'array',
             ],
 
-            'suppliers.*.supplier_id' => [
+            'components.*.suppliers.*.supplier_id' => [
                 'required',
                 'integer',
                 'exists:users,id',
             ],
 
-            'suppliers.*.unit_price' => [
+            'components.*.suppliers.*.unit_price' => [
                 'required',
                 'integer',
                 'min:0',
             ],
 
-            'suppliers.*.is_default' => [
+            'components.*.suppliers.*.is_default' => [
                 'nullable',
-                'boolean',
             ],
 
-            'suppliers.*.is_active' => [
+            'components.*.suppliers.*.is_active' => [
                 'nullable',
-                'boolean',
             ],
 
-            'suppliers.*.note' => [
+            'components.*.suppliers.*.note' => [
                 'nullable',
                 'string',
-                'max:2000',
             ],
         ]);
 
-        $this->validateBomData([
-            'product_id' => $validated['product_id'],
-            'components' => [
-                [
-                    'component_product_id' =>
-                        $validated['component_product_id'],
-                    'suppliers' =>
-                        $validated['suppliers'] ?? [],
-                ],
-            ],
-        ]);
+        $this->validateBomData(
+            $product->id,
+            $validated['components']
+        );
 
         DB::transaction(function () use (
-            $validated,
-            $productBom
+            $product,
+            $validated
         ) {
+            $submittedBomIds = collect($validated['components'])
+                ->pluck('id')
+                ->filter()
+                ->map(fn ($id) => (int) $id)
+                ->values();
 
-            $productBom->update([
-                'product_id' => $validated['product_id'],
-                'component_product_id' =>
-                    $validated['component_product_id'],
-                'quantity' => $validated['quantity'],
-                'unit' => $validated['unit'] ?? null,
-                'unit_price' => $validated['unit_price'],
-                'is_active' =>
-                    $validated['is_active'] ?? false,
-                'note' => $validated['note'] ?? null,
-            ]);
+            /*
+             * BOMهایی که قبلاً وجود داشته‌اند ولی در فرم ارسال نشده‌اند
+             * غیرفعال می‌شوند.
+             */
+            $product->boms()
+                ->whereNotIn('id', $submittedBomIds)
+                ->update([
+                    'is_active' => false,
+                ]);
 
-            $this->syncSuppliers(
-                $productBom,
-                $validated['suppliers'] ?? []
-            );
+            foreach ($validated['components'] as $component) {
+
+                if (!empty($component['id'])) {
+
+                    $bom = ProductBom::query()
+                        ->where('id', $component['id'])
+                        ->where('product_id', $product->id)
+                        ->firstOrFail();
+
+                    $bom->update([
+                        'component_product_id' => $component['component_product_id'],
+                        'quantity' => $component['quantity'],
+                        'unit' => $component['unit'] ?? null,
+                        'unit_price' => $component['unit_price'],
+                        'is_active' => true,
+                        'note' => $component['note'] ?? null,
+                    ]);
+
+                } else {
+
+                    $bom = ProductBom::create([
+                        'product_id' => $product->id,
+                        'component_product_id' => $component['component_product_id'],
+                        'quantity' => $component['quantity'],
+                        'unit' => $component['unit'] ?? null,
+                        'unit_price' => $component['unit_price'],
+                        'is_active' => true,
+                        'note' => $component['note'] ?? null,
+                    ]);
+                }
+
+                $this->syncSuppliers(
+                    $bom,
+                    $component['suppliers'] ?? []
+                );
+            }
         });
 
         return redirect()
             ->route('admin.product-boms.index')
-            ->with('success', 'فرمول ساخت با موفقیت بروزرسانی شد.');
+            ->with('success', 'فرمول دستگاه با موفقیت به‌روزرسانی شد.');
     }
 
     /**
