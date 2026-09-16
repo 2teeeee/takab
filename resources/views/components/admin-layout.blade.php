@@ -662,6 +662,14 @@
                 <span>فرمول‌های ساخت</span>
             </a>
 
+            <a
+                    href="{{ route('admin.production-plans.index') }}"
+                    class="{{ request()->routeIs('admin.production-plans.*') ? 'active' : '' }}"
+            >
+                <i class="bi bi-tools"></i>
+                <span>برنامه تولید</span>
+            </a>
+
         @endif
 
     </nav>
@@ -1036,6 +1044,14 @@
             >
                 <i class="bi bi-tools"></i>
                 <span>فرمول‌های ساخت</span>
+            </a>
+
+            <a
+                    href="{{ route('admin.production-plans.index') }}"
+                    class="mobile-menu-link {{ request()->routeIs('admin.production-plans.*') ? 'active' : '' }}"
+            >
+                <i class="bi bi-tools"></i>
+                <span>برنامه تولید</span>
             </a>
 
         @endif

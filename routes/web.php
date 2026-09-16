@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\Admin\DepartmentController;
 use App\Http\Controllers\Admin\ProductBomController;
+use App\Http\Controllers\Admin\ProductionPlanController;
 use App\Http\Controllers\AssemblyController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\CartController;
@@ -711,8 +712,38 @@ Route::middleware('auth')
                         '/{productBom}',
                         [ProductBomController::class, 'destroy']
                     )->name('destroy');
+                });
 
-            });
+
+            Route::prefix('production-plans')
+                ->name('production-plans.')
+                ->middleware('role:admin,managerو personel')->group(function () {
+
+                    Route::get(
+                        '/',
+                        [ProductionPlanController::class, 'index']
+                    )->name('index');
+
+                    Route::get(
+                        '/create',
+                        [ProductionPlanController::class, 'create']
+                    )->name('create');
+
+                    Route::post(
+                        '/',
+                        [ProductionPlanController::class, 'store']
+                    )->name('store');
+
+                    Route::get(
+                        '/preview',
+                        [ProductionPlanController::class, 'preview']
+                    )->name('preview');
+
+                    Route::get(
+                        '/{productionPlan}',
+                        [ProductionPlanController::class, 'show']
+                    )->name('show');
+                });
 
         });
 
