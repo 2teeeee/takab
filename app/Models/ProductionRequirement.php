@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class ProductionRequirement extends Model
 {
@@ -42,5 +43,10 @@ class ProductionRequirement extends Model
     public function componentProduct(): BelongsTo
     {
         return $this->belongsTo(Product::class, 'component_product_id');
+    }
+
+    public function purchaseRequests(): HasMany
+    {
+        return $this->hasMany(PurchaseRequest::class);
     }
 }

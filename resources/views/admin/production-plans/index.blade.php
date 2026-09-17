@@ -285,7 +285,7 @@
 
                                         <div class="fw-bold">
 
-                                            {{ $plan->product?->title ?? '---' }}
+                                            {{ $plan->product?->translation?->title ?? '---' }}
 
                                         </div>
 

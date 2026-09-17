@@ -89,13 +89,12 @@ class ProductionPlanController extends Controller
 
             'start_date' => [
                 'required',
-                'date',
+                'string',
             ],
 
             'end_date' => [
                 'required',
-                'date',
-                'after_or_equal:start_date',
+                'string',
             ],
 
             'quantity' => [

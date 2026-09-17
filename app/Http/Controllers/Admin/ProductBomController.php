@@ -19,16 +19,27 @@ class ProductBomController extends Controller
      */
     public function index(): View
     {
-        $boms = ProductBom::query()
-            ->withCount('suppliers')
-            ->with([
-                'product',
-                'componentProduct',
+        $products = Product::query()
+            ->whereHas('boms')
+            ->withCount([
+                'boms as active_boms_count' => function ($query) {
+                    $query->where('is_active', true);
+                },
             ])
-            ->latest()
+            ->with([
+                'boms' => function ($query) {
+                    $query
+                        ->where('is_active', true)
+                        ->withCount('suppliers');
+                },
+            ])
+            ->latest('id')
             ->paginate(20);
 
-        return view('admin.product-boms.index', compact('boms'));
+        return view(
+            'admin.product-boms.index',
+            compact('products')
+        );
     }
 
     /**

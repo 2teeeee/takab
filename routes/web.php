@@ -3,6 +3,7 @@
 use App\Http\Controllers\Admin\DepartmentController;
 use App\Http\Controllers\Admin\ProductBomController;
 use App\Http\Controllers\Admin\ProductionPlanController;
+use App\Http\Controllers\Admin\PurchaseRequestController;
 use App\Http\Controllers\AssemblyController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\CartController;
@@ -28,6 +29,7 @@ use App\Http\Controllers\SliderController;
 use App\Http\Controllers\StoreController;
 use App\Http\Controllers\StoreProductController;
 use App\Http\Controllers\StoreSaleController;
+use App\Http\Controllers\Supplier\SupplierPurchaseRequestController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\WalletController;
 use App\Http\Controllers\WalletWithdrawalController;
@@ -745,6 +747,31 @@ Route::middleware('auth')
                     )->name('show');
                 });
 
+            Route::prefix('purchase-requests')
+                ->name('purchase-requests.')
+                ->group(function () {
+
+                    Route::get('/', [
+                        PurchaseRequestController::class,
+                        'index'
+                    ])->name('index');
+
+                    Route::get('/create/{productionRequirement}', [
+                        PurchaseRequestController::class,
+                        'create'
+                    ])->name('create');
+
+                    Route::post('/', [
+                        PurchaseRequestController::class,
+                        'store'
+                    ])->name('store');
+
+                    Route::get('/{purchaseRequest}', [
+                        PurchaseRequestController::class,
+                        'show'
+                    ])->name('show');
+                });
+
         });
 
     });
@@ -936,6 +963,30 @@ Route::middleware([
             [InstallScheduleController::class, 'storeReport']
         )->name('install_schedules.report.store');
 
+    });
+
+Route::prefix('supplier')
+    ->name('supplier.')
+    ->middleware([
+        'auth',
+        'role:supplier'
+    ])
+    ->group(function () {
+
+        Route::get('/purchase-requests', [
+            SupplierPurchaseRequestController::class,
+            'index'
+        ])->name('purchase-requests.index');
+
+        Route::get('/purchase-requests/{purchaseRequest}', [
+            SupplierPurchaseRequestController::class,
+            'show'
+        ])->name('purchase-requests.show');
+
+        Route::post('/purchase-requests/{purchaseRequest}/quote', [
+            SupplierPurchaseRequestController::class,
+            'quote'
+        ])->name('purchase-requests.quote');
     });
 
 

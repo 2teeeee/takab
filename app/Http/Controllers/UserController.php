@@ -377,17 +377,19 @@ class UserController extends Controller
 
         $rolesQuery = Role::query();
         if ($user->hasRole('admin'))
-            $rolesQuery->whereIn('name', ['admin', 'manager', 'personel', 'wholesaler', 'marketer', 'seller', 'installer', 'user']);
+            $rolesQuery->whereIn('name', ['admin', 'manager', 'personel', 'wholesaler', 'marketer', 'seller', 'installer', 'user', 'supplier']);
         elseif ($user->hasRole('manager'))
-            $rolesQuery->whereIn('name', ['personel', 'wholesaler', 'marketer', 'seller', 'installer', 'user']);
+            $rolesQuery->whereIn('name', ['personel', 'wholesaler', 'marketer', 'seller', 'installer', 'user', 'supplier']);
         elseif ($user->hasRole('personel'))
-            $rolesQuery->whereIn('name', ['wholesaler', 'marketer', 'seller', 'installer', 'user']);
+            $rolesQuery->whereIn('name', ['wholesaler', 'marketer', 'seller', 'installer', 'user', 'supplier']);
         elseif ($user->hasRole('wholesaler'))
             $rolesQuery->whereIn('name', ['marketer', 'seller']);
         elseif ($user->hasRole('marketer'))
             $rolesQuery->whereIn('name', ['seller']);
         elseif ($user->hasRole('seller'))
             $rolesQuery->whereIn('name', ['user']);
+        elseif ($user->hasRole('supplier'))
+            $rolesQuery->whereIn('name', ['supplier']);
 
         return $rolesQuery->get();
     }

@@ -183,6 +183,22 @@ class User extends Authenticatable
         );
     }
 
+    public function purchaseRequests(): HasMany
+    {
+        return $this->hasMany(
+            PurchaseRequest::class,
+            'supplier_id'
+        );
+    }
+
+    public function purchaseQuotes(): HasMany
+    {
+        return $this->hasMany(
+            PurchaseQuote::class,
+            'supplier_id'
+        );
+    }
+
     public function scopeRole($query, string|array $roles)
     {
         $roles = is_array($roles) ? $roles : [$roles];

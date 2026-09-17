@@ -295,6 +295,8 @@
     $isSeller = $user?->hasRole('seller');
     $isMarketer = $user?->hasRole('marketer');
     $isInstaller = $user?->hasRole('installer');
+    $isSupplier = $user?->hasRole('supplier');
+
 @endphp
 
 
@@ -648,6 +650,24 @@
 
         @endif
 
+        @if($isSupplier)
+
+            <hr class="border-secondary my-1">
+
+            <div class="px-3 py-2 text-secondary small">
+                تامین قطعات
+            </div>
+
+            <a href="{{ route('supplier.purchase-requests.index') }}"
+               class="{{ request()->routeIs('supplier.purchase-requests.*') ? 'active' : '' }}">
+
+                <i class="bi bi-tools"></i>
+                درخواست‌های تامین
+
+            </a>
+
+        @endif
+
         @if($isStaff)
 
             <div class="sidebar-section-title">
@@ -668,6 +688,14 @@
             >
                 <i class="bi bi-tools"></i>
                 <span>برنامه تولید</span>
+            </a>
+
+            <a
+                    href="{{ route('admin.purchase-requests.index') }}"
+                    class="{{ request()->routeIs('admin.purchase-requests.*') ? 'active' : '' }}"
+            >
+                <i class="bi bi-tools"></i>
+                <span>درخواست تامین</span>
             </a>
 
         @endif
@@ -1031,6 +1059,24 @@
 
         @endif
 
+        @if($isSupplier)
+
+            <hr class="border-secondary">
+
+            <div class="text-secondary small mb-2">
+                تامین قطعات
+            </div>
+
+            <a href="{{ route('supplier.purchase-requests.index') }}"
+               class="mobile-menu-link text-light d-block mb-2 text-decoration-none">
+
+                <i class="bi bi-tools"></i>
+                درخواست‌های تامین
+
+            </a>
+
+        @endif
+
 
         @if($isStaff)
 
@@ -1052,6 +1098,14 @@
             >
                 <i class="bi bi-tools"></i>
                 <span>برنامه تولید</span>
+            </a>
+
+            <a
+                    href="{{ route('admin.purchase-requests.index') }}"
+                    class="mobile-menu-link {{ request()->routeIs('admin.purchase-requests.*') ? 'active' : '' }}"
+            >
+                <i class="bi bi-tools"></i>
+                <span>درخواست تامین</span>
             </a>
 
         @endif
