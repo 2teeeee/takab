@@ -90,7 +90,6 @@ class UserController extends Controller
             'national_code' => [
                 'required',
                 'string',
-                'digits:10',
                 'unique:users,national_code',
             ],
 
@@ -190,7 +189,7 @@ class UserController extends Controller
             'name' => 'required|string|max:255',
             'mobile' => 'required|unique:users,mobile,' . $user->id,
             'password' => 'nullable|string|min:6',
-            'national_code' => 'required|string|min:10|max:10',
+            'national_code' => 'required|string',
             'roles' => 'nullable|array',
             'roles.*' => 'exists:roles,id',
         ]);
