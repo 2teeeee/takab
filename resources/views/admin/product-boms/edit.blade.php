@@ -16,13 +16,27 @@
             </div>
 
             <a href="{{ route('admin.product-boms.index') }}"
-               class="btn btn-outline-secondary">
+               class="btn btn-sm btn-outline-secondary">
                 <i class="bi bi-arrow-right"></i>
                 بازگشت
             </a>
 
         </div>
 
+        @if($errors->any())
+            <div class="alert alert-danger">
+                <div class="fw-bold mb-2">
+                    <i class="bi bi-exclamation-triangle"></i>
+                    لطفاً خطاهای زیر را بررسی کنید:
+                </div>
+
+                <ul class="mb-0">
+                    @foreach($errors->all() as $error)
+                        <li>{{ $error }}</li>
+                    @endforeach
+                </ul>
+            </div>
+        @endif
 
         <form method="POST"
               action="{{ route('admin.product-boms.update', $product->boms->first()) }}">
@@ -56,6 +70,10 @@
                         </option>
 
                     </select>
+
+                    <input type="hidden"
+                           name="product_id"
+                           value="{{ $product->id }}">
 
                     <div class="form-text">
                         دستگاه در این صفحه قابل تغییر نیست.
@@ -96,7 +114,7 @@
 
                         @foreach($product->boms as $componentIndex => $bom)
 
-                            <div class="component-card border rounded p-3 mb-4"
+                            <div class="component-card border border-info rounded p-3 mb-4"
                                  data-component-index="{{ $componentIndex }}">
 
                                 <input type="hidden"
@@ -290,6 +308,7 @@
 
                                                             <input type="checkbox"
                                                                    class="form-check-input supplier-default"
+                                                                   value="1"
                                                                     @checked($bomSupplier->is_default)>
 
                                                             <label class="form-check-label">
@@ -307,6 +326,7 @@
 
                                                             <input type="checkbox"
                                                                    class="form-check-input supplier-active"
+                                                                   value="1"
                                                                     @checked($bomSupplier->is_active)>
 
                                                             <label class="form-check-label">
@@ -402,7 +422,7 @@
     {{-- Component Template --}}
     <template id="componentTemplate">
 
-        <div class="component-card border rounded p-3 mb-4"
+        <div class="component-card border border-info rounded p-3 mb-4"
              data-component-index="__INDEX__">
 
             <input type="hidden"
@@ -588,7 +608,8 @@
                     <div class="form-check mb-2">
 
                         <input type="checkbox"
-                               class="form-check-input supplier-default">
+                               class="form-check-input supplier-default"
+                               value="1">
 
                         <label class="form-check-label">
                             پیش‌فرض
@@ -605,6 +626,7 @@
 
                         <input type="checkbox"
                                class="form-check-input supplier-active"
+                               value="1"
                                checked>
 
                         <label class="form-check-label">
@@ -619,7 +641,7 @@
                 <div class="col-md-1">
 
                     <button type="button"
-                            class="btn btn-outline-danger w-100 remove-supplier">
+                            class="btn btn-sm btn-outline-danger w-100 remove-supplier">
 
                         <i class="bi bi-trash"></i>
 

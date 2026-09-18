@@ -244,12 +244,21 @@ class ProductBomController extends Controller
         ));
     }
 
-    public function update(Request $request, ProductBom $productBom)
-    {
+    public function update(
+        Request $request,
+        ProductBom $productBom
+    ): RedirectResponse {
+        /*
+         * دستگاه اصلی BOM
+         */
         $product = $productBom->product;
 
         $validated = $request->validate([
-            'components' => ['required', 'array', 'min:1'],
+            'components' => [
+                'required',
+                'array',
+                'min:1',
+            ],
 
             'components.*.id' => [
                 'nullable',
@@ -284,6 +293,7 @@ class ProductBomController extends Controller
             'components.*.note' => [
                 'nullable',
                 'string',
+                'max:2000',
             ],
 
             'components.*.suppliers' => [
@@ -305,27 +315,43 @@ class ProductBomController extends Controller
 
             'components.*.suppliers.*.is_default' => [
                 'nullable',
+                'boolean',
             ],
 
             'components.*.suppliers.*.is_active' => [
                 'nullable',
+                'boolean',
             ],
 
             'components.*.suppliers.*.note' => [
                 'nullable',
                 'string',
+                'max:2000',
             ],
         ]);
 
-        $this->validateBomData(
-            $product->id,
-            $validated['components']
-        );
+        /*
+         * validateBomData در store انتظار دارد که
+         * product_id و components را داخل یک آرایه دریافت کند.
+         *
+         * چون product_id در فرم ویرایش وجود ندارد،
+         * آن را از BOM فعلی به دست می‌آوریم.
+         */
+        $bomData = [
+            'product_id' => $product->id,
+            'components' => $validated['components'],
+        ];
+
+        $this->validateBomData($bomData);
 
         DB::transaction(function () use (
             $product,
             $validated
         ) {
+
+            /*
+             * شناسه BOMهایی که در فرم باقی مانده‌اند
+             */
             $submittedBomIds = collect($validated['components'])
                 ->pluck('id')
                 ->filter()
@@ -333,8 +359,8 @@ class ProductBomController extends Controller
                 ->values();
 
             /*
-             * BOMهایی که قبلاً وجود داشته‌اند ولی در فرم ارسال نشده‌اند
-             * غیرفعال می‌شوند.
+             * BOMهایی که قبلاً برای این دستگاه وجود داشته‌اند
+             * ولی کاربر در فرم حذف کرده است، غیرفعال می‌شوند.
              */
             $product->boms()
                 ->whereNotIn('id', $submittedBomIds)
@@ -342,10 +368,19 @@ class ProductBomController extends Controller
                     'is_active' => false,
                 ]);
 
+            /*
+             * ذخیره قطعات
+             */
             foreach ($validated['components'] as $component) {
 
+                /*
+                 * BOM موجود
+                 */
                 if (!empty($component['id'])) {
 
+                    /*
+                     * حتماً بررسی می‌کنیم BOM متعلق به همین دستگاه باشد.
+                     */
                     $bom = ProductBom::query()
                         ->where('id', $component['id'])
                         ->where('product_id', $product->id)
@@ -360,6 +395,9 @@ class ProductBomController extends Controller
                         'note' => $component['note'] ?? null,
                     ]);
 
+                    /*
+                     * BOM جدید
+                     */
                 } else {
 
                     $bom = ProductBom::create([
@@ -373,6 +411,9 @@ class ProductBomController extends Controller
                     ]);
                 }
 
+                /*
+                 * تأمین‌کنندگان این قطعه
+                 */
                 $this->syncSuppliers(
                     $bom,
                     $component['suppliers'] ?? []
@@ -382,7 +423,10 @@ class ProductBomController extends Controller
 
         return redirect()
             ->route('admin.product-boms.index')
-            ->with('success', 'فرمول دستگاه با موفقیت به‌روزرسانی شد.');
+            ->with(
+                'success',
+                'فرمول دستگاه با موفقیت به‌روزرسانی شد.'
+            );
     }
 
     /**
