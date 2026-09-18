@@ -277,7 +277,7 @@ TEXT;
 TEXT;
 
         $sms->sendSingle(
-            $order->user_id,
+            $order->user->mobile,
             $message
         );
     }

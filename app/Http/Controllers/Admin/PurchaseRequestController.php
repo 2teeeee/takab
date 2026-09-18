@@ -3,13 +3,15 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Models\Letter;
 use App\Models\ProductionRequirement;
 use App\Models\PurchaseRequest;
 use App\Models\User;
+use App\Services\Sms\NikSmsService;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\View\View;
-use Morilog\Jalali\Jalalian;
 
 class PurchaseRequestController extends Controller
 {
@@ -34,9 +36,8 @@ class PurchaseRequestController extends Controller
     public function create(
         ProductionRequirement $productionRequirement
     ): View {
-
         abort_if(
-            $productionRequirement->purchase_quantity <= 0,
+            (float) $productionRequirement->purchase_quantity <= 0,
             422,
             'برای این قطعه نیازی به خرید وجود ندارد.'
         );
@@ -63,8 +64,10 @@ class PurchaseRequestController extends Controller
         );
     }
 
-    public function store(Request $request)
-    {
+    public function store(
+        Request $request,
+        NikSmsService $sms
+    ) {
         $validated = $request->validate([
             'production_requirement_id' => [
                 'required',
@@ -109,7 +112,7 @@ class PurchaseRequestController extends Controller
             return back()
                 ->withErrors([
                     'supplier_ids' =>
-                        'برای این قطعه نیازی به خرید وجود ندارد.'
+                        'برای این قطعه نیازی به خرید وجود ندارد.',
                 ])
                 ->withInput();
         }
@@ -119,8 +122,7 @@ class PurchaseRequestController extends Controller
         )->unique()->values();
 
         /*
-         * فقط کاربرانی که نقش supplier دارند
-         * اجازه دریافت درخواست قیمت دارند.
+         * فقط کاربران دارای نقش supplier
          */
         $validSupplierIds = User::query()
             ->whereIn('id', $supplierIds)
@@ -133,7 +135,7 @@ class PurchaseRequestController extends Controller
             return back()
                 ->withErrors([
                     'supplier_ids' =>
-                        'یکی از تأمین‌کنندگان انتخاب‌شده معتبر نیست.'
+                        'یکی از تأمین‌کنندگان انتخاب‌شده معتبر نیست.',
                 ])
                 ->withInput();
         }
@@ -143,13 +145,12 @@ class PurchaseRequestController extends Controller
             $requirement,
             $validated
         ) {
-
             $requests = collect();
 
             foreach ($validSupplierIds as $supplierId) {
 
                 /*
-                 * جلوگیری از درخواست تکراری
+                 * جلوگیری از ایجاد درخواست تکراری
                  */
                 $existing = PurchaseRequest::query()
                     ->where(
@@ -210,10 +211,6 @@ class PurchaseRequestController extends Controller
                 );
             }
 
-            /*
-             * اگر حداقل یک درخواست ایجاد شد،
-             * وضعیت نیازمندی را coordinating می‌کنیم.
-             */
             if ($requests->isNotEmpty()) {
                 $requirement->update([
                     'status' => 'coordinating',
@@ -224,19 +221,13 @@ class PurchaseRequestController extends Controller
         });
 
         /*
-         * در مرحله بعد:
-         *
-         * 1. ایجاد نامه
-         * 2. ایجاد receiver
-         * 3. ارسال SMS
-         *
-         * برای هر PurchaseRequest
+         * ایجاد نامه و ارسال SMS
          */
-
         foreach ($purchaseRequests as $purchaseRequest) {
-
-            // TODO:
-            // $this->sendSupplierNotification($purchaseRequest);
+            $this->createSupplierPurchaseRequestLetter(
+                $purchaseRequest,
+                $sms
+            );
         }
 
         return redirect()
@@ -247,14 +238,13 @@ class PurchaseRequestController extends Controller
             ->with(
                 'success',
                 $purchaseRequests->count()
-                . ' درخواست قیمت ایجاد شد.'
+                . ' درخواست قیمت ایجاد و برای تأمین‌کنندگان ارسال شد.'
             );
     }
 
     public function show(
         PurchaseRequest $purchaseRequest
     ): View {
-
         $purchaseRequest->load([
             'supplier',
             'productionRequirement.componentProduct',
@@ -267,5 +257,123 @@ class PurchaseRequestController extends Controller
             'admin.purchase-requests.show',
             compact('purchaseRequest')
         );
+    }
+
+    /**
+     * ایجاد نامه و ارسال پیامک به تأمین‌کننده
+     */
+    protected function createSupplierPurchaseRequestLetter(
+        PurchaseRequest $purchaseRequest,
+        NikSmsService $sms
+    ): void {
+        $purchaseRequest->loadMissing([
+            'supplier',
+            'productionRequirement.componentProduct',
+            'productionRequirement.productionPlan.product',
+        ]);
+
+        $supplier = $purchaseRequest->supplier;
+
+        if (!$supplier) {
+            return;
+        }
+
+        $requirement = $purchaseRequest->productionRequirement;
+
+        $supplierName = $supplier->name ?? 'تأمین‌کننده';
+
+        $productName =
+            $requirement
+                ->productionPlan
+                ->product
+                ?->translation
+                ?->title ?? '—';
+
+        $componentName =
+            $requirement
+                ->componentProduct
+                ?->translation
+                ?->title ?? '—';
+
+        $quantity = rtrim(
+            rtrim(
+                number_format(
+                    (float) $purchaseRequest->quantity,
+                    4,
+                    '.',
+                    ''
+                ),
+                '0'
+            ),
+            '.'
+        );
+
+        $deadline = $purchaseRequest->deadline
+            ? $purchaseRequest->deadline->format('Y/m/d')
+            : 'بدون مهلت مشخص';
+
+        $actor = Auth::user();
+
+        $message = <<<TEXT
+تأمین‌کننده محترم {$supplierName}
+
+برای تأمین قطعه مورد نیاز برنامه تولید، درخواست اعلام قیمت برای شما ثبت شده است.
+
+دستگاه تولیدی:
+{$productName}
+
+قطعه / ماده:
+{$componentName}
+
+مقدار مورد نیاز:
+{$quantity} {$purchaseRequest->unit}
+
+مهلت اعلام قیمت:
+{$deadline}
+
+{$purchaseRequest->note}
+
+لطفاً قیمت پیشنهادی، مقدار قابل تأمین و زمان تحویل را از طریق پنل تأمین‌کنندگان ثبت فرمایید.
+
+با تشکر
+واحد تأمین
+TEXT;
+
+        $letter = Letter::create([
+            'sender_id' => $actor->id,
+
+            'subject' =>
+                "درخواست اعلام قیمت قطعه - {$componentName}",
+
+            'body' => $message,
+
+            'priority' => 'medium',
+        ]);
+
+        $letter->receiverItems()->create([
+            'user_id' => $supplier->id,
+            'status' => 'new',
+            'last_received_at' => now(),
+        ]);
+
+        $smsMessage = <<<TEXT
+یک درخواست قیمت جدید برای شما ثبت شده است.
+
+موضوع:
+{$letter->subject}
+
+لطفاً وارد پنل تأمین‌کنندگان شوید و قیمت پیشنهادی خود را ثبت نمایید.
+
+{$letter->url}
+TEXT;
+
+        $sms->sendSingle(
+            $supplier->mobile,
+            $smsMessage
+        );
+
+        $purchaseRequest->update([
+            'status' => 'sent',
+        ]);
     }
 }
