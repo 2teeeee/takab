@@ -318,7 +318,7 @@ class ProductionPlanController extends Controller
                         $bom->component_product_id,
 
                     'component_name' =>
-                        $bom->componentProduct?->title,
+                        $bom->componentProduct?->translation?->title,
 
                     'required_per_unit' =>
                         $requiredPerUnit,
