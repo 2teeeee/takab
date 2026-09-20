@@ -1,4 +1,4 @@
-<x-profile-layout title="درخواست‌های قیمت">
+<x-admin-layout title="درخواست‌های قیمت">
 
     <div class="container-fluid">
 
@@ -79,6 +79,11 @@
                                             'class' => 'bg-success',
                                         ],
 
+                                        'approved' => [
+                                            'title' => 'قیمت تایید شده',
+                                            'class' => 'bg-success',
+                                        ],
+
                                         'expired' => [
                                             'title' => 'منقضی شده',
                                             'class' => 'bg-warning text-dark',
@@ -107,6 +112,7 @@
                                             {{ $purchaseRequest
                                                 ->productionRequirement
                                                 ->componentProduct
+                                                ?->translation
                                                 ?->title ?? '-' }}
                                         </div>
 
@@ -118,6 +124,7 @@
                                             ->productionRequirement
                                             ->productionPlan
                                             ->product
+                                            ?->translation
                                             ?->title ?? '-' }}
 
                                     </td>
@@ -205,4 +212,4 @@
 
     </div>
 
-</x-profile-layout>
+</x-admin-layout>

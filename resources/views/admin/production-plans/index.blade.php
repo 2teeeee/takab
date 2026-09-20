@@ -442,7 +442,7 @@
 
                                         <small class="text-muted">
 
-                                            {{ jdate($plan->created_at)->format('H:i') }}
+                                            {{ jdate($plan->created_at->setTimezone('Asia/Tehran'))->format('H:i') }}
 
                                         </small>
 
@@ -463,6 +463,7 @@
                                                title="مشاهده">
 
                                                 <i class="bi bi-eye"></i>
+                                                مشاهده
 
                                             </a>
 
@@ -474,6 +475,7 @@
                                                    title="ویرایش">
 
                                                     <i class="bi bi-pencil"></i>
+                                                    ویرایش
 
                                                 </a>
 

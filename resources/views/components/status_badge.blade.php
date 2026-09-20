@@ -4,6 +4,7 @@
     $map = [
         'pending'       => ['text' => 'در انتظار بررسی',    'class' => 'bg-warning text-dark'],
         'success'       => ['text' => 'تایید شده',          'class' => 'bg-success text-white'],
+        'approved'      => ['text' => 'تایید شده',          'class' => 'bg-success text-white'],
         'rejected'      => ['text' => 'رد شده',             'class' => 'bg-danger text-white'],
         'referred'      => ['text' => 'ارجاع داده شده',     'class' => 'bg-warning text-dark'],
         'scheduled'     => ['text' => 'زمان‌بندی شد',        'class' => 'bg-info text-white'],

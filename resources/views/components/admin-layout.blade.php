@@ -424,7 +424,8 @@
             'wholesaler',
             'seller',
             'marketer',
-            'installer'
+            'installer',
+            'supplier'
         ]))
 
             <a
@@ -856,7 +857,8 @@
             'wholesaler',
             'seller',
             'marketer',
-            'installer'
+            'installer',
+            'supplier'
         ]))
 
             <hr class="border-secondary">

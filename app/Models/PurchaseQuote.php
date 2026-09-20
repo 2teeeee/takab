@@ -15,6 +15,7 @@ class PurchaseQuote extends Model
         'total_price',
         'delivery_days',
         'note',
+        'status',
         'quoted_at',
     ];
 
@@ -39,5 +40,10 @@ class PurchaseQuote extends Model
             User::class,
             'supplier_id'
         );
+    }
+
+    public function purchaseOrder()
+    {
+        return $this->hasOne(PurchaseOrder::class);
     }
 }

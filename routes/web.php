@@ -3,6 +3,7 @@
 use App\Http\Controllers\Admin\DepartmentController;
 use App\Http\Controllers\Admin\ProductBomController;
 use App\Http\Controllers\Admin\ProductionPlanController;
+use App\Http\Controllers\Admin\PurchaseQuoteController;
 use App\Http\Controllers\Admin\PurchaseRequestController;
 use App\Http\Controllers\AssemblyController;
 use App\Http\Controllers\AuthController;
@@ -368,7 +369,7 @@ Route::middleware('auth')
     ->group(function () {
 
         Route::middleware([
-            'role:admin,manager,installer,wholesaler,marketer,seller,personel'
+            'role:admin,manager,installer,wholesaler,marketer,seller,personel,supplier'
         ])->group(function () {
 
 
@@ -771,6 +772,11 @@ Route::middleware('auth')
                         'show'
                     ])->name('show');
                 });
+
+            Route::post(
+                '/purchase-quotes/{purchaseQuote}/approve',
+                [PurchaseQuoteController::class, 'approve']
+            )->name('purchase-quotes.approve');
 
         });
 

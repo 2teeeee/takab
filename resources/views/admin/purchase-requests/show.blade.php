@@ -185,6 +185,18 @@
                                     تاریخ
                                 </th>
 
+                                <th>
+                                    وضعیت
+                                </th>
+
+                                <th>
+                                    توضیحات
+                                </th>
+
+                                <th>
+                                    عملیات
+                                </th>
+
                             </tr>
 
                             </thead>
@@ -223,8 +235,35 @@
                                     </td>
 
                                     <td>
-                                        {{ $quote->quoted_at
-                                            ?->format('Y/m/d H:i') }}
+                                        {{ jdate($quote->quoted_at->setTimezone('Asia/Tehran'))
+                                            ->format('Y/m/d H:i') }}
+                                    </td>
+
+                                    <td>
+                                        <x-status_badge status="{{ $purchaseRequest->status }}" />
+                                    </td>
+
+                                    <td>
+                                        {{ $quote->note}}
+                                    </td>
+
+                                    <td>
+                                        @if($purchaseRequest->status == 'pending')
+                                        <form method="POST"
+                                              action="{{ route(
+                                                  'admin.purchase-quotes.approve',
+                                                  $quote
+                                              ) }}">
+                                            @csrf
+
+                                            <button type="submit"
+                                                    class="btn btn-sm btn-success"
+                                                    onclick="return confirm('پیشنهاد تأیید شود؟')">
+                                                <i class="bi bi-check-circle"></i>
+                                                تأیید پیشنهاد
+                                            </button>
+                                        </form>
+                                        @endif
                                     </td>
 
                                 </tr>

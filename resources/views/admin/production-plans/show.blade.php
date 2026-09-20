@@ -379,7 +379,7 @@
                                     {{-- Required per unit --}}
                                     <td class="text-center">
 
-                                        {{ rtrim(rtrim(number_format($requirement->required_per_unit, 4, '.', ''), '0'), '.') }}
+                                        {{ rtrim(rtrim(number_format($requirement->required_per_unit, 4, '.', ','), '0'), '.') }}
 
                                     </td>
 
@@ -387,7 +387,7 @@
                                     {{-- Required quantity --}}
                                     <td class="text-center fw-bold">
 
-                                        {{ rtrim(rtrim(number_format($required, 4, '.', ''), '0'), '.') }}
+                                        {{ rtrim(rtrim(number_format($required, 4, '.', ','), '0'), '.') }}
 
                                     </td>
 
@@ -398,7 +398,7 @@
                                         @if($available > 0)
 
                                             <span class="text-success fw-semibold">
-                                                {{ rtrim(rtrim(number_format($available, 4, '.', ''), '0'), '.') }}
+                                                {{ rtrim(rtrim(number_format($available, 4, '.', ','), '0'), '.') }}
                                             </span>
 
                                         @else
@@ -418,7 +418,7 @@
                                         @if($purchase > 0)
 
                                             <span class="badge bg-danger-subtle text-danger px-2 py-1">
-                                                {{ rtrim(rtrim(number_format($purchase, 4, '.', ''), '0'), '.') }}
+                                                {{ rtrim(rtrim(number_format($purchase, 4, '.', ','), '0'), '.') }}
                                             </span>
 
                                         @else

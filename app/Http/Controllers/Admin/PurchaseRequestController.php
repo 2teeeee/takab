@@ -12,6 +12,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\View\View;
+use Morilog\Jalali\Jalalian;
 
 class PurchaseRequestController extends Controller
 {
@@ -90,6 +91,12 @@ class PurchaseRequestController extends Controller
             'deadline' => [
                 'nullable',
                 'string',
+            ],
+
+            'quantity' => [
+                'required',
+                'numeric',
+                'gt:0',
             ],
 
             'note' => [
@@ -185,7 +192,7 @@ class PurchaseRequestController extends Controller
                         $supplierId,
 
                     'quantity' =>
-                        $requirement->purchase_quantity,
+                        $validated['quantity'],
 
                     'unit' =>
                         $requirement->unit,
@@ -301,7 +308,7 @@ class PurchaseRequestController extends Controller
                     (float) $purchaseRequest->quantity,
                     4,
                     '.',
-                    ''
+                    ','
                 ),
                 '0'
             ),

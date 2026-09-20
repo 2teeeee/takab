@@ -140,87 +140,113 @@
 
                     </div>
 
+                    <div class="row">
+                        <div class="col-md-12 mb-3">
 
-                    <div class="mb-3">
+                            <label class="form-label">
+                                تأمین‌کنندگان
+                                <span class="text-danger">*</span>
+                            </label>
 
-                        <label class="form-label">
-                            تأمین‌کنندگان
-                            <span class="text-danger">*</span>
-                        </label>
+                            <select name="supplier_ids[]"
+                                    id="supplier_ids"
+                                    class="form-select"
+                                    multiple
+                                    required>
 
-                        <select name="supplier_ids[]"
-                                id="supplier_ids"
-                                class="form-select"
-                                multiple
-                                required>
+                                @foreach($suppliers as $supplier)
 
-                            @foreach($suppliers as $supplier)
-
-                                <option value="{{ $supplier->id }}"
-                                        @selected(
-                                            in_array(
-                                                $supplier->id,
-                                                old(
-                                                    'supplier_ids',
-                                                    []
+                                    <option value="{{ $supplier->id }}"
+                                            @selected(
+                                                in_array(
+                                                    $supplier->id,
+                                                    old(
+                                                        'supplier_ids',
+                                                        []
+                                                    )
                                                 )
-                                            )
-                                        )>
+                                            )>
 
-                                    {{ $supplier->name }}
+                                        {{ $supplier->name }}
 
-                                </option>
+                                    </option>
 
-                            @endforeach
+                                @endforeach
 
-                        </select>
+                            </select>
 
-                        @error('supplier_ids')
-                        <div class="text-danger small mt-1">
-                            {{ $message }}
+                            @error('supplier_ids')
+                            <div class="text-danger small mt-1">
+                                {{ $message }}
+                            </div>
+                            @enderror
+
                         </div>
-                        @enderror
 
-                    </div>
+                        {{-- Deadline --}}
+                        <div class="col md-6 mb-3">
 
+                            <label class="form-label">
+                                مهلت اعلام قیمت
+                            </label>
 
-                    {{-- Deadline --}}
-                    <div class="mb-3">
+                            <input type="text"
+                                   name="deadline"
+                                   class="form-control"
+                                   data-jdp
+                                   data-jdp-only-date
+                                   value="{{ old('deadline') }}"
+                                   placeholder="مهلت اعلام قیمت"
+                                   required>
 
-                        <label class="form-label">
-                            مهلت اعلام قیمت
-                        </label>
+                            @error('deadline')
+                            <div class="text-danger small mt-1">
+                                {{ $message }}
+                            </div>
+                            @enderror
 
-                        <input type="text"
-                               name="deadline"
-                               class="form-control"
-                               data-jdp
-                               data-jdp-only-date
-                               value="{{ old('deadline') }}"
-                               placeholder="مهلت اعلام قیمت"
-                               required>
-
-                        @error('deadline')
-                        <div class="text-danger small mt-1">
-                            {{ $message }}
                         </div>
-                        @enderror
 
-                    </div>
+                        {{-- Quantity --}}
+                        <div class="col md-6 mb-3">
 
+                            <label class="form-label">
+                                مقدار مورد نیاز
+                            </label>
 
-                    {{-- Note --}}
-                    <div class="mb-3">
+                            <input type="text"
+                                   name="quantity"
+                                   class="form-control"
+                                   value="{{ old('quantity') ?? number_format(
+                                                                    $productionRequirement->purchase_quantity,
+                                                                    4,
+                                                                    '.',
+                                                                    ''
+                                                                )}}"
+                                   placeholder="مقدار مورد نیاز"
+                                   required>
 
-                        <label class="form-label">
-                            توضیحات
-                        </label>
+                            @error('quantity')
+                            <div class="text-danger small mt-1">
+                                {{ $message }}
+                            </div>
+                            @enderror
 
-                        <textarea name="note"
-                                  rows="4"
-                                  class="form-control"
-                                  placeholder="توضیحات مربوط به درخواست قیمت...">{{ old('note') }}</textarea>
+                        </div>
 
+                        {{-- Note --}}
+                        <div class="mb-3">
+
+                            <label class="form-label">
+                                توضیحات
+                            </label>
+
+                            <textarea name="note"
+                                      rows="4"
+                                      class="form-control"
+                                      placeholder="توضیحات مربوط به درخواست قیمت...">{{ old('note') }}</textarea>
+
+                        </div>
                     </div>
 
                 </div>

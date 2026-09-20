@@ -1,4 +1,4 @@
-<x-profile-layout title="اعلام قیمت">
+<x-admin-layout title="اعلام قیمت">
 
     <div class="container-fluid">
 
@@ -55,6 +55,7 @@
                                 ->productionRequirement
                                 ->productionPlan
                                 ->product
+                                ?->translation
                                 ?->title ?? '-' }}
                         </div>
 
@@ -70,6 +71,7 @@
                             {{ $purchaseRequest
                                 ->productionRequirement
                                 ->componentProduct
+                                ?->translation
                                 ?->title ?? '-' }}
                         </div>
 
@@ -349,4 +351,4 @@
 
     </div>
 
-</x-profile-layout>
+</x-admin-layout>
