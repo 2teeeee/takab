@@ -5,6 +5,7 @@ use App\Http\Controllers\Admin\ProductBomController;
 use App\Http\Controllers\Admin\ProductionPlanController;
 use App\Http\Controllers\Admin\PurchaseOrderController;
 use App\Http\Controllers\Admin\PurchaseQuoteController;
+use App\Http\Controllers\Admin\PurchaseReceiptController;
 use App\Http\Controllers\Admin\PurchaseRequestController;
 use App\Http\Controllers\AssemblyController;
 use App\Http\Controllers\AuthController;
@@ -797,6 +798,27 @@ Route::middleware('auth')
                         '/{purchaseOrder}/ship',
                         [PurchaseOrderController::class, 'ship']
                     )->name('ship.store');
+
+                });
+
+            Route::prefix('purchase-receipts')
+                ->name('purchase-receipts.')
+                ->group(function () {
+
+                    Route::get(
+                        '/',
+                        [PurchaseReceiptController::class, 'index']
+                    )->name('index');
+
+                    Route::get(
+                        '/{purchaseOrder}/create',
+                        [PurchaseReceiptController::class, 'create']
+                    )->name('create');
+
+                    Route::post(
+                        '/{purchaseOrder}',
+                        [PurchaseReceiptController::class, 'store']
+                    )->name('store');
 
                 });
 

@@ -699,6 +699,14 @@
                 <span>درخواست تامین</span>
             </a>
 
+            <a
+                    href="{{ route('admin.purchase-receipts.index') }}"
+                    class="{{ request()->routeIs('admin.purchase-receipts.*') ? 'active' : '' }}"
+            >
+                <i class="bi bi-tools"></i>
+                <span>دریافت کالا</span>
+            </a>
+
         @endif
 
     </nav>
@@ -1108,6 +1116,14 @@
             >
                 <i class="bi bi-tools"></i>
                 <span>درخواست تامین</span>
+            </a>
+
+            <a
+                    href="{{ route('admin.purchase-receipts.index') }}"
+                    class="mobile-menu-link {{ request()->routeIs('admin.purchase-receipts.*') ? 'active' : '' }}"
+            >
+                <i class="bi bi-tools"></i>
+                <span>دریافت کالا</span>
             </a>
 
         @endif

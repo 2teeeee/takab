@@ -87,8 +87,8 @@ class PurchaseOrder extends Model
         $requirement = $request->productionRequirement;
 
         $quantity = min(
-            (float) $quote->quantity,
-            (float) $requirement->purchase_quantity
+            (float) $quote->available_quantity,
+            (float) $requirement->quantity
         );
 
         $unitPrice = (int) $quote->unit_price;
