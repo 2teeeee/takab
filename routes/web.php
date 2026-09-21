@@ -3,6 +3,7 @@
 use App\Http\Controllers\Admin\DepartmentController;
 use App\Http\Controllers\Admin\ProductBomController;
 use App\Http\Controllers\Admin\ProductionPlanController;
+use App\Http\Controllers\Admin\PurchaseOrderController;
 use App\Http\Controllers\Admin\PurchaseQuoteController;
 use App\Http\Controllers\Admin\PurchaseRequestController;
 use App\Http\Controllers\AssemblyController;
@@ -777,6 +778,27 @@ Route::middleware('auth')
                 '/purchase-quotes/{purchaseQuote}/approve',
                 [PurchaseQuoteController::class, 'approve']
             )->name('purchase-quotes.approve');
+
+            Route::prefix('purchase-orders')
+                ->name('purchase-orders.')
+                ->group(function () {
+
+                    Route::get(
+                        '/{purchaseOrder}',
+                        [PurchaseOrderController::class, 'show']
+                    )->name('show');
+
+                    Route::get(
+                        '/{purchaseOrder}/ship',
+                        [PurchaseOrderController::class, 'shipForm']
+                    )->name('ship');
+
+                    Route::post(
+                        '/{purchaseOrder}/ship',
+                        [PurchaseOrderController::class, 'ship']
+                    )->name('ship.store');
+
+                });
 
         });
 

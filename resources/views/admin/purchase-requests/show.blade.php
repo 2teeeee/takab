@@ -240,7 +240,7 @@
                                     </td>
 
                                     <td>
-                                        <x-status_badge status="{{ $purchaseRequest->status }}" />
+                                        <x-status_badge status="{{ $quote->status }}" />
                                     </td>
 
                                     <td>
@@ -248,21 +248,38 @@
                                     </td>
 
                                     <td>
-                                        @if($purchaseRequest->status == 'pending')
-                                        <form method="POST"
-                                              action="{{ route(
+                                        @if($quote->status == 'pending')
+                                            <form method="POST"
+                                                  action="{{ route(
                                                   'admin.purchase-quotes.approve',
                                                   $quote
                                               ) }}">
-                                            @csrf
+                                                @csrf
 
-                                            <button type="submit"
-                                                    class="btn btn-sm btn-success"
-                                                    onclick="return confirm('پیشنهاد تأیید شود؟')">
-                                                <i class="bi bi-check-circle"></i>
-                                                تأیید پیشنهاد
-                                            </button>
-                                        </form>
+                                                <button type="submit"
+                                                        class="btn btn-sm btn-success"
+                                                        onclick="return confirm('پیشنهاد تأیید شود؟')">
+                                                    <i class="bi bi-check-circle"></i>
+                                                    تأیید پیشنهاد
+                                                </button>
+                                            </form>
+                                        @endif
+                                        @if($quote->status == 'approved' ||
+                                              $quote->status == 'sent' ||
+                                              $quote->status == 'complete')
+                                            <form method="GET"
+                                                  action="{{ route(
+                                                  'admin.purchase-orders.show',
+                                                  $quote->purchaseOrder
+                                              ) }}">
+                                                @csrf
+
+                                                <button type="submit"
+                                                        class="btn btn-sm btn-info">
+                                                    <i class="bi bi-eye"></i>
+                                                    مشاهده
+                                                </button>
+                                            </form>
                                         @endif
                                     </td>
 

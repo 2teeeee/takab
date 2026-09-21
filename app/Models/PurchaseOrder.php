@@ -19,11 +19,19 @@ class PurchaseOrder extends Model
         'total_amount',
         'note',
         'created_by',
+
+        'shipped_at',
+        'vehicle_type',
+        'vehicle_plate',
+        'driver_name',
+        'driver_mobile',
+        'shipping_note',
     ];
 
     protected $casts = [
         'order_date' => 'date',
         'expected_delivery_date' => 'date',
+        'shipped_at' => 'date',
         'total_amount' => 'integer',
     ];
 

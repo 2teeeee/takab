@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 
 class PurchaseQuote extends Model
 {
@@ -42,7 +43,7 @@ class PurchaseQuote extends Model
         );
     }
 
-    public function purchaseOrder()
+    public function purchaseOrder(): HasOne
     {
         return $this->hasOne(PurchaseOrder::class);
     }

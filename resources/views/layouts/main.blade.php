@@ -353,7 +353,8 @@
             </div>
         </div>
         <div class="bg-dark py-2 mt-3" dir="ltr">
-            CopyRight 2025 <i class="bi bi-c-circle"></i> TakAb Sanat Eram
+            CopyRight 2027 <i class="bi bi-c-circle"></i> TakAb Sanat Eram
+                | Make BY ♡ <a href="http://ahmadreza-jalali.ir/" target="_blank" class="text-decoration-none">ARG</a>
         </div>
     </div>
         <div class="min-h-screen bg-gray-100">
@@ -423,8 +424,9 @@
                 </div>
             </div>
             <div class="copyright py-1 font-en-us text-center">
-                Copyright <i class="bi bi-c-circle"></i> 2025
+                Copyright <i class="bi bi-c-circle"></i> 2027
                 <a href="/" class="text-decoration-none">TakAb Sanat Eram</a>
+                | Make BY ♡ <a href="http://ahmadreza-jalali.ir/" target="_blank" class="text-decoration-none">ARG</a>
             </div>
         </div>
     </div>

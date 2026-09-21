@@ -1227,8 +1227,12 @@
         {{ $slot }}
     </section>
 
+
 </main>
 
+<div class="bg-secondary py-1 text-center text-small text-white">
+   Make BY ♡ | All Rights Reserved © <a href="http://ahmadreza-jalali.ir/" target="_blank" class="text-decoration-none">ARG</a>
+</div>
 
 {{-- =========================================================
      JavaScript

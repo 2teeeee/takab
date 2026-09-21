@@ -13,13 +13,11 @@ class SupplierPurchaseRequestController extends Controller
     public function index(): View
     {
         $purchaseRequests = PurchaseRequest::query()
-            ->where(
-                'supplier_id',
-                auth()->id()
-            )
+            ->where('supplier_id', auth()->id())
             ->with([
-                'productionRequirement.componentProduct',
-                'productionRequirement.productionPlan.product',
+                'productionRequirement.componentProduct.translation',
+                'productionRequirement.productionPlan.product.translation',
+                'quotes.purchaseOrder',
             ])
             ->latest()
             ->paginate(20);

@@ -33,10 +33,6 @@
                                     قطعه
                                 </th>
 
-                                <th>
-                                    دستگاه
-                                </th>
-
                                 <th class="text-center">
                                     مقدار
                                 </th>
@@ -76,7 +72,7 @@
 
                                         'quoted' => [
                                             'title' => 'قیمت ثبت شده',
-                                            'class' => 'bg-success',
+                                            'class' => 'bg-primary',
                                         ],
 
                                         'approved' => [
@@ -115,17 +111,6 @@
                                                 ?->translation
                                                 ?->title ?? '-' }}
                                         </div>
-
-                                    </td>
-
-                                    <td>
-
-                                        {{ $purchaseRequest
-                                            ->productionRequirement
-                                            ->productionPlan
-                                            ->product
-                                            ?->translation
-                                            ?->title ?? '-' }}
 
                                     </td>
 
@@ -169,6 +154,29 @@
                                             مشاهده
 
                                         </a>
+
+                                        @php
+                                            $approvedQuote = $purchaseRequest->quotes
+                                                ->firstWhere('status', 'approved');
+
+                                            $purchaseOrder = $approvedQuote?->purchaseOrder;
+                                        @endphp
+
+
+                                        @if($purchaseOrder)
+
+                                            <a href="{{ route(
+                                                'admin.purchase-orders.ship',
+                                                $purchaseOrder
+                                            ) }}"
+                                               class="btn btn-sm btn-success">
+
+                                                <i class="bi bi-truck"></i>
+                                                ثبت ارسال
+
+                                            </a>
+
+                                        @endif
 
                                     </td>
 
