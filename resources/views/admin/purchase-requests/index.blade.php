@@ -14,6 +14,16 @@
                 </div>
             </div>
 
+
+            <a href="{{ route('admin.purchase-requests.create-noorder') }}"
+               class="btn btn-sm btn-primary">
+
+                <i class="bi bi-plus-lg"></i>
+
+                درخواست تامین جدید
+
+            </a>
+
         </div>
 
 
@@ -124,7 +134,6 @@
 
                                         <div class="fw-semibold">
                                             {{ $request
-                                                ->productionRequirement
                                                 ->componentProduct
                                                 ?->translation
                                                 ?->title ?? '-' }}

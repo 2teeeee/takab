@@ -106,7 +106,6 @@
 
                                         <div class="fw-semibold">
                                             {{ $purchaseRequest
-                                                ->productionRequirement
                                                 ->componentProduct
                                                 ?->translation
                                                 ?->title ?? '-' }}

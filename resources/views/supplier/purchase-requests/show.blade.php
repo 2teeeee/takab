@@ -69,7 +69,6 @@
 
                         <div class="fw-bold">
                             {{ $purchaseRequest
-                                ->productionRequirement
                                 ->componentProduct
                                 ?->translation
                                 ?->title ?? '-' }}

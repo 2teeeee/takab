@@ -11,6 +11,7 @@ class PurchaseRequest extends Model
 {
     protected $fillable = [
         'production_requirement_id',
+        'component_product_id',
         'supplier_id',
         'quantity',
         'unit',
@@ -63,6 +64,14 @@ class PurchaseRequest extends Model
             PurchaseOrder::class,
             'purchase_quote_id',
             'approved_quote_id'
+        );
+    }
+
+    public function componentProduct(): BelongsTo
+    {
+        return $this->belongsTo(
+            Product::class,
+            'component_product_id'
         );
     }
 }

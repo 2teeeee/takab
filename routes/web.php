@@ -769,6 +769,16 @@ Route::middleware('auth')
                         'store'
                     ])->name('store');
 
+                    Route::get(
+                        '/noorder',
+                        [PurchaseRequestController::class, 'createNoOrder']
+                    )->name('create-noorder');
+
+                    Route::post(
+                        '/noorder',
+                        [PurchaseRequestController::class, 'storeNoOrder']
+                    )->name('store-noorder');
+
                     Route::get('/{purchaseRequest}', [
                         PurchaseRequestController::class,
                         'show'

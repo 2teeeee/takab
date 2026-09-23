@@ -4,10 +4,12 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\Letter;
+use App\Models\Product;
 use App\Models\ProductionRequirement;
 use App\Models\PurchaseRequest;
 use App\Models\User;
 use App\Services\Sms\NikSmsService;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -188,6 +190,9 @@ class PurchaseRequestController extends Controller
                     'production_requirement_id' =>
                         $requirement->id,
 
+                    'component_product_id' =>
+                        $requirement->component_product_id,
+
                     'supplier_id' =>
                         $supplierId,
 
@@ -246,6 +251,137 @@ class PurchaseRequestController extends Controller
                 'success',
                 $purchaseRequests->count()
                 . ' درخواست قیمت ایجاد و برای تأمین‌کنندگان ارسال شد.'
+            );
+    }
+
+    public function createNoOrder(): View
+    {
+        $suppliers = User::query()
+            ->role('supplier')
+            ->orderBy('name')
+            ->get();
+
+        $products = Product::query()
+            ->where('status', 1)
+            ->with('translation')
+            ->orderBy('id', 'desc')
+            ->get();
+
+        return view(
+            'admin.purchase-requests.create-no-order',
+            compact(
+                'suppliers',
+                'products'
+            )
+        );
+    }
+
+    public function storeNoOrder(
+        Request $request
+    ): RedirectResponse {
+
+        $validated = $request->validate([
+
+            'supplier_id' => [
+                'required',
+                'integer',
+                'exists:users,id',
+            ],
+
+            'component_product_id' => [
+                'required',
+                'integer',
+                'exists:products,id',
+            ],
+
+            'quantity' => [
+                'required',
+                'numeric',
+                'gt:0',
+            ],
+
+            'unit' => [
+                'nullable',
+                'string',
+                'max:50',
+            ],
+
+            'deadline' => [
+                'required',
+                'date',
+            ],
+
+            'note' => [
+                'nullable',
+                'string',
+                'max:5000',
+            ],
+        ]);
+
+        /*
+         * اطمینان از اینکه کاربر انتخاب‌شده واقعاً Supplier است.
+         */
+        $supplier = User::query()
+            ->role('supplier')
+            ->findOrFail(
+                $validated['supplier_id']
+            );
+
+        /*
+         * محصول.
+         */
+        $product = Product::query()
+            ->findOrFail(
+                $validated['component_product_id']
+            );
+
+        $deadline = $validated['deadline'] ? Jalalian::fromFormat(
+            'Y/m/d',
+            $validated['deadline']
+        )->toCarbon()->format('Y-m-d') : null;
+
+        /*
+         * ایجاد PurchaseRequest مستقیم.
+         *
+         * production_requirement_id عمداً NULL است.
+         */
+        $purchaseRequest = PurchaseRequest::create([
+
+            'production_requirement_id' => null,
+
+            'component_product_id' =>
+                $product->id,
+
+            'supplier_id' =>
+                $supplier->id,
+
+            'quantity' =>
+                $validated['quantity'],
+
+            'unit' =>
+                $validated['unit'] ?? null,
+
+            'status' =>
+                'sent',
+
+            'requested_at' =>
+                now(),
+
+            'deadline' =>
+                $deadline,
+
+            'note' =>
+                $validated['note'] ?? null,
+        ]);
+
+        return redirect()
+            ->route(
+                'admin.purchase-requests.show',
+                $purchaseRequest
+            )
+            ->with(
+                'success',
+                'درخواست تأمین با موفقیت ایجاد و برای تأمین‌کننده ارسال شد.'
             );
     }
 
