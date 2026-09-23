@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\PurchaseOrder;
+use App\Services\Sms\NikSmsService;
 use Illuminate\Http\Request;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\View\View;
@@ -58,7 +59,8 @@ class PurchaseOrderController extends Controller
 
     public function ship(
         Request $request,
-        PurchaseOrder $purchaseOrder
+        PurchaseOrder $purchaseOrder,
+        NikSmsService $sms
     ): RedirectResponse {
         $this->ensureSupplierOwnsOrder($purchaseOrder);
 
@@ -117,6 +119,12 @@ class PurchaseOrderController extends Controller
             $validated['shipped_at']
         )->toCarbon()->format('Y-m-d');
 
+        /*
+        |--------------------------------------------------------------------------
+        | ثبت اطلاعات ارسال
+        |--------------------------------------------------------------------------
+        */
+
         $purchaseOrder->update([
             'shipped_at' => $shippedAt,
             'vehicle_type' => $validated['vehicle_type'] ?? null,
@@ -131,13 +139,24 @@ class PurchaseOrderController extends Controller
             'status' => 'sent',
         ]);
 
+        /*
+        |--------------------------------------------------------------------------
+        | اطلاع به واحد انبار
+        |--------------------------------------------------------------------------
+        */
+
+        $this->notifyWarehouseAboutShipment(
+            $purchaseOrder,
+            $sms
+        );
+
         return redirect()
             ->route(
                 'supplier.purchase-requests.index'
             )
             ->with(
                 'success',
-                'اطلاعات ارسال سفارش با موفقیت ثبت شد.'
+                'اطلاعات ارسال سفارش با موفقیت ثبت شد و واحد انبار مطلع گردید.'
             );
     }
 
@@ -149,6 +168,208 @@ class PurchaseOrderController extends Controller
             (int) auth()->id()
         ) {
             abort(403);
+        }
+    }
+
+    protected function notifyWarehouseAboutShipment(
+        PurchaseOrder $purchaseOrder,
+        NikSmsService $sms
+    ): void {
+        $purchaseOrder->load([
+            'supplier',
+            'quote.purchaseRequest.componentProduct',
+            'quote.purchaseRequest.productionRequirement.productionPlan.product',
+            'items.componentProduct',
+        ]);
+
+        /*
+        |--------------------------------------------------------------------------
+        | پیدا کردن کاربران واحد انبار
+        |--------------------------------------------------------------------------
+        */
+
+        $warehouseUsers = User::query()
+            ->whereHas('departments', function ($query) {
+                $query->where('code', 'warehouse')
+                    ->where('is_active', true);
+            })
+            ->get();
+
+        if ($warehouseUsers->isEmpty()) {
+            return;
+        }
+
+        /*
+        |--------------------------------------------------------------------------
+        | اطلاعات سفارش
+        |--------------------------------------------------------------------------
+        */
+
+        $supplierName = $purchaseOrder->supplier?->name
+            ?? 'تأمین‌کننده';
+
+        $orderNumber = $purchaseOrder->order_number;
+
+        $shippedAt = $purchaseOrder->shipped_at
+            ? Jalalian::fromCarbon(
+                $purchaseOrder->shipped_at
+            )->format('Y/m/d')
+            : '-';
+
+        $driverName = $purchaseOrder->driver_name
+            ?: '-';
+
+        $driverMobile = $purchaseOrder->driver_mobile
+            ?: '-';
+
+        $vehicleType = $purchaseOrder->vehicle_type
+            ?: '-';
+
+        $vehiclePlate = $purchaseOrder->vehicle_plate
+            ?: '-';
+
+        $shippingNote = $purchaseOrder->shipping_note
+            ?: '-';
+
+        /*
+        |--------------------------------------------------------------------------
+        | لیست اقلام سفارش
+        |--------------------------------------------------------------------------
+        */
+
+        $itemsHtml = '';
+
+        foreach ($purchaseOrder->items as $item) {
+
+            $productName = $item->componentProduct?->title
+                ?? 'قطعه';
+
+            $itemsHtml .= "
+            <li>
+                <strong>{$productName}</strong>
+                - تعداد: {$item->quantity}
+                {$item->unit}
+            </li>
+        ";
+        }
+
+        /*
+        |--------------------------------------------------------------------------
+        | متن نامه
+        |--------------------------------------------------------------------------
+        */
+
+        $subject =
+            "اطلاعیه ارسال بار - سفارش {$orderNumber}";
+
+        $body = "
+        <p>
+            واحد محترم انبار
+        </p>
+
+        <p>
+            سفارش خرید زیر توسط تأمین‌کننده ارسال شده است.
+            لطفاً هماهنگی‌های لازم برای دریافت بار را انجام دهید.
+        </p>
+
+        <p>
+            <strong>شماره سفارش:</strong>
+            {$orderNumber}
+        </p>
+
+        <p>
+            <strong>تأمین‌کننده:</strong>
+            {$supplierName}
+        </p>
+
+        <p>
+            <strong>تاریخ ارسال:</strong>
+            {$shippedAt}
+        </p>
+
+        <p>
+            <strong>راننده:</strong>
+            {$driverName}
+        </p>
+
+        <p>
+            <strong>شماره تماس راننده:</strong>
+            {$driverMobile}
+        </p>
+
+        <p>
+            <strong>نوع خودرو:</strong>
+            {$vehicleType}
+        </p>
+
+        <p>
+            <strong>پلاک خودرو:</strong>
+            {$vehiclePlate}
+        </p>
+
+        <p>
+            <strong>اقلام سفارش:</strong>
+        </p>
+
+        <ul>
+            {$itemsHtml}
+        </ul>
+
+        <p>
+            <strong>توضیحات ارسال:</strong>
+            {$shippingNote}
+        </p>
+
+        <p>
+            لطفاً پس از دریافت بار، فرآیند ثبت رسید انبار را انجام دهید.
+        </p>
+    ";
+
+        /*
+        |--------------------------------------------------------------------------
+        | ایجاد نامه
+        |--------------------------------------------------------------------------
+        */
+
+        $letter = Letter::create([
+            'sender_id' => auth()->id(),
+            'subject' => $subject,
+            'body' => $body,
+            'priority' => 'high',
+            'status' => 'sent',
+
+            // اگر department_id در جدول letters دارید:
+            // 'department_id' => $warehouseUsers->first()->departments
+            //     ->where('code', 'warehouse')
+            //     ->first()?->id,
+        ]);
+
+        /*
+        |--------------------------------------------------------------------------
+        | ارسال نامه به اعضای واحد انبار + SMS
+        |--------------------------------------------------------------------------
+        */
+
+        foreach ($warehouseUsers as $warehouseUser) {
+
+            $letter->receivers()->attach($warehouseUser->id, [
+                'status' => 'new',
+            ]);
+
+            if (!empty($warehouseUser->mobile)) {
+
+                $message =
+                    "بار سفارش {$orderNumber} توسط "
+                    . "{$supplierName} ارسال شد. "
+                    . "تاریخ ارسال: {$shippedAt}. "
+                    . "راننده: {$driverName}. "
+                    . "لطفاً برای دریافت بار هماهنگ کنید.";
+
+                $sms->send(
+                    $warehouseUser->mobile,
+                    $message
+                );
+            }
         }
     }
 }

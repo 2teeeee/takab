@@ -7,6 +7,7 @@ use App\Models\Letter;
 use App\Models\PurchaseOrder;
 use App\Models\PurchaseQuote;
 use App\Models\PurchaseRequest;
+use App\Models\User;
 use App\Services\Sms\NikSmsService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\Auth;
@@ -18,10 +19,12 @@ class PurchaseQuoteController extends Controller
         PurchaseQuote $purchaseQuote,
         NikSmsService $sms
     ): RedirectResponse {
-        DB::transaction(function () use ($purchaseQuote) {
+
+        $purchaseOrder = DB::transaction(function () use ($purchaseQuote) {
 
             $purchaseQuote->load([
                 'purchaseRequest.productionRequirement',
+                'purchaseRequest.componentProduct',
                 'purchaseRequest.supplier',
             ]);
 
@@ -41,152 +44,323 @@ class PurchaseQuoteController extends Controller
                 );
             }
 
-            $requirement =
-                $request->productionRequirement;
+            /*
+             * فقط برای درخواست‌های تولید
+             */
+            if ($request->productionRequirement) {
 
-            if ($requirement->purchase_quantity <= 0) {
-                abort(
-                    422,
-                    'برای این قطعه نیازی به خرید وجود ندارد.'
-                );
+                if (
+                    (float) $request
+                        ->productionRequirement
+                        ->purchase_quantity <= 0
+                ) {
+                    abort(
+                        422,
+                        'برای این قطعه نیازی به خرید وجود ندارد.'
+                    );
+                }
             }
 
+            /*
+             * تأیید پیشنهاد
+             */
             $purchaseQuote->update([
                 'status' => 'approved',
             ]);
 
-            // رد کردن سایر پیشنهادها
+            /*
+             * رد سایر پیشنهادها
+             */
             PurchaseQuote::query()
-                ->where('purchase_request_id', $request->id)
+                ->where(
+                    'purchase_request_id',
+                    $request->id
+                )
                 ->whereKeyNot($purchaseQuote->id)
                 ->update([
                     'status' => 'rejected',
                 ]);
 
+            /*
+             * تأیید درخواست
+             */
             $request->update([
                 'status' => 'approved',
             ]);
 
-            $requirement->update([
-                'status' => 'approved',
-            ]);
+            /*
+             * اگر درخواست از تولید آمده باشد،
+             * وضعیت ProductionRequirement نیز تغییر کند.
+             */
+            if ($request->productionRequirement) {
 
-            PurchaseOrder::createFromQuote(
+                $request->productionRequirement->update([
+                    'status' => 'approved',
+                ]);
+            }
+
+            /*
+             * ایجاد سفارش خرید
+             */
+            return PurchaseOrder::createFromQuote(
                 $purchaseQuote
             );
         });
 
+
+        /*
+         * اطلاع به تأمین‌کننده
+         */
         $this->createSupplierPurchaseQuoteApproveLetter(
             $purchaseQuote,
             $sms
         );
+
+
+        /*
+         * اطلاع به واحد مالی
+         */
+        $this->createFinancePurchaseRequestLetter(
+            $purchaseQuote,
+            $purchaseOrder,
+            $sms
+        );
+
 
         return back()->with(
             'success',
             'پیشنهاد تأمین‌کننده تأیید و سفارش خرید ایجاد شد.'
         );
     }
+
     protected function createSupplierPurchaseQuoteApproveLetter(
         PurchaseQuote $purchaseQuote,
         NikSmsService $sms
     ): void {
-        $purchaseQuote->loadMissing([
-            'supplier',
-            'purchaseRequest',
-            'purchaseRequest.productionRequirement.componentProduct',
+        $purchaseQuote->load([
+            'purchaseRequest.componentProduct',
             'purchaseRequest.productionRequirement.productionPlan.product',
+            'supplier',
         ]);
 
+        $request = $purchaseQuote->purchaseRequest;
         $supplier = $purchaseQuote->supplier;
 
-        if (!$supplier) {
+        $componentName = $request->componentProduct?->title
+            ?? 'قطعه';
+
+        $requirement = $request->productionRequirement;
+
+        $deviceName = $requirement?->productionPlan?->product?->title
+            ?? 'درخواست خرید مستقیم';
+
+        $quantity = $purchaseQuote->quantity;
+
+        $unitPrice = $purchaseQuote->unit_price;
+
+        $subject = "تایید اعلام قیمت قطعه - {$componentName}";
+
+        $body = "
+        <p>
+            {$supplier->name} گرامی
+        </p>
+
+        <p>
+            اعلام قیمت شما برای قطعه
+            <strong>{$componentName}</strong>
+            تأیید شد.
+        </p>
+
+        <p>
+            <strong>محصول:</strong>
+            {$deviceName}
+        </p>
+
+        <p>
+            <strong>تعداد:</strong>
+            {$quantity}
+        </p>
+
+        <p>
+            <strong>قیمت واحد:</strong>
+            " . number_format($unitPrice) . "
+        </p>
+
+        <p>
+            سفارش خرید ایجاد شده است.
+            لطفاً برای ثبت اطلاعات ارسال سفارش اقدام کنید.
+        </p>
+    ";
+
+        $letter = Letter::create([
+            'sender_id' => auth()->id(),
+            'subject' => $subject,
+            'body' => $body,
+            'priority' => 'normal',
+            'status' => 'sent',
+        ]);
+
+        // ارسال به تأمین‌کننده
+        $letter->receivers()->attach($supplier->id, [
+            'status' => 'new',
+        ]);
+
+        // SMS
+        if (!empty($supplier->mobile)) {
+            $message =
+                "اعلام قیمت شما برای {$componentName} تأیید شد. "
+                . "تعداد: {$quantity}. "
+                . "لطفاً اطلاعات ارسال سفارش را ثبت کنید.";
+
+            $sms->send(
+                $supplier->mobile,
+                $message
+            );
+        }
+    }
+
+    protected function createFinancePurchaseRequestLetter(
+        PurchaseQuote $purchaseQuote,
+        PurchaseOrder $purchaseOrder,
+        NikSmsService $sms
+    ): void {
+        $purchaseQuote->load([
+            'purchaseRequest.componentProduct',
+            'purchaseRequest.productionRequirement.productionPlan.product',
+            'supplier',
+        ]);
+
+        $request = $purchaseQuote->purchaseRequest;
+
+        $componentName = $request->componentProduct?->title
+            ?? 'قطعه';
+
+        $requirement = $request->productionRequirement;
+
+        $deviceName = $requirement?->productionPlan?->product?->title
+            ?? 'درخواست خرید مستقیم';
+
+        $supplierName = $purchaseQuote->supplier?->name
+            ?? 'تأمین‌کننده';
+
+        $quantity = $purchaseQuote->quantity;
+
+        $unitPrice = $purchaseQuote->unit_price;
+
+        $totalAmount = $purchaseOrder->total_amount;
+
+        /*
+        |--------------------------------------------------------------------------
+        | کاربران واحد مالی
+        |--------------------------------------------------------------------------
+        */
+
+        $financeUsers = User::query()
+            ->whereHas('departments', function ($query) {
+                $query->where('code', 'finance')
+                    ->where('is_active', true);
+            })
+            ->get();
+
+        if ($financeUsers->isEmpty()) {
             return;
         }
 
-        $requirement = $purchaseQuote->purchaseRequest->productionRequirement;
+        /*
+        |--------------------------------------------------------------------------
+        | ایجاد نامه
+        |--------------------------------------------------------------------------
+        */
 
-        $supplierName = $supplier->name ?? 'تأمین‌کننده';
+        $subject =
+            "پیگیری مالی سفارش خرید {$purchaseOrder->order_number}";
 
-        $productName =
-            $requirement
-                ->productionPlan
-                ->product
-                ?->translation
-                ?->title ?? '—';
-
-        $componentName =
-            $requirement
-                ->componentProduct
-                ?->translation
-                ?->title ?? '—';
-
-        $quantity = rtrim(
-            rtrim(
-                number_format(
-                    (float) $purchaseQuote->available_quantity,
-                    4,
-                    '.',
-                    ','
-                ),
-                '0'
-            ),
-            '.'
-        );
-
-        $actor = Auth::user();
-
-        $message = <<<TEXT
-تأمین‌کننده محترم {$supplierName}
-
-برای تأمین قطعه مورد نیاز برنامه تولید، قیمت شما مورد تایید قرار گرفته است.
-
-
-قطعه / ماده:
-{$componentName}
-
-مقدار مورد نیاز:
-{$quantity} {$purchaseQuote->purchaseRequest->unit}
-
-لطفا نسبت با تامین طبق زمان مشخص شده اقدام نمایید.
-
-با تشکر
-واحد تأمین
-TEXT;
+        $body = "
+            <p>
+                یک سفارش خرید جدید برای بررسی مالی ایجاد شده است.
+            </p>
+    
+            <p>
+                <strong>شماره سفارش:</strong>
+                {$purchaseOrder->order_number}
+            </p>
+    
+            <p>
+                <strong>تأمین‌کننده:</strong>
+                {$supplierName}
+            </p>
+    
+            <p>
+                <strong>قطعه:</strong>
+                {$componentName}
+            </p>
+    
+            <p>
+                <strong>مربوط به:</strong>
+                {$deviceName}
+            </p>
+    
+            <p>
+                <strong>تعداد:</strong>
+                {$quantity}
+            </p>
+    
+            <p>
+                <strong>قیمت واحد:</strong>
+                " . number_format($unitPrice) . "
+            </p>
+    
+            <p>
+                <strong>مبلغ کل سفارش:</strong>
+                " . number_format($totalAmount) . "
+            </p>
+    
+            <p>
+                لطفاً سفارش را از نظر مالی بررسی و اقدامات لازم را انجام دهید.
+            </p>
+        ";
 
         $letter = Letter::create([
-            'sender_id' => $actor->id,
-
-            'subject' =>
-                "تایید اعلام قیمت قطعه - {$componentName}",
-
-            'body' => $message,
-
-            'priority' => 'medium',
+            'sender_id' => auth()->id(),
+            'subject' => $subject,
+            'body' => $body,
+            'priority' => 'high',
+            'status' => 'sent',
         ]);
 
-        $letter->receiverItems()->create([
-            'user_id' => $supplier->id,
-            'status' => 'new',
-            'last_received_at' => now(),
-        ]);
+        /*
+        |--------------------------------------------------------------------------
+        | گیرندگان نامه
+        |--------------------------------------------------------------------------
+        */
 
-        $smsMessage = <<<TEXT
-قیمت شما مورد تایید قرار گرفته است.
+        foreach ($financeUsers as $financeUser) {
 
-موضوع:
-{$letter->subject}
+            $letter->receivers()->attach($financeUser->id, [
+                'status' => 'new',
+            ]);
 
-لطفاً نسبت با تامین قطعه مورد نظر اقدام و پس از تامین در پنل نسبت به اطلاع رسانی آن اقدام نمایید.
+            /*
+            |--------------------------------------------------------------------------
+            | SMS
+            |--------------------------------------------------------------------------
+            */
 
-{$letter->url}
-TEXT;
+            if (!empty($financeUser->mobile)) {
 
-        $sms->sendSingle(
-            $supplier->mobile,
-            $smsMessage
-        );
+                $message =
+                    "سفارش خرید {$purchaseOrder->order_number} "
+                    . "برای بررسی مالی ایجاد شد. "
+                    . "مبلغ: "
+                    . number_format($totalAmount)
+                    . " تومان";
 
+                $sms->send(
+                    $financeUser->mobile,
+                    $message
+                );
+            }
+        }
     }
-
 
 }
