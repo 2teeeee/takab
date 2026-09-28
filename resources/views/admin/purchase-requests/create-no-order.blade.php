@@ -42,7 +42,7 @@
 
             <form method="POST"
                   action="{{ route(
-                      'admin.purchase-requests.store'
+                      'admin.purchase-requests.store-noorder'
                   ) }}">
 
                 @csrf

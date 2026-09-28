@@ -339,7 +339,6 @@ class PurchaseRequestController extends Controller
             'Y/m/d',
             $validated['deadline']
         )->toCarbon()->format('Y-m-d') : null;
-
         /*
          * ایجاد PurchaseRequest مستقیم.
          *
@@ -372,11 +371,14 @@ class PurchaseRequestController extends Controller
 
             'note' =>
                 $validated['note'] ?? null,
+
+            'created_by' =>
+                auth()->id(),
         ]);
 
         return redirect()
             ->route(
-                'admin.purchase-requests.show',
+                'admin.purchase-requests.index',
                 $purchaseRequest
             )
             ->with(
