@@ -19,6 +19,7 @@ class StoreSaleController extends Controller
     {
         $authUser = Auth::user();
 
+        $storesQuery = User::query();
          // فقط فروشگاه‌ها
 
         if (!$authUser->hasRole(['admin', 'manager', 'personel'])) {

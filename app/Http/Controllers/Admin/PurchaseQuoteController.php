@@ -6,11 +6,9 @@ use App\Http\Controllers\Controller;
 use App\Models\Letter;
 use App\Models\PurchaseOrder;
 use App\Models\PurchaseQuote;
-use App\Models\PurchaseRequest;
 use App\Models\User;
 use App\Services\Sms\NikSmsService;
 use Illuminate\Http\RedirectResponse;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 
 class PurchaseQuoteController extends Controller
@@ -196,7 +194,7 @@ class PurchaseQuoteController extends Controller
             'sender_id' => auth()->id(),
             'subject' => $subject,
             'body' => $body,
-            'priority' => 'normal',
+            'priority' => 'medium',
             'status' => 'sent',
         ]);
 
@@ -212,7 +210,7 @@ class PurchaseQuoteController extends Controller
                 . "تعداد: {$quantity}. "
                 . "لطفاً اطلاعات ارسال سفارش را ثبت کنید.";
 
-            $sms->send(
+            $sms->sendSingle(
                 $supplier->mobile,
                 $message
             );
@@ -355,7 +353,7 @@ class PurchaseQuoteController extends Controller
                     . number_format($totalAmount)
                     . " تومان";
 
-                $sms->send(
+                $sms->sendSingle(
                     $financeUser->mobile,
                     $message
                 );

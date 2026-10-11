@@ -185,13 +185,6 @@ class LetterController extends Controller
         });
 
         $letters->select('letters.*')
-            ->orderByRaw("
-                CASE
-                    WHEN lr.created_at IS NULL THEN 1
-                    ELSE 0
-                END
-            ")
-            ->orderByDesc('lr.last_received_at')
             ->orderByDesc('letters.created_at');
 
 

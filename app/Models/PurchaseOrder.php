@@ -84,50 +84,114 @@ class PurchaseOrder extends Model
         PurchaseQuote $quote
     ): self {
         $request = $quote->purchaseRequest;
+
+        if (!$request) {
+            throw new \RuntimeException(
+                'درخواست خرید مربوط به اعلام قیمت پیدا نشد.'
+            );
+        }
+
         $requirement = $request->productionRequirement;
 
+        /*
+        |--------------------------------------------------------------------------
+        | تعیین محصول و مقدار سفارش
+        |--------------------------------------------------------------------------
+        */
+
+        if ($requirement) {
+            // درخواست وابسته به برنامه تولید
+            $componentProductId = $requirement->component_product_id;
+
+            $requiredQuantity = (float) $requirement->purchase_quantity;
+
+            $unit = $requirement->unit;
+            $productionPlanId = $requirement->production_plan_id;
+
+            $requirementId = $requirement->id;
+        } else {
+            // درخواست خرید مستقیم
+            $componentProductId = $request->component_product_id;
+
+            $requiredQuantity = (float) $request->quantity;
+
+            $unit = $request->unit;
+            $productionPlanId = null;
+
+            $requirementId = null;
+        }
+
+        if (!$componentProductId) {
+            throw new \RuntimeException(
+                'محصول درخواست خرید مشخص نشده است.'
+            );
+        }
+
+        if ($requiredQuantity <= 0) {
+            throw new \RuntimeException(
+                'مقدار موردنیاز برای سفارش باید بیشتر از صفر باشد.'
+            );
+        }
+
+        /*
+        |--------------------------------------------------------------------------
+        | کنترل مقدار قابل تأمین
+        |--------------------------------------------------------------------------
+        */
+
+        $availableQuantity = (float) $quote->available_quantity;
+
+        if ($availableQuantity <= 0) {
+            throw new \RuntimeException(
+                'مقدار قابل تأمین اعلام‌شده توسط تأمین‌کننده معتبر نیست.'
+            );
+        }
+
         $quantity = min(
-            (float) $quote->available_quantity,
-            (float) $requirement->quantity
+            $availableQuantity,
+            $requiredQuantity
         );
 
         $unitPrice = (int) $quote->unit_price;
+
+        /*
+        |--------------------------------------------------------------------------
+        | ایجاد سفارش خرید
+        |--------------------------------------------------------------------------
+        */
 
         $order = self::create([
             'order_number' => self::generateOrderNumber(),
             'purchase_quote_id' => $quote->id,
             'supplier_id' => $quote->supplier_id,
-            'production_plan_id' =>
-                $requirement->production_plan_id,
+            'production_plan_id' => $productionPlanId,
             'status' => 'pending',
             'order_date' => now()->toDateString(),
-            'expected_delivery_date' =>
-                now()
-                    ->addDays($quote->delivery_days ?? 0)
-                    ->toDateString(),
-            'total_amount' =>
-                (int) round($quantity * $unitPrice),
+            'expected_delivery_date' => now()
+                ->addDays($quote->delivery_days ?? 0)
+                ->toDateString(),
+            'total_amount' => (int) round(
+                $quantity * $unitPrice
+            ),
             'created_by' => auth()->id(),
         ]);
 
+        /*
+        |--------------------------------------------------------------------------
+        | ثبت قلم سفارش
+        |--------------------------------------------------------------------------
+        */
+
         $order->items()->create([
-            'production_requirement_id' =>
-                $requirement->id,
-
-            'component_product_id' =>
-                $requirement->component_product_id,
-
+            'production_requirement_id' => $requirementId,
+            'component_product_id' => $componentProductId,
             'quantity' => $quantity,
-
             'received_quantity' => 0,
-
             'unit_price' => $unitPrice,
-
-            'total_price' =>
-                (int) round($quantity * $unitPrice),
-
-            'unit' => $requirement->unit,
-
+            'total_price' => (int) round(
+                $quantity * $unitPrice
+            ),
+            'unit' => $unit,
             'note' => $quote->note,
         ]);
 
