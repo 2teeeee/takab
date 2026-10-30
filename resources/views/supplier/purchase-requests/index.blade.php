@@ -42,7 +42,11 @@
                                 </th>
 
                                 <th class="text-center">
-                                    وضعیت
+                                    وضعیت درخواست
+                                </th>
+
+                                <th class="text-center">
+                                    وضعیت سفارش
                                 </th>
 
                                 <th class="text-center">
@@ -140,6 +144,48 @@
 
                                     </td>
 
+                                    <td>
+                                        @php
+
+                                            $approvedQuote = $purchaseRequest->quotes
+                                                ->firstWhere('status', 'approved');
+
+                                            $purchaseOrder = $approvedQuote?->purchaseOrder;
+
+                                            $statusLabels = [
+                                                'pending' => 'در انتظار ارسال',
+                                                'confirmed' => 'تأیید شده',
+                                                'sent' => 'ارسال شده',
+                                                'partially_received' => 'دریافت ناقص',
+                                                'received' => 'دریافت کامل',
+                                                'cancelled' => 'لغو شده',
+                                            ];
+
+                                            $statusClasses = [
+                                                'pending' => 'bg-secondary',
+                                                'confirmed' => 'bg-primary',
+                                                'sent' => 'bg-info',
+                                                'partially_received' => 'bg-warning text-dark',
+                                                'received' => 'bg-success',
+                                                'cancelled' => 'bg-danger',
+                                            ];
+
+                                            $orderStatusLabel =
+                                                $statusLabels[$purchaseOrder?->status]
+                                                ?? $purchaseOrder?->status;
+
+                                            $orderStatusClass =
+                                                $statusClasses[$purchaseOrder?->status]
+                                                ?? 'bg-secondary';
+                                        @endphp
+
+
+                                        <span class="badge {{ $orderStatusClass }}">
+                                            {{ $orderStatusLabel }}
+                                        </span>
+
+                                    </td>
+
                                     <td class="text-center">
 
                                         <a href="{{ route(
@@ -154,15 +200,7 @@
 
                                         </a>
 
-                                        @php
-                                            $approvedQuote = $purchaseRequest->quotes
-                                                ->firstWhere('status', 'approved');
-
-                                            $purchaseOrder = $approvedQuote?->purchaseOrder;
-                                        @endphp
-
-
-                                        @if($purchaseOrder)
+                                        @if($purchaseOrder && $purchaseOrder->status == 'pending')
 
                                             <a href="{{ route(
                                                 'admin.purchase-orders.ship',

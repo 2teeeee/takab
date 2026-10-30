@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\PurchaseOrder;
+use App\Models\User;
 use App\Services\Sms\NikSmsService;
 use Illuminate\Http\Request;
 use Illuminate\Http\RedirectResponse;
@@ -30,6 +31,7 @@ class PurchaseOrderController extends Controller
             compact('purchaseOrder')
         );
     }
+
     public function shipForm(
         PurchaseOrder $purchaseOrder
     ): View {
