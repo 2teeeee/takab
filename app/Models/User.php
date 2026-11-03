@@ -244,7 +244,7 @@ class User extends Authenticatable
             $prefix = 'P';
         } elseif ($this->hasRole('wholesaler')) {
             $prefix = 'W';
-        } elseif ($this->hasRole('seller')) {
+        } elseif ($this->hasRole('seller') || $this->hasRole('superseller')) {
             $prefix = 'S';
         } elseif ($this->hasRole('marketer')) {
             $prefix = 'K';

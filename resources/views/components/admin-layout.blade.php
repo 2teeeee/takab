@@ -327,7 +327,8 @@
             'personel',
             'wholesaler',
             'seller',
-            'marketer'
+            'marketer',
+            'superseller'
         ]))
 
             <a
@@ -425,7 +426,8 @@
             'seller',
             'marketer',
             'installer',
-            'supplier'
+            'supplier',
+            'superseller'
         ]))
 
             <a
@@ -446,8 +448,15 @@
         @if($user->hasRole([
             'admin',
             'manager',
-            'personel'
+            'personel',
+            'superseller'
         ]))
+
+            <a href="{{ route('admin.direct-sales.create') }}"
+               class="nav-link">
+                <i class="bi bi-cart-check"></i>
+                فروش مستقیم
+            </a>
 
             <a
                     href="{{ route('admin.orders.index') }}"

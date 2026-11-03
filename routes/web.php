@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Admin\AdminDirectSaleController;
 use App\Http\Controllers\Admin\DepartmentController;
 use App\Http\Controllers\Admin\ProductBomController;
 use App\Http\Controllers\Admin\ProductionPlanController;
@@ -371,7 +372,7 @@ Route::middleware('auth')
     ->group(function () {
 
         Route::middleware([
-            'role:admin,manager,installer,wholesaler,marketer,seller,personel,supplier'
+            'role:admin,manager,installer,wholesaler,marketer,seller,personel,supplier,superseller'
         ])->group(function () {
 
 
@@ -833,6 +834,23 @@ Route::middleware('auth')
                 });
 
         });
+
+        Route::middleware(['role:admin,manager,personel,superseller'])
+            ->prefix('direct-sales')
+            ->name('direct-sales.')
+            ->group(function () {
+
+                Route::get('/create', [
+                    AdminDirectSaleController::class,
+                    'create'
+                ])->name('create');
+
+                Route::post('/', [
+                    AdminDirectSaleController::class,
+                    'store'
+                ])->name('store');
+
+            });
 
     });
 
