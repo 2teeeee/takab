@@ -376,11 +376,11 @@ class UserController extends Controller
 
         $rolesQuery = Role::query();
         if ($user->hasRole('admin'))
-            $rolesQuery->whereIn('name', ['admin', 'manager', 'personel', 'wholesaler', 'superseller', 'marketer', 'seller', 'installer', 'user', 'supplier']);
+            $rolesQuery->whereIn('name', ['admin', 'manager', 'personel', 'wholesaler', 'superseller', 'marketer', 'seller', 'installer', 'user', 'supplier', 'superseller']);
         elseif ($user->hasRole('manager'))
-            $rolesQuery->whereIn('name', ['personel', 'wholesaler', 'marketer', 'seller', 'superseller', 'installer', 'user', 'supplier']);
+            $rolesQuery->whereIn('name', ['personel', 'wholesaler', 'marketer', 'seller', 'superseller', 'installer', 'user', 'supplier', 'superseller']);
         elseif ($user->hasRole('personel'))
-            $rolesQuery->whereIn('name', ['wholesaler', 'marketer', 'seller', 'installer','superseller', 'user', 'supplier']);
+            $rolesQuery->whereIn('name', ['wholesaler', 'marketer', 'seller', 'installer','superseller', 'user', 'supplier', 'superseller']);
         elseif ($user->hasRole('wholesaler'))
             $rolesQuery->whereIn('name', ['marketer', 'seller']);
         elseif ($user->hasRole('marketer'))
