@@ -770,7 +770,7 @@ TEXT;
                 }
 
                 // wholesaler
-                if ($user->hasRole('wholesaler')) {
+                if ($user->hasAnyRole(['wholesaler', 'superseller'])) {
 
                     $query->where(function ($q) use ($user) {
 

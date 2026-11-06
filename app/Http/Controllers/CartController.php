@@ -4,7 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Order;
 use App\Models\Product;
-use App\Models\ProductUser;
+use App\Models\ShopSetting;
 use App\Models\User;
 use App\Services\CartService;
 use Illuminate\Contracts\View\View;
@@ -173,7 +173,11 @@ class CartController extends Controller
                     ->withInput();
             }
 
-            $discount = 1_000_000;
+            $quantity = (int) $cart->items->sum('quantity');
+
+            $discountPerProduct = ShopSetting::getValue('customer_discount');
+
+            $discount = $quantity * $discountPerProduct;
         }
 
         /*
@@ -290,7 +294,10 @@ class CartController extends Controller
         return response()->json([
             'success' => true,
             'message' => __('order.referral_code_applied'),
-            'discount' => 1_000_000,
+            'discount' => (
+                (int) ShopSetting::getValue('customer_discount')
+                * (int) $this->cartService->getCart()->items()->sum('quantity')
+            ),
             'referrer_name' => $referrer->name,
         ]);
     }

@@ -7,8 +7,10 @@ use App\Models\Order;
 use App\Models\Product;
 use App\Models\ProductUser;
 use App\Models\User;
+use App\Models\ShopSetting;
 use Illuminate\Database\Query\JoinClause;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\ValidationException;
 use Illuminate\View\View;
@@ -22,6 +24,7 @@ class AdminDirectSaleController extends Controller
     public function create(): View
     {
         $locale = app()->getLocale();
+        $authUser = Auth::user();
 
         $companyUserId = config('shop.company_user_id');
 
@@ -32,6 +35,7 @@ class AdminDirectSaleController extends Controller
         // مشتریان
         $customers = User::query()
             ->select('id', 'name', 'mobile')
+            ->where('registered_by', $authUser->id)
             ->orderBy('name')
             ->get();
 
@@ -44,6 +48,8 @@ class AdminDirectSaleController extends Controller
             })
             ->where('product_user.user_id', $companyUserId)
             ->where('product_user.quantity', '>', 0)
+            ->where('products.status', '=', 1)
+            ->where('products.is_main_sale', 1)
             ->select([
                 'products.id',
                 't.title',
@@ -147,8 +153,6 @@ class AdminDirectSaleController extends Controller
                         ]);
                     }
 
-                    // مطابق منطق فعلی CartController
-                    $discount = 1_000_000;
                 }
 
                 /*
@@ -231,6 +235,14 @@ class AdminDirectSaleController extends Controller
                     $inventory->quantity -= $quantity;
                     $inventory->save();
                 }
+
+                $quantity = collect($orderItems)->sum('quantity');
+
+                $discountPerProduct = ShopSetting::getValue('customer_discount');
+
+                $discount = $referrer
+                    ? $quantity * $discountPerProduct
+                    : 0;
 
                 /*
                  * 5. محاسبه مبلغ نهایی

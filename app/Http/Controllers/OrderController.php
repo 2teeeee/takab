@@ -43,7 +43,7 @@ class OrderController extends Controller
             $query->where('status', $request->status);
         }
 
-        if (Auth::user()->hasRole('seller')) {
+        if (Auth::user()->hasAnyRole(['wholesaler', 'superseller'])) {
             $query->where('seller_id', Auth::id());
         }
 

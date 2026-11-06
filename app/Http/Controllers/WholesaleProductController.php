@@ -19,6 +19,7 @@ class WholesaleProductController extends Controller
         $products = Product::query()
             ->where('products.category_id', 1)
             ->where('products.status', 1)
+            ->where('products.is_main_sale', 1)
             ->join('product_translations as t', function (JoinClause $join) use ($locale) {
                 $join->on('t.product_id', '=', 'products.id')
                     ->where('t.locale', $locale);

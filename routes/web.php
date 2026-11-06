@@ -8,6 +8,7 @@ use App\Http\Controllers\Admin\PurchaseOrderController;
 use App\Http\Controllers\Admin\PurchaseQuoteController;
 use App\Http\Controllers\Admin\PurchaseReceiptController;
 use App\Http\Controllers\Admin\PurchaseRequestController;
+use App\Http\Controllers\Admin\ShopSettingController;
 use App\Http\Controllers\AssemblyController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\CartController;
@@ -849,6 +850,17 @@ Route::middleware('auth')
                     AdminDirectSaleController::class,
                     'store'
                 ])->name('store');
+
+            });
+
+        Route::middleware(['role:admin,manager'])
+            ->group(function () {
+
+                Route::get('/settings/commissions', [ShopSettingController::class, 'index'])
+                    ->name('settings.commissions');
+
+                Route::put('/settings/commissions', [ShopSettingController::class, 'update'])
+                    ->name('settings.commissions.update');
 
             });
 

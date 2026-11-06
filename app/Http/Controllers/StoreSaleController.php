@@ -76,7 +76,7 @@ class StoreSaleController extends Controller
         $products = ProductUser::query()
             ->where('product_user.user_id', $wholesalerId)
             ->where('product_user.quantity', '>', 0)
-
+            ->where('products.is_main_sale', 1)
             ->join(
                 'products',
                 'products.id',

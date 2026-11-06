@@ -36,6 +36,7 @@ class CustomerSaleController extends Controller
         $products = ProductUser::query()
             ->where('product_user.user_id',auth()->id())
             ->where('product_user.quantity','>',0)
+            ->where('products.is_main_sale', 1)
             ->join('products','products.id','=','product_user.product_id')
             ->join('product_translations as t',function($join) use($locale){
                 $join->on('t.product_id','=','products.id')

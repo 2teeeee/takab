@@ -4,7 +4,7 @@ namespace App\Services;
 
 use App\Models\Order;
 use App\Models\ReferralCommission;
-use App\Models\User;
+use App\Models\ShopSetting;
 use App\Services\Sms\NikSmsService;
 use Illuminate\Support\Facades\DB;
 
@@ -82,7 +82,10 @@ class CommissionService
             return;
         }
 
-        $amount = $this->calculateCommissionAmount($order);
+        $amount = $this->calculateCommissionAmount(
+            $order,
+            'wholesaler_commission'
+        );
 
         if ($amount <= 0) {
             return;
@@ -109,7 +112,10 @@ class CommissionService
             return;
         }
 
-        $amount = $this->calculateCommissionAmount($order);
+        $amount = $this->calculateCommissionAmount(
+            $order,
+            'store_commission'
+        );
 
         if ($amount <= 0) {
             return;
@@ -140,7 +146,10 @@ class CommissionService
             return;
         }
 
-        $amount = $this->calculateCommissionAmount($order);
+        $amount = $this->calculateCommissionAmount(
+            $order,
+            'referral_commission'
+        );
 
         if ($amount <= 0) {
             return;
@@ -225,11 +234,15 @@ class CommissionService
      *
      * Each product unit generates a 1,000,000 Toman commission.
      */
-    protected function calculateCommissionAmount(Order $order): int
-    {
-        $quantity = $order->items()->sum('quantity');
+    protected function calculateCommissionAmount(
+        Order $order,
+        string $settingKey
+    ): int {
+        $quantity = (int) $order->items()->sum('quantity');
 
-        return $quantity * 1_000_000;
+        $unitAmount = ShopSetting::getValue($settingKey);
+
+        return $quantity * $unitAmount;
     }
 
     /**

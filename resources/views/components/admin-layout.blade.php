@@ -366,6 +366,21 @@
         @endif
 
 
+
+
+        @if($user->hasRole([
+                    'admin',
+                    'manager'
+                ]))
+            <a
+                    href="{{ route('admin.settings.commissions') }}"
+                    class="{{ request()->routeIs('admin.settings.commissions.*') ? 'active' : '' }}"
+            >
+                <i class="bi bi-wallet"></i>
+                <span>مدیریت کمیسیون ها</span>
+            </a>
+        @endif
+
         {{-- =====================================================
              Website Management
         ====================================================== --}}
@@ -820,6 +835,19 @@
         </a>
         @endif
 
+
+        @if($user->hasRole([
+                    'admin',
+                    'manager'
+                ]))
+            <a
+                    href="{{ route('admin.settings.commissions') }}"
+                    class="mobile-menu-link {{ request()->routeIs('admin.settings.commissions.*') ? 'active' : '' }}"
+            >
+                <i class="bi bi-wallet"></i>
+                <span>مدیریت کمیسیون ها</span>
+            </a>
+        @endif
 
         {{-- Website --}}
 
